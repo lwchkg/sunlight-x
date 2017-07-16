@@ -1,0 +1,39 @@
+{
+  "name": "sunlight-x",
+  "version": "0.0.1",
+  "description": "Sunlight highlighter refactored for Node.js",
+  "main": "babel-out/index.js",
+  "author": "WC Leung",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-jsdoc-to-assert": "^4.0.0",
+    "babel-preset-power-assert": "^1.0.0",
+    "babel-register": "^6.24.1",
+    "cross-env": "^5.0.1",
+    "eslint": "^4.2.0",
+    "eslint-plugin-prettier": "^2.1.2",
+    "less": "^2.7.2",
+    "mocha": "^3.4.2",
+    "power-assert": "^1.4.4",
+    "prettier": "^1.5.3"
+  },
+  "dependencies": {
+    "jsdom": "^9.12.0"
+  },
+  "scripts": {
+    "babel": "babel",
+    "compile": "yarn run compile-js && yarn run compile-css",
+    "compile-css": "lessc style/sunlight.less compiled-assets/sunlight.css",
+    "compile-debug": "yarn run compile-js-debug && yarn run compile-css",
+    "compile-js": "cross-env NODE_ENV=production babel -d babel-out/ src/",
+    "compile-js-debug": "babel -d babel-out/ src/",
+    "lessc": "lessc",
+    "lint": "eslint src/*.js test/*.js",
+    "mocha": "mocha",
+    "prepare": "yarn run compile",
+    "test": "yarn run lint && yarn run testOnly",
+    "testOnly": "yarn run compile-js-debug && yarn run mocha"
+  }
+}
