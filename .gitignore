@@ -1,3 +1,7 @@
+# Build output
+babel-out
+compiled-assets
+
 # Logs
 logs
 *.log
