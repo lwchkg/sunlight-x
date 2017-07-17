@@ -55,39 +55,33 @@ var escapeSequences = exports.escapeSequences = ['\\n', '\\t', '\\r', '\\\\', '\
 
 // array.contains()
 function contains(arr, value, caseInsensitive) {
-  var i = void 0;
   if (arr.indexOf && !caseInsensitive) return arr.indexOf(value) >= 0;
 
-  for (i = 0; i < arr.length; i++) {
-    if (arr[i] === value) return true;
-
-    if (caseInsensitive && typeof arr[i] === 'string' && typeof value === 'string' && arr[i].toUpperCase() === value.toUpperCase()) return true;
-  }
-
-  return false;
+  return arr.some(function (element) {
+    return element === value || caseInsensitive && typeof element === 'string' && typeof value === 'string' && element.toUpperCase() === value.toUpperCase();
+  });
 }
 
 function matchWord(context, wordMap, tokenName, doNotRead) {
-  var current = context.reader.current();
-  var i = void 0,
-      word = void 0,
-      peek = void 0;
   var line = context.reader.getLine();
   var column = context.reader.getColumn();
-
   wordMap = wordMap || [];
+
+  var current = context.reader.current();
   if (context.language.caseInsensitive) current = current.toUpperCase();
 
   if (!wordMap[current]) return null;
 
   wordMap = wordMap[current];
-  for (i = 0; i < wordMap.length; i++) {
-    word = wordMap[i].value;
 
-    peek = current + context.reader.peek(word.length);
-    if (word === peek || wordMap[i].regex.test(peek)) {
-      return context.createToken(tokenName, context.reader.current() + context.reader[doNotRead ? 'peek' : 'read'](word.length - 1), line, column);
-    }
+  var index = wordMap.findIndex(function (wordItem) {
+    var word = wordItem.value;
+    var peek = current + context.reader.peek(word.length);
+    return word === peek || wordItem.regex.test(peek);
+  });
+
+  if (index >= 0) {
+    return context.createToken(tokenName, context.reader.current() + context.reader[doNotRead ? 'peek' : 'read'](wordMap[index].value.length - 1), line, column);
   }
 
   return null;
@@ -190,24 +184,35 @@ function createProceduralRule(startIndex, direction, tokenRequirements, caseInse
   };
 }
 
+// gets the next token in the specified direction while matcher matches the current token
+function getNextWhileInternal(tokens, index, direction, matcher) {
+  var count = 1,
+      token = void 0;
+
+  direction = direction || 1;
+  while (token = tokens[index + direction * count++]) {
+    if (!matcher(token)) return token;
+  }return undefined;
+}
+
 function getNextWhile(tokens, index, matcher) {
-  return getNextWhile(tokens, index, 1, matcher);
+  return getNextWhileInternal(tokens, index, 1, matcher);
 }
 
 function getNextNonWsToken(tokens, index) {
-  return getNextWhile(tokens, index, 1, function (token) {
+  return getNextWhileInternal(tokens, index, 1, function (token) {
     return token.name === 'default';
   });
 }
 
 function getPreviousNonWsToken(tokens, index) {
-  return getNextWhile(tokens, index, -1, function (token) {
+  return getNextWhileInternal(tokens, index, -1, function (token) {
     return token.name === 'default';
   });
 }
 
 function getPreviousWhile(tokens, index, matcher) {
-  return getNextWhile(tokens, index, -1, matcher);
+  return getNextWhileInternal(tokens, index, -1, matcher);
 }
 
 var whitespace = exports.whitespace = { token: 'default', optional: true };

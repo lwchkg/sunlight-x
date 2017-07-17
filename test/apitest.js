@@ -19,7 +19,5 @@ describe('API tests', function() {
     const dummyElement = document.createElement('div');
     dummyElement.appendChild(preElement);
     highlighter.highlightNode(preElement);
-
-    console.log(dummyElement.innerHTML);
   });
 });

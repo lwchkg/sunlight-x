@@ -40,17 +40,14 @@ export const escapeSequences = ['\\n', '\\t', '\\r', '\\\\', '\\v', '\\f'];
 export function contains(arr, value, caseInsensitive) {
   if (arr.indexOf && !caseInsensitive) return arr.indexOf(value) >= 0;
 
-  return arr.some((element) => {
-    if (element === value)
-      return true;
-
-    if (caseInsensitive &&
-      typeof element === 'string' &&
-      typeof value === 'string' &&
-      element.toUpperCase() === value.toUpperCase()
-    )
-      return true;
-  });
+  return arr.some(
+    (element) =>
+      element === value ||
+      (caseInsensitive &&
+        typeof element === 'string' &&
+        typeof value === 'string' &&
+        element.toUpperCase() === value.toUpperCase())
+  );
 }
 
 export function matchWord(context, wordMap, tokenName, doNotRead) {
@@ -67,16 +64,19 @@ export function matchWord(context, wordMap, tokenName, doNotRead) {
 
   wordMap = wordMap[current];
 
-  const index = wordMap.findIndex((word) => {
+  const index = wordMap.findIndex((wordItem) => {
+    const word = wordItem.value;
     const peek = current + context.reader.peek(word.length);
-    return word === peek || word.regex.test(peek);
+    return word === peek || wordItem.regex.test(peek);
   });
 
   if (index >= 0) {
     return context.createToken(
       tokenName,
       context.reader.current() +
-        context.reader[doNotRead ? 'peek' : 'read'](wordMap[index].length - 1),
+        context.reader[doNotRead ? 'peek' : 'read'](
+          wordMap[index].value.length - 1
+        ),
       line,
       column
     );
@@ -115,8 +115,10 @@ export function createBetweenRule(startIndex, opener, closer, caseInsensitive) {
     // check to the left: if we run into a closer or never run into an opener, fail
     while ((token = tokens[--index]) !== undefined) {
       if (token.name === closer.token && contains(closer.values, token.value)) {
-        if (token.name === opener.token &&
-          contains(opener.values, token.value, caseInsensitive)) {
+        if (
+          token.name === opener.token &&
+          contains(opener.values, token.value, caseInsensitive)
+        ) {
           // if the closer is the same as the opener that's okay
           success = true;
           break;
@@ -226,11 +228,21 @@ export function getNextWhile(tokens, index, matcher) {
 }
 
 export function getNextNonWsToken(tokens, index) {
-  return getNextWhileInternal(tokens, index, 1, (token) => token.name === 'default');
+  return getNextWhileInternal(
+    tokens,
+    index,
+    1,
+    (token) => token.name === 'default'
+  );
 }
 
 export function getPreviousNonWsToken(tokens, index) {
-  return getNextWhileInternal(tokens, index, -1, (token) => token.name === 'default');
+  return getNextWhileInternal(
+    tokens,
+    index,
+    -1,
+    (token) => token.name === 'default'
+  );
 }
 
 export function getPreviousWhile(tokens, index, matcher) {

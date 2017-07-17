@@ -7,9 +7,9 @@ exports.operators = exports.namedIdentRules = exports.identAfterFirstLetter = ex
 
 var _util = require('../util.js');
 
-var _util2 = _interopRequireDefault(_util);
+var util = _interopRequireWildcard(_util);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 var name = exports.name = 'javascript';
 
@@ -43,7 +43,7 @@ var customTokens = exports.customTokens = {
 };
 
 var scopes = exports.scopes = {
-  string: [['"', '"', _util2.default.escapeSequences.concat(['\\"'])], ['\'', '\'', _util2.default.escapeSequences.concat(['\\\'', '\\\\'])]],
+  string: [['"', '"', util.escapeSequences.concat(['\\"'])], ['\'', '\'', util.escapeSequences.concat(['\\\'', '\\\\'])]],
   comment: [['//', '\n', null, true], ['/*', '*/']]
 };
 
@@ -78,9 +78,9 @@ function (context) {
     // since JavaScript doesn't require statement terminators, if the previous token was whitespace and contained a newline, then we're good
     if (previousToken.name === 'default' && previousToken.value.indexOf('\n') >= 0) return true;
 
-    if (_util2.default.contains(['keyword', 'ident', 'number'], previousNonWsToken.name)) return false;
+    if (util.contains(['keyword', 'ident', 'number'], previousNonWsToken.name)) return false;
 
-    if (previousNonWsToken.name === 'punctuation' && !_util2.default.contains(['(', '{', '[', ',', ';'], previousNonWsToken.value)) return false;
+    if (previousNonWsToken.name === 'punctuation' && !util.contains(['(', '{', '[', ',', ';'], previousNonWsToken.value)) return false;
 
     return true;
   }();
@@ -122,7 +122,7 @@ function (context) {
 var identFirstLetter = exports.identFirstLetter = /[$A-Za-z_]/;
 var identAfterFirstLetter = exports.identAfterFirstLetter = /[\w$]/;
 
-var namedIdentRules = exports.namedIdentRules = { follows: [[{ token: 'keyword', values: ['function'] }, _util2.default.whitespace]] };
+var namedIdentRules = exports.namedIdentRules = { follows: [[{ token: 'keyword', values: ['function'] }, util.whitespace]] };
 
 var operators = exports.operators = [
 // arithmetic
