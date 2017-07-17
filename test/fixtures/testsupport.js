@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 import {jsdom} from 'jsdom';
-import {Sunlight} from '../../src/sunlight.js';
+import {Highlighter} from '../../src/sunlight.js';
 
 const defaultOptions = {
   classPrefix: 'sunlight-',
@@ -37,20 +37,33 @@ export class TestSupport {
       this.options.classPrefix + 'highlight-' + language
     );
 
-    this.CodeElement = document.createElement('div');
-    this.CodeElement.appendChild(preElement);
+    this.codeElement = document.createElement('div');
+    this.codeElement.appendChild(preElement);
 
-    const highlighter = new Sunlight.Highlighter(this.options);
+    const highlighter = new Highlighter(this.options);
     highlighter.highlightNode(preElement);
   }
 
   /**
-   * Assert that the text |content| inside a tag with |className| exists.
+   * Return if an element with class |className| exists.
+   * @param {string} className
+   * @returns {boolean}
+   */
+  DoesElementsWithClassNameExist(className) {
+    return (
+      this.codeElement.querySelector(
+        '.' + this.options.classPrefix + className
+      ) !== null
+    );
+  }
+
+  /**
+   * Assert that the text |content| inside a tag with class |className| exists.
    * @param {string} className
    * @param {string} content
    */
   AssertContentExists(className, content) {
-    const elements = this.CodeElement.querySelectorAll(
+    const elements = this.codeElement.querySelectorAll(
       '.' + this.options.classPrefix + className
     );
 

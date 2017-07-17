@@ -252,7 +252,7 @@ export function getPreviousWhile(tokens, index, matcher) {
 export const whitespace = {token: 'default', optional: true};
 
 // adapted from http://blargh.tommymontgomery.com/2010/04/get-computed-style-in-javascript/
-export function getComputedStyle() {
+export function getComputedStyle(element, style) {
   let func = null;
   if (document.defaultView && document.defaultView.getComputedStyle) {
     func = document.defaultView.getComputedStyle;
@@ -262,7 +262,5 @@ export function getComputedStyle() {
     };
   }
 
-  return function(element, style) {
-    return func(element, null)[style];
-  };
+  return func(element, null)[style];
 }

@@ -1,13 +1,8 @@
 import * as util from './util.js';
-import {
-  isIe,
-  EOL,
-  EMPTY,
-  DEFAULT_LANGUAGE,
-  events,
-  globalOptions,
-} from './constants.js';
-import {languages} from './globals.js';
+import {isIe, EOL, EMPTY, DEFAULT_LANGUAGE, TEXT_NODE} from './constants.js';
+import {globalOptions} from './globalOptions.js';
+import {fireEvent} from './events.js';
+import {languages} from './languages.js';
 import {createCodeReader} from './code-reader.js';
 import {parseNextToken} from './parse-next-token.js';
 
@@ -21,14 +16,7 @@ function appendAll(parent, children) {
   for (i = 0; i < children.length; i++) parent.appendChild(children[i]);
 }
 
-function fireEvent(eventName, highlighter, eventContext) {
-  const delegates = events[eventName] || [];
-
-  for (let i = 0; i < delegates.length; i++)
-    delegates[i].call(highlighter, eventContext);
-}
-
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [0, 1, 3] }]*/
+/* eslint require-jsdoc: 0 */
 export class Highlighter {
   constructor(options) {
     this.options = util.merge(util.clone(globalOptions), options);
@@ -379,7 +367,7 @@ export class Highlighter {
     let currentNodeCount = 0;
     fireEvent('beforeHighlightNode', this, {node: node});
     for (let j = 0; j < node.childNodes.length; j++) {
-      if (node.childNodes[j].nodeType === 3) {
+      if (node.childNodes[j].nodeType === TEXT_NODE) {
         // text nodes
         partialContext = this.highlightText.call(
           this,

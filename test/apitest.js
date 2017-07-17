@@ -1,8 +1,8 @@
 // Do not pass sunlight-all-min.js to babel. It is broken after compilation.
 // import assert from 'power-assert';
 import {jsdom} from 'jsdom';
-import {Sunlight} from '../src/sunlight.js';
-const highlighter = new Sunlight.Highlighter();
+import {Highlighter} from '../src/sunlight.js';
+const highlighter = new Highlighter();
 
 describe('API tests', function() {
   it('highlights code', function() {
