@@ -34,6 +34,6 @@
     "mocha": "mocha",
     "prepare": "yarn run compile",
     "test": "yarn run lint && yarn run testOnly",
-    "testOnly": "yarn run compile-js-debug && yarn run mocha"
+    "testOnly": "yarn run mocha"
   }
 }
