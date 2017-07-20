@@ -6,8 +6,9 @@ import * as php from "./languages/php.js";
 import * as xml from "./languages/xml.js";
 import * as css from "./languages/css.js";
 import * as csharp from "./languages/csharp.js";
+import * as brainfuck from "./languages/brainfuck.js";
 
-const languages = [plaintext, javascript, php, xml, css, csharp];
+const languages = [plaintext, javascript, php, xml, css, csharp, brainfuck];
 
 /**
  * Register the languages into Sunlight-X highlighter.
