@@ -3,8 +3,8 @@
 // Use of this source code is governed by a Apache License Version 2.0, that can
 // be found in the LICENSE file.
 
-import {createHashMap} from './util.js';
-import {defaultAnalyzer, defaultNumberParser} from './default-helpers.js';
+import { createHashMap } from "./util.js";
+import { defaultAnalyzer, defaultNumberParser } from "./default-helpers.js";
 
 const languageDefaults = Object.freeze({
   analyzer: new defaultAnalyzer(),
@@ -15,7 +15,7 @@ const languageDefaults = Object.freeze({
   caseInsensitive: false,
   doNotParse: /\s/,
   contextItems: {},
-  embeddedLanguages: {},
+  embeddedLanguages: {}
 });
 
 export const languages = {};
@@ -28,11 +28,10 @@ export const languages = {};
 export function registerLanguage(languageId, languageData) {
   let tokenName, languageName;
 
-  if (!languageId) {
+  if (!languageId)
     throw new Error(
       'Languages must be registered with an identifier, e.g. "php" for PHP'
     );
-  }
 
   languageData = Object.assign({}, languageDefaults, languageData);
   languageData.name = languageId;
@@ -40,17 +39,17 @@ export function registerLanguage(languageId, languageData) {
   // Transform keywords, operators and custom tokens into a hash map.
   languageData.keywords = createHashMap(
     languageData.keywords || [],
-    '\\b',
+    "\\b",
     languageData.caseInsensitive
   );
 
   languageData.operators = createHashMap(
     languageData.operators || [],
-    '',
+    "",
     languageData.caseInsensitive
   );
 
-  for (tokenName in languageData.customTokens) {
+  for (tokenName in languageData.customTokens)
     languageData.customTokens[tokenName] = createHashMap(
       languageData.customTokens[tokenName].values
         ? languageData.customTokens[tokenName].values
@@ -58,18 +57,16 @@ export function registerLanguage(languageId, languageData) {
       languageData.customTokens[tokenName].boundary,
       languageData.caseInsensitive
     );
-  }
 
   // Convert the embedded language object to an easier-to-use array.
   const embeddedLanguages = [];
-  for (languageName in languageData.embeddedLanguages) {
+  for (languageName in languageData.embeddedLanguages)
     embeddedLanguages.push({
       parentLanguage: languageData.name,
       language: languageName,
       switchTo: languageData.embeddedLanguages[languageName].switchTo,
-      switchBack: languageData.embeddedLanguages[languageName].switchBack,
+      switchBack: languageData.embeddedLanguages[languageName].switchBack
     });
-  }
 
   languageData.embeddedLanguages = embeddedLanguages;
 
