@@ -11,7 +11,7 @@ const events = {
   beforeAnalyze: [],
   afterAnalyze: [],
   afterHighlight: [],
-  afterHighlightNode: [],
+  afterHighlightNode: []
 };
 
 /**
@@ -20,8 +20,7 @@ const events = {
  * @param {highlightCallback} callback
  */
 export function bind(event, callback) {
-  if (!events[event])
-    throw new Error('Unknown event "' + event + '"');
+  if (!events[event]) throw new Error('Unknown event "' + event + '"');
   events[event].push(callback);
 }
 

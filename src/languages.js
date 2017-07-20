@@ -1,4 +1,9 @@
-import {merge, createHashMap} from './util.js';
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
+import {createHashMap} from './util.js';
 import {defaultAnalyzer, defaultNumberParser} from './default-helpers.js';
 
 const languageDefaults = Object.freeze({
@@ -13,10 +18,13 @@ const languageDefaults = Object.freeze({
   embeddedLanguages: {},
 });
 
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [0, 1, 3] }]*/
-
 export const languages = {};
 
+/**
+ * Register a language to the highlighter.
+ * @param {string} languageId
+ * @param {Object} languageData
+ */
 export function registerLanguage(languageId, languageData) {
   let tokenName, languageName;
 
@@ -26,20 +34,22 @@ export function registerLanguage(languageId, languageData) {
     );
   }
 
-  languageData = merge(merge({}, languageDefaults), languageData);
+  languageData = Object.assign({}, languageDefaults, languageData);
   languageData.name = languageId;
 
-  // transform keywords, operators and custom tokens into a hash map
+  // Transform keywords, operators and custom tokens into a hash map.
   languageData.keywords = createHashMap(
     languageData.keywords || [],
     '\\b',
     languageData.caseInsensitive
   );
+
   languageData.operators = createHashMap(
     languageData.operators || [],
     '',
     languageData.caseInsensitive
   );
+
   for (tokenName in languageData.customTokens) {
     languageData.customTokens[tokenName] = createHashMap(
       languageData.customTokens[tokenName].values
@@ -50,7 +60,7 @@ export function registerLanguage(languageId, languageData) {
     );
   }
 
-  // convert the embedded language object to an easier-to-use array
+  // Convert the embedded language object to an easier-to-use array.
   const embeddedLanguages = [];
   for (languageName in languageData.embeddedLanguages) {
     embeddedLanguages.push({
@@ -66,6 +76,11 @@ export function registerLanguage(languageId, languageData) {
   languages[languageData.name] = languageData;
 }
 
+/**
+ * Query if an language is registered to the highlighter.
+ * @param {string} languageId
+ * @returns {boolean}
+ */
 export function isRegistered(languageId) {
   return languages[languageId] !== undefined;
 }

@@ -1,1 +1,1 @@
-import {} from './plugins/linenumbers.js';
+import {} from "./plugins/linenumbers.js";

@@ -10,13 +10,12 @@
  *  - lineHighlight: <array> (array of line numbers to highlight)
  */
 
-import {TEXT_NODE} from '../constants.js';
-import {bind} from '../events.js';
-import {globalOptions} from '../globalOptions.js';
-import * as util from '../util.js';
+import { TEXT_NODE } from "../constants.js";
+import { bind } from "../events.js";
+import { globalOptions } from "../globalOptions.js";
+import * as util from "../util.js";
 
-import {jsdom} from 'jsdom';
-const document = jsdom('', {});
+import { document } from "../jsdom.js";
 const eolElement = document.createTextNode(util.eol);
 
 /**
@@ -35,10 +34,10 @@ function getLineCount(node) {
     if (node.lastChild.nodeType === TEXT_NODE) return node.lastChild;
 
     return getLastNode(node.lastChild);
-  })(node) || {lastChild: ''};
+  })(node) || { lastChild: "" };
 
   return (
-    node.innerHTML.replace(/[^\n]/g, '').length -
+    node.innerHTML.replace(/[^\n]/g, "").length -
     /\n$/.test(lastTextNode.nodeValue)
   );
 }
@@ -54,22 +53,22 @@ function maybeAddLineNumbers(highlighter, context) {
   // Skip if it's not a block level element or the lineNumbers option is not set
   // to "automatic"
   if (
-    highlighter.options.lineNumbers === 'automatic' &&
-    util.getComputedStyle(context.node, 'display') !== 'block'
+    highlighter.options.lineNumbers === "automatic" &&
+    util.getComputedStyle(context.node, "display") !== "block"
   )
     return;
 
   let lineHighlightOverlay;
   const lineHighlightingEnabled = highlighter.options.lineHighlight.length > 0;
   if (lineHighlightingEnabled) {
-    lineHighlightOverlay = document.createElement('div');
+    lineHighlightOverlay = document.createElement("div");
     lineHighlightOverlay.className =
-      highlighter.options.classPrefix + 'line-highlight-overlay';
+      highlighter.options.classPrefix + "line-highlight-overlay";
   }
 
-  const lineContainer = document.createElement('pre');
+  const lineContainer = document.createElement("pre");
   lineContainer.className =
-    highlighter.options.classPrefix + 'line-number-margin';
+    highlighter.options.classPrefix + "line-number-margin";
 
   const lineCount = getLineCount(context.node);
   for (
@@ -77,27 +76,27 @@ function maybeAddLineNumbers(highlighter, context) {
     i <= highlighter.options.lineNumberStart + lineCount;
     ++i
   ) {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     const name =
       (context.node.id
         ? context.node.id
         : highlighter.options.classPrefix + context.count) +
-      '-line-' +
+      "-line-" +
       i;
 
-    link.setAttribute('name', name);
-    link.setAttribute('href', '#' + name);
+    link.setAttribute("name", name);
+    link.setAttribute("href", "#" + name);
 
     link.appendChild(document.createTextNode(i));
     lineContainer.appendChild(link);
     lineContainer.appendChild(eolElement.cloneNode(false));
 
     if (lineHighlightingEnabled) {
-      const currentLineOverlay = document.createElement('div');
-      if (util.contains(highlighter.options.lineHighlight, i)) {
+      const currentLineOverlay = document.createElement("div");
+      if (util.contains(highlighter.options.lineHighlight, i))
         currentLineOverlay.className =
-          highlighter.options.classPrefix + 'line-highlight-active';
-      }
+          highlighter.options.classPrefix + "line-highlight-active";
+
       lineHighlightOverlay.appendChild(currentLineOverlay);
     }
   }
@@ -111,13 +110,13 @@ function maybeAddLineNumbers(highlighter, context) {
     context.codeContainer.appendChild(lineHighlightOverlay);
 
   // enable the border on the code container
-  context.codeContainer.style.borderWidth = '1px';
-  context.codeContainer.style.borderStyle = 'solid';
+  context.codeContainer.style.borderWidth = "1px";
+  context.codeContainer.style.borderStyle = "solid";
 }
 
 // Initialization of plugin
-bind('afterHighlightNode', maybeAddLineNumbers);
+bind("afterHighlightNode", maybeAddLineNumbers);
 
-globalOptions.lineNumbers = 'automatic';
+globalOptions.lineNumbers = "automatic";
 globalOptions.lineNumberStart = 1;
 globalOptions.lineHighlight = [];

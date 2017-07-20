@@ -3,24 +3,22 @@
 // Use of this source code is governed by a Apache License Version 2.0, that can
 // be found in the LICENSE file.
 
-import {Highlighter} from './highlighter.js';
-import {registerLanguages} from './register-languages.js';
-import {defaultAnalyzer} from './default-helpers.js';
-import {} from './load-plugins.js';
-
-import {jsdom} from 'jsdom';
-const document = jsdom('', {});
+import { Highlighter } from "./highlighter.js";
+import { registerLanguages } from "./register-languages.js";
+import { defaultAnalyzer } from "./default-helpers.js";
+import {} from "./load-plugins.js";
+import { document } from "./jsdom.js";
 
 /* eslint require-jsdoc: 0 */
 
 // Exports
-export const version = '1.22.0';
+export const version = "1.22.0";
 
-export {globalOptions} from './globalOptions.js';
+export { globalOptions } from "./globalOptions.js";
 
-export {registerLanguage, isRegistered} from './languages.js';
+export { registerLanguage, isRegistered } from "./languages.js";
 
-export {Highlighter};
+export { Highlighter };
 
 export function createAnalyzer() {
   return new defaultAnalyzer();
@@ -28,12 +26,11 @@ export function createAnalyzer() {
 
 export function highlightAll(options) {
   const highlighter = new Highlighter(options);
-  const tags = document.getElementsByTagName('*');
-  for (let i = 0; i < tags.length; i++)
-    highlighter.highlightNode(tags[i]);
+  const tags = document.getElementsByTagName("*");
+  for (let i = 0; i < tags.length; i++) highlighter.highlightNode(tags[i]);
 }
 
-export {bind} from './events.js';
+export { bind } from "./events.js";
 
 // Highlighter initialization
 registerLanguages();

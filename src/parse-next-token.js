@@ -1,4 +1,4 @@
-import * as util from './util.js';
+import * as util from "./util.js";
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2, 3] }]*/
 
 function isIdentMatch(context) {
@@ -10,7 +10,7 @@ function isIdentMatch(context) {
 
 // token parsing functions
 function parseKeyword(context) {
-  return util.matchWord(context, context.language.keywords, 'keyword');
+  return util.matchWord(context, context.language.keywords, "keyword");
 }
 
 function parseCustomTokens(context) {
@@ -30,19 +30,18 @@ function parseCustomTokens(context) {
 }
 
 function parseOperator(context) {
-  return util.matchWord(context, context.language.operators, 'operator');
+  return util.matchWord(context, context.language.operators, "operator");
 }
 
 function parsePunctuation(context) {
   const current = context.reader.current();
-  if (context.language.punctuation.test(util.regexEscape(current))) {
+  if (context.language.punctuation.test(util.regexEscape(current)))
     return context.createToken(
-      'punctuation',
+      "punctuation",
       current,
       context.reader.getLine(),
       context.reader.getColumn()
     );
-  }
 
   return null;
 }
@@ -61,11 +60,11 @@ function parseIdent(context) {
     ident += context.reader.read();
   }
 
-  return context.createToken('ident', ident, line, column);
+  return context.createToken("ident", ident, line, column);
 }
 
 function parseDefault(context) {
-  if (context.defaultData.text === '') {
+  if (context.defaultData.text === "") {
     // new default token
     context.defaultData.line = context.reader.getLine();
     context.defaultData.column = context.reader.getColumn();
@@ -79,23 +78,16 @@ function getScopeReaderFunction(scope, tokenName) {
   const escapeSequences = scope[2] || [];
   const closerLength = scope[1].length;
   const closer =
-      typeof scope[1] === 'string'
-        ? new RegExp(util.regexEscape(scope[1]))
-        : scope[1].regex;
+    typeof scope[1] === "string"
+      ? new RegExp(util.regexEscape(scope[1]))
+      : scope[1].regex;
   const zeroWidth = scope[3] || false;
 
   // processCurrent indicates that this is being called from a continuation
   // which means that we need to process the current char, rather than peeking at the next
-  return function(
-    context,
-    continuation,
-    buffer,
-    line,
-    column,
-    processCurrent
-  ) {
+  return function(context, continuation, buffer, line, column, processCurrent) {
     let foundCloser = false;
-    buffer = buffer || '';
+    buffer = buffer || "";
 
     processCurrent = processCurrent ? 1 : 0;
 
@@ -106,7 +98,7 @@ function getScopeReaderFunction(scope, tokenName) {
 
       for (let i = 0; i < escapeSequences.length; i++) {
         peekValue =
-          (processCurrent ? current : '') +
+          (processCurrent ? current : "") +
           context.reader.peek(escapeSequences[i].length - processCurrent);
         if (peekValue === escapeSequences[i]) {
           buffer += context.reader.read(peekValue.length - processCurrent);
@@ -115,7 +107,7 @@ function getScopeReaderFunction(scope, tokenName) {
       }
 
       peekValue =
-        (processCurrent ? current : '') +
+        (processCurrent ? current : "") +
         context.reader.peek(closerLength - processCurrent);
       if (closer.test(peekValue)) {
         foundCloser = true;
@@ -126,11 +118,10 @@ function getScopeReaderFunction(scope, tokenName) {
       return true;
     }
 
-    if (!processCurrent || process(true)) {
+    if (!processCurrent || process(true))
       while (context.reader.peek() !== context.reader.EOF && process(false)) {
         // empty
       }
-    }
 
     if (processCurrent) {
       buffer += context.reader.current();
@@ -138,15 +129,14 @@ function getScopeReaderFunction(scope, tokenName) {
     } else {
       buffer +=
         zeroWidth || context.reader.peek() === context.reader.EOF
-          ? ''
+          ? ""
           : context.reader.read(closerLength);
     }
 
-    if (!foundCloser) {
+    if (!foundCloser)
       // we need to signal to the context that this scope was never properly closed
       // this has significance for partial parses (e.g. for nested languages)
       context.continuation = continuation;
-    }
 
     return context.createToken(tokenName, buffer, line, column);
   };

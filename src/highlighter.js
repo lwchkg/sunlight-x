@@ -1,25 +1,23 @@
-import * as util from './util.js';
-import {isIe, EOL, EMPTY, DEFAULT_LANGUAGE, TEXT_NODE} from './constants.js';
-import {globalOptions} from './globalOptions.js';
-import {fireEvent} from './events.js';
-import {languages} from './languages.js';
-import {createCodeReader} from './code-reader.js';
-import {parseNextToken} from './parse-next-token.js';
+import * as util from "./util.js";
+import { isIe, EOL, EMPTY, DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
+import { globalOptions } from "./globalOptions.js";
+import { fireEvent } from "./events.js";
+import { languages } from "./languages.js";
+import { CodeReader } from "./code-reader.js";
+import { parseNextToken } from "./parse-next-token.js";
 
-import {jsdom} from 'jsdom';
-const document = jsdom('', {});
+import { document } from "./jsdom.js";
 
 let HIGHLIGHTED_NODE_COUNT = 0;
 
 function appendAll(parent, children) {
-  let i;
-  for (i = 0; i < children.length; i++) parent.appendChild(children[i]);
+  for (let i = 0; i < children.length; i++) parent.appendChild(children[i]);
 }
 
 /* eslint require-jsdoc: 0 */
 export class Highlighter {
   constructor(options) {
-    this.options = util.merge(util.clone(globalOptions), options);
+    this.options = Object.assign({}, globalOptions, options);
   }
 
   // called before processing the current
@@ -27,10 +25,9 @@ export class Highlighter {
     let i, embeddedLanguage;
 
     for (i = 0; i < context.language.embeddedLanguages.length; i++) {
-      if (!languages[context.language.embeddedLanguages[i].language]) {
+      if (!languages[context.language.embeddedLanguages[i].language])
         // unregistered language
         continue;
-      }
 
       embeddedLanguage = util.clone(context.language.embeddedLanguages[i]);
 
@@ -62,17 +59,15 @@ export class Highlighter {
   }
 
   tokenize(unhighlightedCode, language, partialContext, options) {
-    let tokens = [],
-      continuation,
-      token;
+    let tokens = [];
 
-    fireEvent('beforeTokenize', this, {
+    fireEvent("beforeTokenize", this, {
       code: unhighlightedCode,
-      language: language,
+      language: language
     });
 
     const context = {
-      reader: createCodeReader(unhighlightedCode),
+      reader: new CodeReader(unhighlightedCode),
       language: language,
       items: util.clone(language.contextItems),
       token: function(index) {
@@ -86,33 +81,28 @@ export class Highlighter {
       },
       options: options,
       embeddedLanguageStack: [],
-
-      defaultData: {
-        text: '',
-        line: 1,
-        column: 1,
-      },
+      defaultData: { text: "", line: 1, column: 1 },
       createToken: function(name, value, line, column) {
         return {
           name: name,
           line: line,
-          value: isIe ? value.replace(/\n/g, '\r') : value,
+          value: isIe ? value.replace(/\n/g, "\r") : value,
           column: column,
-          language: this.language.name,
+          language: this.language.name
         };
-      },
+      }
     };
 
     // if continuation is given, then we need to pick up where we left off from a previous parse
     // basically it indicates that a scope was never closed, so we need to continue that scope
     if (partialContext.continuation) {
-      continuation = partialContext.continuation;
+      const continuation = partialContext.continuation;
       partialContext.continuation = null;
       tokens.push(
         continuation(
           context,
           continuation,
-          '',
+          "",
           context.reader.getLine(),
           context.reader.getColumn(),
           true
@@ -122,29 +112,28 @@ export class Highlighter {
 
     while (!context.reader.isEof()) {
       this.switchToEmbeddedLanguageIfNecessary(context);
-      token = parseNextToken(context);
+      const token = parseNextToken(context);
 
       // flush default data if needed (in pretty much all languages this is just whitespace)
       if (token !== null) {
-        if (context.defaultData.text !== '') {
+        if (context.defaultData.text !== "") {
           tokens.push(
             context.createToken(
-              'default',
+              "default",
               context.defaultData.text,
               context.defaultData.line,
               context.defaultData.column
             )
           );
-          context.defaultData.text = '';
+          context.defaultData.text = "";
         }
 
-        if (token[0] !== undefined) {
+        if (token[0] !== undefined)
           // multiple tokens
           tokens = tokens.concat(token);
-        } else {
+        else
           // single token
           tokens.push(token);
-        }
       }
 
       this.switchBackFromEmbeddedLanguageIfNecessary(context);
@@ -152,20 +141,19 @@ export class Highlighter {
     }
 
     // append the last default token, if necessary
-    if (context.defaultData.text !== '') {
+    if (context.defaultData.text !== "")
       tokens.push(
         context.createToken(
-          'default',
+          "default",
           context.defaultData.text,
           context.defaultData.line,
           context.defaultData.column
         )
       );
-    }
 
-    fireEvent('afterTokenize', this, {
+    fireEvent("afterTokenize", this, {
       code: unhighlightedCode,
-      parserContext: context,
+      parserContext: context
     });
     return context;
   }
@@ -175,28 +163,27 @@ export class Highlighter {
     const prepareText = (function() {
       let nbsp, tab;
       if (options.showWhitespace) {
-        nbsp = '\u00b7';
-        tab = new Array(options.tabWidth).join('\u2014') + '\u2192';
+        nbsp = "\u00b7";
+        tab = new Array(options.tabWidth).join("\u2014") + "\u2192";
       } else {
-        nbsp = '\u00a0';
+        nbsp = "\u00a0";
         tab = new Array(options.tabWidth + 1).join(nbsp);
+        tab = nbsp.repeat(options.tabWidth);
       }
 
       return function(token) {
-        let value = token.value.split(' ').join(nbsp),
-          tabIndex,
-          lastNewlineColumn,
-          actualColumn,
-          tabLength;
+        let value = token.value.split(" ").join(nbsp);
 
-        // tabstop madness: replace \t with the appropriate number of characters, depending on the tabWidth option and its relative position in the line
-        while ((tabIndex = value.indexOf('\t')) >= 0) {
-          lastNewlineColumn = value.lastIndexOf(EOL, tabIndex);
-          actualColumn =
+        // tabstop madness: replace \t with the appropriate number of characters,
+        // depending on the tabWidth option and its relative position in the line
+        let tabIndex;
+        while ((tabIndex = value.indexOf("\t")) >= 0) {
+          const lastNewlineColumn = value.lastIndexOf(EOL, tabIndex);
+          const actualColumn =
             lastNewlineColumn >= 0
               ? tabIndex - lastNewlineColumn - 1
               : tabIndex;
-          tabLength = options.tabWidth - actualColumn % options.tabWidth; // actual length of the TAB character
+          const tabLength = options.tabWidth - actualColumn % options.tabWidth; // actual length of the TAB character
 
           value =
             value.substring(0, tabIndex) +
@@ -228,12 +215,12 @@ export class Highlighter {
       resetNodes: function() {
         nodes = [];
       },
-      items: parserContext.items,
+      items: parserContext.items
     };
   }
 
   createContainer(ctx) {
-    const container = document.createElement('span');
+    const container = document.createElement("span");
     container.className = ctx.options.classPrefix + ctx.language.name;
     return container;
   }
@@ -242,7 +229,7 @@ export class Highlighter {
     let nodes, container, i, tokenName, func, language, analyzer;
     // TODO: let lastIndex;
 
-    fireEvent('beforeAnalyze', this, {analyzerContext: analyzerContext});
+    fireEvent("beforeAnalyze", this, { analyzerContext: analyzerContext });
 
     if (analyzerContext.tokens.length > 0) {
       analyzerContext.language =
@@ -268,7 +255,7 @@ export class Highlighter {
         analyzerContext.index = i;
         tokenName = analyzerContext.tokens[i].name;
         // TODO: clean up!!!
-        func = 'handle_' + tokenName;
+        func = "handle_" + tokenName;
 
         analyzer =
           analyzerContext.getAnalyzer.call(analyzerContext) ||
@@ -285,7 +272,7 @@ export class Highlighter {
       for (i = 0; i < nodes.length; i++) analyzerContext.addNode(nodes[i]);
     }
 
-    fireEvent('afterAnalyze', this, {analyzerContext: analyzerContext});
+    fireEvent("afterAnalyze", this, { analyzerContext: analyzerContext });
   }
 
   // partialContext allows us to perform a partial parse, and then pick up where we left off at a later time
@@ -294,15 +281,14 @@ export class Highlighter {
     let language = languages[languageId];
 
     partialContext = partialContext || {};
-    if (language === undefined) {
+    if (language === undefined)
       // use default language if one wasn't specified or hasn't been registered
       language = languages[DEFAULT_LANGUAGE];
-    }
 
-    fireEvent('beforeHighlight', this, {
+    fireEvent("beforeHighlight", this, {
       code: unhighlightedCode,
       language: language,
-      previousContext: partialContext,
+      previousContext: partialContext
     });
 
     const analyzerContext = this.createAnalyzerContext(
@@ -323,28 +309,27 @@ export class Highlighter {
       partialContext.index ? partialContext.index + 1 : 0
     );
 
-    fireEvent('afterHighlight', this, {analyzerContext: analyzerContext});
+    fireEvent("afterHighlight", this, { analyzerContext: analyzerContext });
 
     return analyzerContext;
   }
 
   // matches the language of the node to highlight
   matchSunlightNode(node) {
-    if (!this.matchSunlightNodeRegEx) {
+    if (!this.matchSunlightNodeRegEx)
       this.matchSunlightNodeRegEx = new RegExp(
-        '(?:\\s|^)' + this.options.classPrefix + 'highlight-(\\S+)(?:\\s|$)'
+        "(?:\\s|^)" + this.options.classPrefix + "highlight-(\\S+)(?:\\s|$)"
       );
-    }
+
     return this.matchSunlightNodeRegEx.exec(node.className);
   }
 
   // determines if the node has already been highlighted
   isAlreadyHighlighted(node) {
-    if (!this.isAlreadyHighlightedRegEx) {
+    if (!this.isAlreadyHighlightedRegEx)
       this.isAlreadyHighlightedRegEx = new RegExp(
-        '(?:\\s|^)' + this.options.classPrefix + 'highlighted(?:\\s|$)'
+        "(?:\\s|^)" + this.options.classPrefix + "highlighted(?:\\s|$)"
       );
-    }
 
     return this.isAlreadyHighlightedRegEx.test(node.className);
   }
@@ -365,8 +350,8 @@ export class Highlighter {
 
     const languageId = match[1];
     let currentNodeCount = 0;
-    fireEvent('beforeHighlightNode', this, {node: node});
-    for (let j = 0; j < node.childNodes.length; j++) {
+    fireEvent("beforeHighlightNode", this, { node: node });
+    for (let j = 0; j < node.childNodes.length; j++)
       if (node.childNodes[j].nodeType === TEXT_NODE) {
         // text nodes
         partialContext = this.highlightText.call(
@@ -386,26 +371,25 @@ export class Highlighter {
         // element nodes
         this.highlightNode.call(this, node.childNodes[j]);
       }
-    }
 
     // indicate that this node has been highlighted
-    node.className += ' ' + this.options.classPrefix + 'highlighted';
+    node.className += " " + this.options.classPrefix + "highlighted";
 
     let container, codeContainer;
     // if the node is block level, we put it in a container, otherwise we just leave it alone
-    if (util.getComputedStyle(node, 'display') === 'block') {
-      container = document.createElement('div');
-      container.className = this.options.classPrefix + 'container';
+    if (util.getComputedStyle(node, "display") === "block") {
+      container = document.createElement("div");
+      container.className = this.options.classPrefix + "container";
 
-      codeContainer = document.createElement('div');
-      codeContainer.className = this.options.classPrefix + 'code-container';
+      codeContainer = document.createElement("div");
+      codeContainer.className = this.options.classPrefix + "code-container";
 
       // apply max height if specified in options
       if (this.options.maxHeight !== false) {
-        codeContainer.style.overflowY = 'auto';
+        codeContainer.style.overflowY = "auto";
         codeContainer.style.maxHeight =
           this.options.maxHeight +
-          (/^\d+$/.test(this.options.maxHeight) ? 'px' : '');
+          (/^\d+$/.test(this.options.maxHeight) ? "px" : "");
       }
 
       container.appendChild(codeContainer);
@@ -419,11 +403,11 @@ export class Highlighter {
       container.appendChild(codeContainer);
     }
 
-    fireEvent('afterHighlightNode', this, {
+    fireEvent("afterHighlightNode", this, {
       container: container,
       codeContainer: codeContainer,
       node: node,
-      count: currentNodeCount,
+      count: currentNodeCount
     });
   }
 }

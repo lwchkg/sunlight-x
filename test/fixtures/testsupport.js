@@ -1,15 +1,15 @@
-import assert from 'power-assert';
-const fs = require('fs');
-const path = require('path');
+import assert from "power-assert";
+const fs = require("fs");
+const path = require("path");
 
-import {jsdom} from 'jsdom';
-import {Highlighter} from '../../src/sunlight.js';
+import { jsdom } from "jsdom";
+import { Highlighter } from "../../src/sunlight.js";
 
 const defaultOptions = {
-  classPrefix: 'sunlight-',
+  classPrefix: "sunlight-",
   showMenu: true,
   enableDocLinks: true,
-  maxHeight: undefined,
+  maxHeight: undefined
 };
 
 export class TestSupport {
@@ -25,19 +25,19 @@ export class TestSupport {
         : Object.assign({}, defaultOptions, options);
 
     const code = fs.readFileSync(
-      path.join(__dirname, '..', 'code-snippets', filename)
+      path.join(__dirname, "..", "code-snippets", filename)
     );
 
-    const document = jsdom('', {});
-    const preElement = document.createElement('div');
+    const document = jsdom("", {});
+    const preElement = document.createElement("div");
     // Note: setting innerText does not work in jsdom 9.4.2
     preElement.appendChild(document.createTextNode(code));
     preElement.setAttribute(
-      'class',
-      this.options.classPrefix + 'highlight-' + language
+      "class",
+      this.options.classPrefix + "highlight-" + language
     );
 
-    this.codeElement = document.createElement('div');
+    this.codeElement = document.createElement("div");
     this.codeElement.appendChild(preElement);
 
     const highlighter = new Highlighter(this.options);
@@ -52,7 +52,7 @@ export class TestSupport {
   DoesElementsWithClassNameExist(className) {
     return (
       this.codeElement.querySelector(
-        '.' + this.options.classPrefix + className
+        "." + this.options.classPrefix + className
       ) !== null
     );
   }
@@ -64,16 +64,15 @@ export class TestSupport {
    */
   AssertContentExists(className, content) {
     const elements = this.codeElement.querySelectorAll(
-      '.' + this.options.classPrefix + className
+      "." + this.options.classPrefix + className
     );
 
     const nodeValues = [];
-    for (let i = 0; i < elements.length; i++) {
+    for (let i = 0; i < elements.length; i++)
       if (elements[i].firstChild)
         nodeValues.push(elements[i].firstChild.nodeValue);
-    }
 
-    const nbsp = '\u00a0';
+    const nbsp = "\u00a0";
     content = content.replace(/ /g, nbsp).replace(/\t/g, nbsp.repeat(4));
 
     assert(nodeValues.indexOf(content) >= 0);
