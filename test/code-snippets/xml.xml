@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<config xmlns:foo="http://example.com">
+    <!-- sections -->
+    <section name="foo">Content of the section</section>
+    <section name="bar">Content of the section&beforeopentag;</section>
+    <section foo:id="12" name="foo">Content of the "section" & stuff</section>
+
+    <System.Net />
+
+    <!-- cdata -->
+<![CDATA[I can put whatever I want here HAHAHA!
+<tags> that shouldn't be tags</tags>
+<?xml lol! ?>]]>
+
+    <_self-closing />
+
+    <section>
+        <nested lulz="asdf">
+            And again&hellip;
+            <again>nested content</again>
+        </nested>
+    </section>
+</config>

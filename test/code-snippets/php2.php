@@ -1,0 +1,2 @@
+$foo = <<<HEREDOC
+unclosed heredoc

@@ -2,10 +2,18 @@ import { registerLanguage } from "./languages.js";
 
 import * as plaintext from "./languages/plaintext.js";
 import * as javascript from "./languages/javascript.js";
+import * as php from "./languages/php.js";
+import * as xml from "./languages/xml.js";
+import * as css from "./languages/css.js";
+import * as csharp from "./languages/csharp.js";
 
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }]*/
+const languages = [plaintext, javascript, php, xml, css, csharp];
+
+/**
+ * Register the languages into Sunlight-X highlighter.
+ */
 export function registerLanguages() {
-  [plaintext, javascript].forEach(language => {
-    registerLanguage(language.name, language);
+  languages.forEach(language => {
+    registerLanguage(language);
   });
 }

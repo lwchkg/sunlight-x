@@ -117,6 +117,6 @@ function maybeAddLineNumbers(highlighter, context) {
 // Initialization of plugin
 bind("afterHighlightNode", maybeAddLineNumbers);
 
-globalOptions.lineNumbers = "automatic";
+globalOptions.lineNumbers = false; // TODO: was "automatic"
 globalOptions.lineNumberStart = 1;
 globalOptions.lineHighlight = [];

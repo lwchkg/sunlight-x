@@ -1,0 +1,59 @@
+@import "/my/style/sheet.css";
+@import url(/my/style/sheet.css) screen "Print style\"s";
+
+html div.myClass {
+    width: 100%;
+    min-height: 100%;
+    opacity: 0.0;
+    background: transparent url(foo.png) no-repeat;
+    background-color: #000000;
+    color: white;
+    font-family: "Courier New", 'Arialola\'s', sans-serif;
+}
+
+body > .warning {
+    color: #FF0000;
+    background-image: url(warning.png); /* ".png" should not be colored as a class */
+    border: 2px solid none;
+    border-image: url(warning.png);
+    border-radius: url(warning.png);
+    border-top: 1px dotted #FFFFFF;
+    border-top-color: magenta;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity = 50);
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+}
+
+#wrapper div[lang~="en"]:first-child::before {
+    text-decoration: underline overline;
+    padding-left: 12px;
+    width: 50%;
+    position: fixed;
+    display: inline-block;
+}
+
+a:fake-pseudo-class {
+    transform: rotate(5deg);
+    -moz-background-inline-policy: -moz-initial;
+    -o-device-pixel-ratio: meh;
+    -webkit-background-origin: lolwut;
+    -ms-accelerator: snoo-snoo !important;
+    zoom: 1; /* IE crap */
+    vertical-align: middle;
+}
+
+/* new clearfix */
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+shouldBeNamed .shouldBeNamed { zoom: 1; } /* IE7 */
+
+pseudotest1:before, pseudotest2:after {
+    /* stuff goes here */
+}

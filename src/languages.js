@@ -22,19 +22,10 @@ export const languages = {};
 
 /**
  * Register a language to the highlighter.
- * @param {string} languageId
  * @param {Object} languageData
  */
-export function registerLanguage(languageId, languageData) {
-  let tokenName, languageName;
-
-  if (!languageId)
-    throw new Error(
-      'Languages must be registered with an identifier, e.g. "php" for PHP'
-    );
-
+export function registerLanguage(languageData) {
   languageData = Object.assign({}, languageDefaults, languageData);
-  languageData.name = languageId;
 
   // Transform keywords, operators and custom tokens into a hash map.
   languageData.keywords = createHashMap(
@@ -49,7 +40,7 @@ export function registerLanguage(languageId, languageData) {
     languageData.caseInsensitive
   );
 
-  for (tokenName in languageData.customTokens)
+  for (const tokenName in languageData.customTokens)
     languageData.customTokens[tokenName] = createHashMap(
       languageData.customTokens[tokenName].values
         ? languageData.customTokens[tokenName].values
@@ -60,7 +51,7 @@ export function registerLanguage(languageId, languageData) {
 
   // Convert the embedded language object to an easier-to-use array.
   const embeddedLanguages = [];
-  for (languageName in languageData.embeddedLanguages)
+  for (const languageName in languageData.embeddedLanguages)
     embeddedLanguages.push({
       parentLanguage: languageData.name,
       language: languageName,

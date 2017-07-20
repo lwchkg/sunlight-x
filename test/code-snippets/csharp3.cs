@@ -1,0 +1,2 @@
+[FirstToken]
+public class Foo { }

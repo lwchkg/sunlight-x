@@ -12,6 +12,8 @@ const defaultOptions = {
   maxHeight: undefined
 };
 
+export const nbsp = "\u00a0";
+
 export class TestSupport {
   /**
    * @param {string} filename Name of the file that contains the code to be highlighted.
@@ -25,7 +27,8 @@ export class TestSupport {
         : Object.assign({}, defaultOptions, options);
 
     const code = fs.readFileSync(
-      path.join(__dirname, "..", "code-snippets", filename)
+      path.join(__dirname, "..", "code-snippets", filename),
+      "utf8"
     );
 
     const document = jsdom("", {});
@@ -67,6 +70,17 @@ export class TestSupport {
   }
 
   /**
+   * Return elements matching the specified CSS class name.
+   * @param {string} className
+   * @returns {NodeList}
+   */
+  GetElementsWithClassName(className) {
+    return this.codeElement.querySelectorAll(
+      "." + this.options.classPrefix + className
+    );
+  }
+
+  /**
    * Assert that the text |content| inside a tag with class |className| exists.
    * @param {string} className
    * @param {string} content
@@ -81,7 +95,6 @@ export class TestSupport {
       if (elements[i].firstChild)
         nodeValues.push(elements[i].firstChild.nodeValue);
 
-    const nbsp = "\u00a0";
     content = content.replace(/ /g, nbsp).replace(/\t/g, nbsp.repeat(4));
 
     assert(nodeValues.indexOf(content) >= 0);

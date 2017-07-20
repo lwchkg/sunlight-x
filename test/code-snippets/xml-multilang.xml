@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+    <head>
+        <script type="text/javascript" src="/sunlight.js"></script>
+        <style></style>
+        <style type="text/css">
+            @font-face {
+                font-family: Custom;
+                src: url(/fonts/custom.ttf);
+            }
+
+            body {
+                background-color: black;
+                font-family: "Courier New";
+                width: 100%;
+                min-height: 200px;
+            }
+
+            .attention {
+                color: red;
+                border: 2px solid #000000;
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function() {
+                try {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/ajax.php", true);
+                    xhr.onreadystatechange = function(e) {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            document.getElementById("foo").innerHTML = xhr.responseText;
+                        }
+                    };
+
+                    xhr.send(null);
+                } catch (e) {}
+            };
+        </script>
+    </head>
+
+    <body>
+        <p>
+            Let's try some PHP: Hello <?= $_GET['username'] ?>! Long tags work, too:
+            <?php
+                echo 'Hello world';
+                foreach (range(1, 10) as $i) {
+                    print_r($i); //prints $i lol
+                }
+            ?>
+        </p>
+
+        <p>
+            Now let's try some C#:
+        </p>
+
+        <%-- server side comment --%>
+        <% if (User.IsInRole("admin")) { %>
+            You can see this
+        <% } else { %>
+            You are no admin fool!
+        <% } %>
+
+        <%= "Short tag ftw" %>
+    </body>
+</html>
