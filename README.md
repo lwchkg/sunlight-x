@@ -1,5 +1,7 @@
 # sunlight-x: Intelligent Syntax Highlighting, Modernized
 
+[![Build Status](https://travis-ci.org/lwchkg/sunlight-x.svg?branch=master)](https://travis-ci.org/lwchkg/sunlight-x)
+
 Sunlight highlighter modernized for node.js.
 While the highlighter can be run, it is still a WIP.
 
@@ -16,6 +18,7 @@ Please read the test to infer on how to use the highlighter.
 - Reorganize API
 - Add tests
 - Browserify
+- Clarify owners of code snippets (some unknown code are used now).
 
 
 # Copyright
