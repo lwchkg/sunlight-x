@@ -58,6 +58,15 @@ export class TestSupport {
   }
 
   /**
+   * Return elements matching the specified CSS selectors.
+   * @param {string} selectors
+   * @returns {NodeList}
+   */
+  querySelectorAll(selectors) {
+    return this.codeElement.querySelectorAll(selectors);
+  }
+
+  /**
    * Assert that the text |content| inside a tag with class |className| exists.
    * @param {string} className
    * @param {string} content
