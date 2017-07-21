@@ -3,11 +3,15 @@
 // Use of this source code is governed by a Apache License Version 2.0, that can
 // be found in the LICENSE file.
 
+// @flow
+
 import { Highlighter } from "./highlighter.js";
 import { registerLanguages } from "./register-languages.js";
 import { defaultAnalyzer } from "./default-helpers.js";
 import {} from "./load-plugins.js";
 import { document } from "./jsdom.js";
+
+import type { SunlightOptionsType } from "./globalOptions.js";
 
 /* eslint require-jsdoc: 0 */
 
@@ -24,7 +28,7 @@ export function createAnalyzer() {
   return new defaultAnalyzer();
 }
 
-export function highlightAll(options) {
+export function highlightAll(options: SunlightOptionsType) {
   const highlighter = new Highlighter(options);
   const tags = document.getElementsByTagName("*");
   for (let i = 0; i < tags.length; i++) highlighter.highlightNode(tags[i]);

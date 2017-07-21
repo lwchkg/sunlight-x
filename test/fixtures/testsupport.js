@@ -1,3 +1,5 @@
+// @flow
+
 import assert from "power-assert";
 const fs = require("fs");
 const path = require("path");
@@ -20,7 +22,10 @@ export class TestSupport {
    * @param {string} language
    * @param {Object|undefined} options
    */
-  constructor(filename, language, options) {
+  options: { [string]: any };
+  codeElement: Element;
+
+  constructor(filename: string, language: string, options: { [string]: any }) {
     this.options =
       options === undefined
         ? Object.assign({}, defaultOptions)
@@ -52,7 +57,7 @@ export class TestSupport {
    * @param {string} className
    * @returns {boolean}
    */
-  DoesElementsWithClassNameExist(className) {
+  DoesElementsWithClassNameExist(className: string): boolean {
     return (
       this.codeElement.querySelector(
         "." + this.options.classPrefix + className
@@ -65,7 +70,7 @@ export class TestSupport {
    * @param {string} selectors
    * @returns {NodeList}
    */
-  querySelectorAll(selectors) {
+  querySelectorAll(selectors: string): NodeList<*> {
     return this.codeElement.querySelectorAll(selectors);
   }
 
@@ -74,7 +79,7 @@ export class TestSupport {
    * @param {string} className
    * @returns {NodeList}
    */
-  GetElementsWithClassName(className) {
+  GetElementsWithClassName(className: string): NodeList<*> {
     return this.codeElement.querySelectorAll(
       "." + this.options.classPrefix + className
     );
@@ -85,7 +90,7 @@ export class TestSupport {
    * @param {string} className
    * @param {string} content
    */
-  AssertContentExists(className, content) {
+  AssertContentExists(className: string, content: string) {
     const elements = this.codeElement.querySelectorAll(
       "." + this.options.classPrefix + className
     );

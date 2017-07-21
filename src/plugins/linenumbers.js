@@ -10,6 +10,8 @@
  *  - lineHighlight: <array> (array of line numbers to highlight)
  */
 
+// @flow
+
 import { TEXT_NODE } from "../constants.js";
 import { bind } from "../events.js";
 import { globalOptions } from "../globalOptions.js";
@@ -20,34 +22,33 @@ const eolElement = document.createTextNode(util.eol);
 
 /**
  * Get the line count
- * @param {Object} node
+ * TODO: rewrite in non-functional manner.
+ * @param {Element} node
  * @returns {number}
  */
-function getLineCount(node) {
+function getLineCount(node: Element): number {
   // browsers don't render the last trailing newline, so we make sure that the
   // line numbers reflect that by disregarding the last trailing newline
 
   // get the last text node
-  const lastTextNode = (function getLastNode(node) {
+  const lastTextNode = (function getLastNode(node: Node): ?Node {
     if (!node.lastChild) return null;
-
     if (node.lastChild.nodeType === TEXT_NODE) return node.lastChild;
-
     return getLastNode(node.lastChild);
-  })(node) || { lastChild: "" };
+  })(node) || { nodeValue: "" };
 
   return (
     node.innerHTML.replace(/[^\n]/g, "").length -
-    /\n$/.test(lastTextNode.nodeValue)
+    (/\n$/.test(lastTextNode.nodeValue) ? 1 : 0)
   );
 }
 
 /**
  * Add line numbers to the highlighted nodes, if configured to do so.
- * @param {Object} highlighter
+ * @param {Highlighter} highlighter
  * @param {Object} context
  */
-function maybeAddLineNumbers(highlighter, context) {
+function maybeAddLineNumbers(highlighter: Highlighter, context) {
   if (!highlighter.options.lineNumbers) return;
 
   // Skip if it's not a block level element or the lineNumbers option is not set
@@ -58,13 +59,11 @@ function maybeAddLineNumbers(highlighter, context) {
   )
     return;
 
-  let lineHighlightOverlay;
+  const lineHighlightOverlay: HTMLElement = document.createElement("div");
   const lineHighlightingEnabled = highlighter.options.lineHighlight.length > 0;
-  if (lineHighlightingEnabled) {
-    lineHighlightOverlay = document.createElement("div");
+  if (lineHighlightingEnabled)
     lineHighlightOverlay.className =
       highlighter.options.classPrefix + "line-highlight-overlay";
-  }
 
   const lineContainer = document.createElement("pre");
   lineContainer.className =

@@ -1,15 +1,25 @@
+// @flow
+
 import { document } from "./jsdom.js";
 
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }]*/
 
-/** Gets the last character in a string or the last element in an array.
- * @param {Array|string} thing
+/**
+ * Gets the last element in an array.
+ * @param {Array} arr
  * @returns {*}
  */
-export function last(thing) {
-  return thing.charAt
-    ? thing.charAt(thing.length - 1)
-    : thing[thing.length - 1];
+export function lastElement<T>(arr: T[]): T {
+  return arr[arr.length - 1];
+}
+
+/**
+ * Gets the last character in a string
+ * @param {string} s
+ * @returns {string}
+ */
+export function lastChar(s: string): string {
+  return s.charAt(s.length - 1);
 }
 
 /**
@@ -18,7 +28,7 @@ export function last(thing) {
  * @param {string} s The string to escape
  * @returns {string}
  */
-export function regexEscape(s) {
+export function regexEscape(s: string): string {
   return s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
@@ -32,11 +42,10 @@ export const eol = isIe ? "\r" : "\n";
 
 // non-recursively merges one object into the other
 // TODO: remove because this is possible a polyfill
-export function merge(defaultObject, objectToMerge) {
-  let key;
+export function merge<T: {}>(defaultObject: T, objectToMerge: T): T {
   if (!objectToMerge) return defaultObject;
 
-  for (key in objectToMerge) defaultObject[key] = objectToMerge[key];
+  for (const key in objectToMerge) defaultObject[key] = objectToMerge[key];
 
   return defaultObject;
 }
@@ -46,7 +55,7 @@ export function merge(defaultObject, objectToMerge) {
  * @param {Object} object
  * @returns {Object}
  */
-export function clone(object) {
+export function clone<T: {}>(object: T): T {
   return Object.assign({}, object);
 }
 
@@ -62,11 +71,15 @@ export const escapeSequences = ["\\n", "\\t", "\\r", "\\\\", "\\v", "\\f"];
  * @param {boolean|undefined} caseInsensitive Set to true to enable case insensitivity.
  * @returns {boolean}
  */
-export function contains(arr, value, caseInsensitive) {
+export function contains<T>(
+  arr: T[],
+  value: T,
+  caseInsensitive: boolean = false
+): boolean {
   if (!caseInsensitive) return arr.indexOf(value) >= 0;
 
   return arr.some(
-    element =>
+    (element: T): boolean =>
       element === value ||
       (caseInsensitive &&
         typeof element === "string" &&
@@ -84,7 +97,12 @@ export function contains(arr, value, caseInsensitive) {
  * @param {boolean|undefined} doNotRead Whether or not to advance the internal pointer
  * @returns {object} A token returned from context.createToken
  */
-export function matchWord(context, wordMap, tokenName, doNotRead) {
+export function matchWord(
+  context,
+  wordMap,
+  tokenName: string,
+  doNotRead: boolean = false
+) {
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
   wordMap = wordMap || [];
@@ -129,7 +147,11 @@ export function matchWord(context, wordMap, tokenName, doNotRead) {
  *                   (the original value) and a regular expression to match the
  *                   word.
  */
-export function createHashMap(wordMap, boundary, caseInsensitive) {
+export function createHashMap(
+  wordMap: string[],
+  boundary: RegExp,
+  caseInsensitive: boolean = false
+) {
   // creates a hash table where the hash is the first character of the word
   const newMap = {};
   for (let i = 0; i < wordMap.length; i++) {
@@ -160,7 +182,12 @@ export function createHashMap(wordMap, boundary, caseInsensitive) {
  * @returns {function} Accepts an array of tokens as the single parameter and
  *                     returns a boolean.
  */
-export function createBetweenRule(startIndex, opener, closer, caseInsensitive) {
+export function createBetweenRule(
+  startIndex: number,
+  opener,
+  closer,
+  caseInsensitive: boolean = false
+) {
   return function(tokens) {
     // check to the left: if we run into a closer or never run into an opener, fail
     let token;
@@ -214,10 +241,10 @@ export function createBetweenRule(startIndex, opener, closer, caseInsensitive) {
  * @returns {function} Accepts an array of tokens as the single parameter and returns a boolean
  */
 export function createProceduralRule(
-  startIndex,
-  direction,
+  startIndex: number,
+  direction: number,
   tokenRequirements,
-  caseInsensitive
+  caseInsensitive: ?boolean
 ) {
   tokenRequirements = tokenRequirements.slice(0); // clone array
   // TODO: verify. Probably were buggy.
@@ -321,16 +348,17 @@ export const whitespace = { token: "default", optional: true };
 /**
  * Gets the computed style of the element
  * Adapted from http://blargh.tommymontgomery.com/2010/04/get-computed-style-in-javascript/
- * @param {Object} element A DOM element
+ * @param {HTMLElement} element A DOM element
  * @param {string} style The name of the CSS style to retrieve
  * @returns {string}
  */
-export function getComputedStyle(element, style) {
+export function getComputedStyle(element: Element, style: string): string {
   let func = null;
   if (document.defaultView && document.defaultView.getComputedStyle)
     func = document.defaultView.getComputedStyle;
   else
-    func = function(element) {
+    func = function(element: HTMLElement): Object {
+      // TODO: Remove (IE compatibility)
       return element.currentStyle || {};
     };
 

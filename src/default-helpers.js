@@ -1,11 +1,15 @@
+// @flow
+
 import * as util from "./util.js";
 import { document } from "./jsdom.js";
 
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
 
-function defaultHandleToken(suffix) {
-  return function(context) {
-    const element = document.createElement("span");
+function defaultHandleToken(
+  suffix: string
+): AnalyzerContext => number | boolean {
+  return function(context: AnalyzerContext): number | boolean {
+    const element: Element = document.createElement("span");
     element.className = context.options.classPrefix + suffix;
     element.appendChild(context.createTextNode(context.tokens[context.index]));
     return context.addNode(element) || true;
@@ -13,24 +17,23 @@ function defaultHandleToken(suffix) {
 }
 
 export class defaultAnalyzer {
-  handleToken(context) {
+  handleToken(context: AnalyzerContext): number | boolean {
     return defaultHandleToken(context.tokens[context.index].name)(context);
   }
 
   // TODO: clean up!!!
   // just append default content as a text node
-  handle_default(context) {
+  handle_default(context: AnalyzerContext): number {
     return context.addNode(
       context.createTextNode(context.tokens[context.index])
     );
   }
 
   // this handles the named ident mayhem
-  handle_ident(context) {
+  handle_ident(context: AnalyzerContext) {
     const evaluate = function(rules, createRule) {
-      let i;
       rules = rules || [];
-      for (i = 0; i < rules.length; i++)
+      for (let i = 0; i < rules.length; i++)
         if (typeof rules[i] === "function") {
           if (rules[i](context))
             return defaultHandleToken("named-ident")(context);
@@ -72,7 +75,7 @@ export class defaultAnalyzer {
   }
 }
 
-export function defaultNumberParser(context) {
+export function defaultNumberParser(context: AnalyzerContext) {
   const current = context.reader.current();
   const line = context.reader.getLine();
   const column = context.reader.getColumn();

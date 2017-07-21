@@ -1,22 +1,31 @@
+// @flow
+
 import * as util from "./util.js";
 import { isIe, EOL, EMPTY, DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
 import { globalOptions } from "./globalOptions.js";
 import { fireEvent } from "./events.js";
 import { languages } from "./languages.js";
 import { CodeReader } from "./code-reader.js";
+import { AnalyzerContext } from "./analyzer-context.js";
 import { parseNextToken } from "./parse-next-token.js";
 
 import { document } from "./jsdom.js";
 
+import type { SunlightOptionsType } from "./globalOptions.js";
+
 let HIGHLIGHTED_NODE_COUNT = 0;
 
-function appendAll(parent, children) {
+function appendAll(parent: Node, children: Node[]) {
   for (let i = 0; i < children.length; i++) parent.appendChild(children[i]);
 }
 
 /* eslint require-jsdoc: 0 */
 export class Highlighter {
-  constructor(options) {
+  options: SunlightOptionsType;
+  matchSunlightNodeRegEx: RegExp;
+  isAlreadyHighlightedRegEx: RegExp;
+
+  constructor(options: SunlightOptionsType) {
     this.options = Object.assign({}, globalOptions, options);
   }
 
@@ -46,7 +55,7 @@ export class Highlighter {
 
   // called after processing the current
   switchBackFromEmbeddedLanguageIfNecessary(context) {
-    const current = util.last(context.embeddedLanguageStack);
+    const current = util.lastElement(context.embeddedLanguageStack);
 
     if (current && current.switchBack(context)) {
       context.language = languages[current.parentLanguage];
@@ -58,7 +67,12 @@ export class Highlighter {
     }
   }
 
-  tokenize(unhighlightedCode, language, partialContext, options) {
+  tokenize(
+    unhighlightedCode: string,
+    language: string,
+    partialContext,
+    options
+  ) {
     let tokens = [];
 
     fireEvent("beforeTokenize", this, {
@@ -66,7 +80,7 @@ export class Highlighter {
       language: language
     });
 
-    const context = {
+    const context: Object = {
       reader: new CodeReader(unhighlightedCode),
       language: language,
       items: util.clone(language.contextItems),
@@ -158,74 +172,13 @@ export class Highlighter {
     return context;
   }
 
-  createAnalyzerContext(parserContext, partialContext, options) {
-    let nodes = [];
-    const prepareText = (function() {
-      let nbsp, tab;
-      if (options.showWhitespace) {
-        nbsp = "\u00b7";
-        tab = new Array(options.tabWidth).join("\u2014") + "\u2192";
-      } else {
-        nbsp = "\u00a0";
-        tab = new Array(options.tabWidth + 1).join(nbsp);
-        tab = nbsp.repeat(options.tabWidth);
-      }
-
-      return function(token) {
-        let value = token.value.split(" ").join(nbsp);
-
-        // tabstop madness: replace \t with the appropriate number of characters,
-        // depending on the tabWidth option and its relative position in the line
-        let tabIndex;
-        while ((tabIndex = value.indexOf("\t")) >= 0) {
-          const lastNewlineColumn = value.lastIndexOf(EOL, tabIndex);
-          const actualColumn =
-            lastNewlineColumn >= 0
-              ? tabIndex - lastNewlineColumn - 1
-              : tabIndex;
-          const tabLength = options.tabWidth - actualColumn % options.tabWidth; // actual length of the TAB character
-
-          value =
-            value.substring(0, tabIndex) +
-            tab.substring(options.tabWidth - tabLength) +
-            value.substring(tabIndex + 1);
-        }
-
-        return value;
-      };
-    })();
-
-    return {
-      tokens: (partialContext.tokens || [])
-        .concat(parserContext.getAllTokens()),
-      index: partialContext.index ? partialContext.index + 1 : 0,
-      language: null,
-      getAnalyzer: EMPTY,
-      options: options,
-      continuation: parserContext.continuation,
-      addNode: function(node) {
-        nodes.push(node);
-      },
-      createTextNode: function(token) {
-        return document.createTextNode(prepareText(token));
-      },
-      getNodes: function() {
-        return nodes;
-      },
-      resetNodes: function() {
-        nodes = [];
-      },
-      items: parserContext.items
-    };
-  }
-
-  createContainer(ctx) {
+  createContainer(ctx): Element {
     const container = document.createElement("span");
     container.className = ctx.options.classPrefix + ctx.language.name;
     return container;
   }
 
-  analyze(analyzerContext, startIndex) {
+  analyze(analyzerContext: AnalyzerContext, startIndex: number) {
     let nodes, container, i, tokenName, func, language, analyzer;
     // TODO: let lastIndex;
 
@@ -277,7 +230,11 @@ export class Highlighter {
 
   // partialContext allows us to perform a partial parse, and then pick up where we left off at a later time
   // this functionality enables nested highlights (language within a language, e.g. PHP within HTML followed by more PHP)
-  highlightText(unhighlightedCode, languageId, partialContext) {
+  highlightText(
+    unhighlightedCode: string,
+    languageId: string,
+    partialContext: Object
+  ): AnalyzerContext {
     let language = languages[languageId];
 
     partialContext = partialContext || {};
@@ -291,7 +248,8 @@ export class Highlighter {
       previousContext: partialContext
     });
 
-    const analyzerContext = this.createAnalyzerContext(
+    //const analyzerContext = this.createAnalyzerContext(
+    const analyzerContext = new AnalyzerContext(
       this.tokenize.call(
         this,
         unhighlightedCode,
@@ -315,7 +273,7 @@ export class Highlighter {
   }
 
   // matches the language of the node to highlight
-  matchSunlightNode(node) {
+  matchSunlightNode(node: Element): any {
     if (!this.matchSunlightNodeRegEx)
       this.matchSunlightNodeRegEx = new RegExp(
         "(?:\\s|^)" + this.options.classPrefix + "highlight-(\\S+)(?:\\s|$)"
@@ -325,7 +283,7 @@ export class Highlighter {
   }
 
   // determines if the node has already been highlighted
-  isAlreadyHighlighted(node) {
+  isAlreadyHighlighted(node: Element): boolean {
     if (!this.isAlreadyHighlightedRegEx)
       this.isAlreadyHighlightedRegEx = new RegExp(
         "(?:\\s|^)" + this.options.classPrefix + "highlighted(?:\\s|$)"
@@ -335,12 +293,12 @@ export class Highlighter {
   }
 
   // highlights a block of text
-  highlight(code, languageId) {
+  highlight(code: string, languageId: string): AnalyzerContext {
     return this.highlightText.call(this, code, languageId);
   }
 
   // recursively highlights a DOM node
-  highlightNode(node) {
+  highlightNode(node: Element) {
     let partialContext;
 
     if (this.isAlreadyHighlighted(node)) return;

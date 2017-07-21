@@ -3,6 +3,10 @@
 // Use of this source code is governed by a Apache License Version 2.0, that can
 // be found in the LICENSE file.
 
+// @flow
+
+import type { Highlighter } from "./highlighter.js";
+
 const events = {
   beforeHighlightNode: [],
   beforeHighlight: [],
@@ -19,7 +23,7 @@ const events = {
  * @param {string} event
  * @param {highlightCallback} callback
  */
-export function bind(event, callback) {
+export function bind(event: string, callback: Function) {
   if (!events[event]) throw new Error('Unknown event "' + event + '"');
   events[event].push(callback);
 }
@@ -27,10 +31,14 @@ export function bind(event, callback) {
 /**
  * Fire an event.
  * @param {string} eventName
- * @param {Object} highlighter
+ * @param {Highlighter} highlighter
  * @param {Object} eventContext
  */
-export function fireEvent(eventName, highlighter, eventContext) {
+export function fireEvent(
+  eventName: string,
+  highlighter: Highlighter,
+  eventContext: any
+) {
   const delegates = events[eventName] || [];
 
   for (let i = 0; i < delegates.length; i++)

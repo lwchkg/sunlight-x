@@ -3,6 +3,8 @@
 // Use of this source code is governed by a Apache License Version 2.0, that can
 // be found in the LICENSE file.
 
+// @flow
+
 import { createHashMap } from "./util.js";
 import { defaultAnalyzer, defaultNumberParser } from "./default-helpers.js";
 
@@ -18,7 +20,7 @@ const languageDefaults = Object.freeze({
   embeddedLanguages: {}
 });
 
-export const languages = {};
+export const languages: { [string]: any } = {};
 
 /**
  * Register a language to the highlighter.
@@ -69,6 +71,6 @@ export function registerLanguage(languageData) {
  * @param {string} languageId
  * @returns {boolean}
  */
-export function isRegistered(languageId) {
+export function isRegistered(languageId: string): boolean {
   return languages[languageId] !== undefined;
 }

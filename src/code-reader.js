@@ -1,7 +1,17 @@
+// @flow
 import * as util from "./util.js";
 
 export class CodeReader {
-  constructor(text) {
+  index: number;
+  line: number;
+  column: number;
+  EOF: string | void; // TODO: is it always undefined???
+  nextReadBeginsLine: boolean | void; // TODO: remove undefined
+  text: string;
+  length: number;
+  currentChar: string | void;
+
+  constructor(text: string) {
     this.index = 0;
     this.line = 1;
     this.column = 1;
@@ -15,7 +25,7 @@ export class CodeReader {
     this.currentChar = this.length > 0 ? text.charAt(0) : this.EOF;
   }
 
-  getCharacters(count) {
+  getCharacters(count: ?number): string | void {
     if (count === 0) return "";
 
     count = count || 1;
@@ -24,54 +34,59 @@ export class CodeReader {
     return value === "" ? this.EOF : value;
   }
 
-  toString() {
+  toString(): string {
+    const currentChar: string =
+      this.currentChar === undefined ? "undefined" : this.currentChar;
     return `length: ${this.length}, index: ${this.index}, line: ${this
-      .line}, column: ${this.column}, current: [${this.currentChar}]`;
+      .line}, column: ${this.column}, current: [${currentChar}]`;
   }
 
-  peek(count) {
+  peek(count: number): string | void {
     return this.getCharacters(count);
   }
 
-  substring() {
+  substring(): string {
     return this.text.substring(this.index);
   }
 
-  peekSubstring() {
+  peekSubstring(): string {
     return this.text.substring(this.index + 1);
   }
 
-  read(count) {
-    const value = this.getCharacters(count);
-    let newlineCount, lastChar;
+  read(count: number): string | void {
+    const value: string | void = this.getCharacters(count);
 
     if (value === "")
       // this is a result of reading/peeking/doing nothing
       return value;
 
     if (value !== this.EOF) {
-      // advance index
-      this.index += value.length;
-      this.column += value.length;
+      // TODO: remove the condition because EOF === undefined (required by flow)
+      if (value !== undefined) {
+        // advance index
+        this.index += value.length;
+        this.column += value.length;
 
-      // update line count
-      if (this.nextReadBeginsLine) {
-        this.line++;
-        this.column = 1;
-        this.nextReadBeginsLine = false;
+        // update line count
+        if (this.nextReadBeginsLine) {
+          this.line++;
+          this.column = 1;
+          this.nextReadBeginsLine = false;
+        }
+
+        const newlineCount = value
+          .substring(0, value.length - 1)
+          .replace(/[^\n]/g, "").length;
+        if (newlineCount > 0) {
+          this.line += newlineCount;
+          this.column = 1;
+        }
+
+        const lastChar = util.lastChar(value);
+        if (lastChar === "\n") this.nextReadBeginsLine = true;
+
+        this.currentChar = lastChar;
       }
-
-      newlineCount = value.substring(0, value.length - 1).replace(/[^\n]/g, "")
-        .length;
-      if (newlineCount > 0) {
-        this.line += newlineCount;
-        this.column = 1;
-      }
-
-      lastChar = util.last(value);
-      if (lastChar === "\n") this.nextReadBeginsLine = true;
-
-      this.currentChar = lastChar;
     } else {
       this.index = this.length;
       this.currentChar = this.EOF;
@@ -80,27 +95,27 @@ export class CodeReader {
     return value;
   }
 
-  text() {
+  text(): string {
     return this.text;
   }
 
-  getLine() {
+  getLine(): number {
     return this.line;
   }
 
-  getColumn() {
+  getColumn(): number {
     return this.column;
   }
 
-  isEof() {
+  isEof(): boolean {
     return this.index >= this.length;
   }
 
-  isSol() {
+  isSol(): boolean {
     return this.column === 1;
   }
 
-  isSolWs() {
+  isSolWs(): boolean {
     let temp = this.index;
     if (this.column === 1) return true;
 
@@ -114,15 +129,15 @@ export class CodeReader {
     return true;
   }
 
-  isEol() {
+  isEol(): boolean | void {
     return this.nextReadBeginsLine;
   }
 
-  EOF() {
+  EOF(): string | void {
     return this.EOF;
   }
 
-  current() {
+  current(): string | void {
     return this.currentChar;
   }
 }
