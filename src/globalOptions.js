@@ -1,7 +1,7 @@
 // @flow
 import { DEFAULT_CLASS_PREFIX } from "./constants.js";
 
-export type SunlightOptionsMapType = { [string]: number | string | boolean };
+export type SunlightOptionsMapType = { [string]: mixed };
 export type SunlightOptionsObjectType = {
   tabWidth: number,
   classPrefix: string,

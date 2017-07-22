@@ -1,54 +1,66 @@
 // @flow
-
 import * as util from "./util.js";
 import { document } from "./jsdom.js";
 
 import type { AnalyzerContext } from "./analyzer-context.js";
+import type {
+  BetweenIdentRule,
+  CustomIdentRule,
+  FollowsOrPrecedesIdentRule
+} from "./languages.js";
+import type { ParserContext } from "./parser-context.js";
+import type { Token } from "./token.js";
 
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
 
-function defaultHandleToken(
-  suffix: string
-): AnalyzerContext => number | boolean {
-  return function(context: AnalyzerContext): number | boolean {
+function defaultHandleToken(suffix: string): * {
+  return function(context: AnalyzerContext): true {
     const element: Element = document.createElement("span");
     element.className = context.options.classPrefix + suffix;
     element.appendChild(context.createTextNode(context.tokens[context.index]));
-    return context.addNode(element) || true;
+    context.addNode(element);
+    return true;
   };
 }
 
 export class defaultAnalyzer {
-  handleToken(context: AnalyzerContext): number | boolean {
+  handleToken(context: AnalyzerContext): true {
     return defaultHandleToken(context.tokens[context.index].name)(context);
   }
 
   // TODO: clean up!!!
   // just append default content as a text node
-  handle_default(context: AnalyzerContext): number {
-    return context.addNode(
-      context.createTextNode(context.tokens[context.index])
-    );
+  handle_default(context: AnalyzerContext): true {
+    context.addNode(context.createTextNode(context.tokens[context.index]));
+    return true;
   }
 
   // this handles the named ident mayhem
-  handle_ident(context: AnalyzerContext) {
-    const evaluate = function(rules, createRule) {
+  handle_ident(context: AnalyzerContext): true {
+    const _evaluateCustomRule = (rules: CustomIdentRule[]): boolean => {
       rules = rules || [];
       for (let i = 0; i < rules.length; i++)
-        if (typeof rules[i] === "function") {
-          if (rules[i](context))
-            return defaultHandleToken("named-ident")(context);
-        } else if (createRule && createRule(rules[i])(context.tokens)) {
+        if (rules[i](context))
           return defaultHandleToken("named-ident")(context);
-        }
+
+      return false;
+    };
+
+    const _evaluate = <T: FollowsOrPrecedesIdentRule | BetweenIdentRule>(
+      rules: T[],
+      createRule: T => (Token[]) => boolean
+    ): boolean => {
+      rules = rules || [];
+      for (let i = 0; i < rules.length; i++)
+        if (createRule && createRule(rules[i])(context.tokens))
+          return defaultHandleToken("named-ident")(context);
 
       return false;
     };
 
     return (
-      evaluate(context.language.namedIdentRules.custom) ||
-      evaluate(context.language.namedIdentRules.follows, ruleData =>
+      _evaluateCustomRule(context.language.namedIdentRules.custom) ||
+      _evaluate(context.language.namedIdentRules.follows, (ruleData: *): * =>
         util.createProceduralRule(
           context.index - 1,
           -1,
@@ -56,7 +68,7 @@ export class defaultAnalyzer {
           context.language.caseInsensitive
         )
       ) ||
-      evaluate(context.language.namedIdentRules.precedes, ruleData =>
+      _evaluate(context.language.namedIdentRules.precedes, (ruleData: *): * =>
         util.createProceduralRule(
           context.index + 1,
           1,
@@ -64,7 +76,7 @@ export class defaultAnalyzer {
           context.language.caseInsensitive
         )
       ) ||
-      evaluate(context.language.namedIdentRules.between, ruleData =>
+      _evaluate(context.language.namedIdentRules.between, (ruleData: *): * =>
         util.createBetweenRule(
           context.index,
           ruleData.opener,
@@ -77,12 +89,12 @@ export class defaultAnalyzer {
   }
 }
 
-export function defaultNumberParser(context: AnalyzerContext) {
+export function defaultNumberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
 
-  let number;
+  let number: string;
   let allowDecimal = true;
   if (!/\d/.test(current)) {
     // is it a decimal followed by a number?

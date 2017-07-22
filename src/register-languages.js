@@ -1,3 +1,4 @@
+// @flow
 import { registerLanguage } from "./languages.js";
 
 import * as plaintext from "./languages/plaintext.js";

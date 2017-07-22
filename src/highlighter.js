@@ -1,5 +1,4 @@
 // @flow
-
 import * as util from "./util.js";
 import { DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
 import { globalOptions } from "./globalOptions.js";
@@ -25,7 +24,7 @@ export class Highlighter {
   matchSunlightNodeRegEx: RegExp;
   isAlreadyHighlightedRegEx: RegExp;
 
-  constructor(options: SunlightOptionsType) {
+  constructor(options: ?SunlightOptionsType) {
     this.options = Object.assign({}, globalOptions, options);
   }
 
@@ -67,15 +66,14 @@ export class Highlighter {
     }
   }
 
-  createContainer(ctx: AnalyzerContext): Element {
+  createContainer(context: AnalyzerContext): Element {
     const container = document.createElement("span");
-    container.className = ctx.options.classPrefix + ctx.language.name;
+    container.className =
+      (context.options.classPrefix || "") + context.language.name;
     return container;
   }
 
   analyze(analyzerContext: AnalyzerContext, startIndex: number) {
-    let tokenName, func, language, analyzer;
-
     fireEvent("beforeAnalyze", this, { analyzerContext: analyzerContext });
 
     if (analyzerContext.tokens.length > 0) {
@@ -86,7 +84,7 @@ export class Highlighter {
       let container = this.createContainer(analyzerContext);
 
       for (let i = startIndex; i < analyzerContext.tokens.length; i++) {
-        language =
+        const language =
           languages[analyzerContext.tokens[i].language] ||
           languages[DEFAULT_LANGUAGE];
         if (language.name !== analyzerContext.language.name) {
@@ -99,16 +97,16 @@ export class Highlighter {
         }
 
         analyzerContext.index = i;
-        tokenName = analyzerContext.tokens[i].name;
+        const tokenName = analyzerContext.tokens[i].name;
         // TODO: clean up!!!
-        func = "handle_" + tokenName;
+        const func = "handle_" + tokenName;
 
-        analyzer =
+        const analyzer =
           analyzerContext.getAnalyzer.call(analyzerContext) ||
           analyzerContext.language.analyzer;
-        analyzer[func]
-          ? analyzer[func](analyzerContext)
-          : analyzer.handleToken(analyzerContext);
+
+        if (analyzer[func]) analyzer[func](analyzerContext);
+        else analyzer.handleToken(analyzerContext);
       }
 
       // append the last nodes, and add the final nodes to the context
@@ -148,8 +146,7 @@ export class Highlighter {
       this.options
     );
 
-    this.analyze.call(
-      this,
+    this.analyze(
       analyzerContext,
       partialContext.index ? partialContext.index + 1 : 0
     );
@@ -160,7 +157,7 @@ export class Highlighter {
   }
 
   // matches the language of the node to highlight
-  matchSunlightNode(node: Element): any {
+  matchSunlightNode(node: Element): * {
     if (!this.matchSunlightNodeRegEx)
       this.matchSunlightNodeRegEx = new RegExp(
         "(?:\\s|^)" + this.options.classPrefix + "highlight-(\\S+)(?:\\s|$)"
@@ -181,7 +178,7 @@ export class Highlighter {
 
   // highlights a block of text
   highlight(code: string, languageId: string): AnalyzerContext {
-    return this.highlightText.call(this, code, languageId);
+    return this.highlightText(code, languageId);
   }
 
   // recursively highlights a DOM node

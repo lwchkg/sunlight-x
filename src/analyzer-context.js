@@ -2,18 +2,20 @@
 import { EOL, EMPTY } from "./constants.js";
 import { document } from "./jsdom.js";
 
-import type { Token } from "./token.js";
+import type { Continuation } from "./continuation.js";
+import type { AnalyzerType, ContextItemsType, Language } from "./languages.js";
 import type { ParserContext } from "./parser-context.js";
 import type { SunlightOptionsType } from "./globalOptions.js";
+import type { Token } from "./token.js";
 
 export class AnalyzerContext {
   options: SunlightOptionsType;
-  nodes: Element[];
+  nodes: (Element | Text)[];
   tokens: Token[];
-  language: ?string;
-  getAnalyzer: () => void;
-  continuation: any;
-  items: any;
+  language: Language; // Uninitizlized by constructor. Initialize before using!
+  getAnalyzer: () => AnalyzerType;
+  continuation: ?Continuation;
+  items: ContextItemsType;
   index: number; // TODO: initialize. But what to initialize with?
 
   nbsp: string;
@@ -37,9 +39,8 @@ export class AnalyzerContext {
 
     this.tokens = (partialContext.tokens || [])
       .concat(parserContext.getAllTokens());
-    this.language = null;
     this.getAnalyzer = EMPTY;
-    this.continuation = parserContext.continuation;
+    this.continuation = parserContext.continuation; // TODO: dead code?
     this.items = parserContext.items;
   }
 
@@ -64,7 +65,7 @@ export class AnalyzerContext {
     return value;
   }
 
-  addNode(node: Element) {
+  addNode(node: Element | Text) {
     this.nodes.push(node);
   }
 
@@ -72,7 +73,7 @@ export class AnalyzerContext {
     return document.createTextNode(this._prepareText(token));
   }
 
-  getNodes(): Element[] {
+  getNodes(): (Element | Text)[] {
     return this.nodes;
   }
 

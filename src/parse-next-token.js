@@ -101,7 +101,7 @@ function parseScopes(context: ParserContext): ?Token {
       const column = context.reader.getColumn();
       context.reader.read(opener.length - 1);
       const continuation = new Continuation(scope, tokenName);
-      return continuation.Process(context, continuation, value, line, column);
+      return continuation.process(context, continuation, value, line, column);
     }
   }
 

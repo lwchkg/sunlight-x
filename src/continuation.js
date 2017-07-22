@@ -3,12 +3,13 @@ import * as util from "./util.js";
 
 import type { ParserContext } from "./parser-context.js";
 import type { ScopeType } from "./languages.js";
+import type { Token } from "./token.js";
 
 export class Continuation {
   closer: RegExp;
   closerLength: number;
   escapeSequences: [string, string][];
-  zeroWidth: string | false;
+  zeroWidth: boolean;
   tokenName: string;
 
   constructor(scope: ScopeType, tokenName: string) {
@@ -22,18 +23,18 @@ export class Continuation {
     this.tokenName = tokenName;
   }
 
-  Process(
+  process(
     context: ParserContext,
     continuation: Continuation,
     buffer: string,
     line: number,
     column: number,
     processCurrent: boolean = false
-  ) {
+  ): Token {
     let foundCloser = false;
     // buffer = buffer || ""; // TODO: remove
 
-    const process = processCurrent => {
+    const _processSingle = (processCurrent: boolean): boolean => {
       // check for escape sequences
       const current = context.reader.current() || "";
 
@@ -60,8 +61,11 @@ export class Continuation {
       return true;
     };
 
-    if (!processCurrent || process(true))
-      while (context.reader.peek() !== context.reader.EOF && process(false)) {
+    if (!processCurrent || _processSingle(true))
+      while (
+        context.reader.peek() !== context.reader.EOF &&
+        _processSingle(false)
+      ) {
         // empty
       }
 

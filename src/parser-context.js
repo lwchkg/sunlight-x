@@ -1,14 +1,23 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
 import { CodeReader } from "./code-reader.js";
-import { Continuation } from "./continuation.js";
 import { fireEvent } from "./events.js";
 import { Token } from "./token.js";
 import { parseNextToken } from "./parse-next-token.js";
 import * as util from "./util.js";
 
 import type { AnalyzerContext } from "./analyzer-context.js";
+import type { Continuation } from "./continuation.js";
 import type { Highlighter } from "./highlighter.js";
-import type { Language } from "./languages.js";
+import type {
+  ContextItemsType,
+  EmbeddedLanguageDefinition,
+  Language
+} from "./languages.js";
 import type { SunlightOptionsType } from "./globalOptions.js";
 
 export class ParserContext {
@@ -17,10 +26,10 @@ export class ParserContext {
   options: SunlightOptionsType;
   reader: CodeReader;
   language: Language;
-  items: any;
-  embeddedLanguageStack: any;
+  items: ContextItemsType;
+  embeddedLanguageStack: EmbeddedLanguageDefinition[];
   defaultData: { text: string, line: number, column: number };
-  continuation: Continuation;
+  continuation: ?Continuation;
 
   constructor(
     highlighter: Highlighter,

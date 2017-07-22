@@ -1,7 +1,11 @@
 // @flow
 import { document } from "./jsdom.js";
 
-import type { HashMapType } from "./languages.js";
+import type {
+  BetweenIdentRule,
+  FollowsOrPrecedesIdentRule,
+  HashMapType
+} from "./languages.js";
 import type { ParserContext } from "./parser-context.js";
 import type { Token } from "./token.js";
 
@@ -137,42 +141,7 @@ export function matchWord(
   return null;
 }
 
-/**
- * Creates a hash map from the given array. This is crucial for performance.
- *
- * @param {string[]} wordMap An array of strings to hash.
- * @param {string} boundary A regular expression representing the boundary of
- *                          each string (e.g. "\\b")
- * @param {boolean|undefined} caseInsensitive Indicates if the words are case
- *                            insensitive (defaults to false)
- * @returns {Object} Each string in the array is hashed by its first letter. The
- *                   value is transformed into an object with properties value
- *                   (the original value) and a regular expression to match the
- *                   word.
- */
-export function createHashMap(
-  wordMap: string[],
-  boundary: string,
-  caseInsensitive: boolean = false
-): HashMapType {
-  // creates a hash table where the hash is the first character of the word
-  const newMap = {};
-  for (let i = 0; i < wordMap.length; i++) {
-    const word = caseInsensitive ? wordMap[i].toUpperCase() : wordMap[i];
-    const firstChar = word.charAt(0);
-    if (!newMap[firstChar]) newMap[firstChar] = [];
-
-    newMap[firstChar].push({
-      value: word,
-      // TODO: rewrite expression once flow issue #4435 is fixed.
-      regex: caseInsensitive
-        ? new RegExp("^" + regexEscape(word) + boundary, "i")
-        : new RegExp("^" + regexEscape(word) + boundary)
-    });
-  }
-
-  return newMap;
-}
+export { createHashMap } from "./languages.js";
 
 /**
  * Creates a between rule
@@ -187,11 +156,11 @@ export function createHashMap(
  */
 export function createBetweenRule(
   startIndex: number,
-  opener,
-  closer,
+  opener: { token: string, values: string[] },
+  closer: { token: string, values: string[] },
   caseInsensitive: boolean = false
-) {
-  return function(tokens) {
+): * {
+  return function(tokens: Token[]): boolean {
     // check to the left: if we run into a closer or never run into an opener, fail
     let token;
     let success = false;
@@ -246,14 +215,14 @@ export function createBetweenRule(
 export function createProceduralRule(
   startIndex: number,
   direction: number,
-  tokenRequirements,
-  caseInsensitive: ?boolean
-) {
+  tokenRequirements: FollowsOrPrecedesIdentRule,
+  caseInsensitive: boolean = false
+): * {
   tokenRequirements = tokenRequirements.slice(0); // clone array
   // TODO: verify. Probably were buggy.
   if (direction === 1) tokenRequirements.reverse();
 
-  return function(tokens) {
+  return function(tokens: Token[]): boolean {
     let tokenIndexStart = startIndex;
 
     for (let j = 0; j < tokenRequirements.length; j++) {

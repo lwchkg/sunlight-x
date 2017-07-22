@@ -25,7 +25,7 @@ export class TestSupport {
   options: { [string]: any };
   codeElement: Element;
 
-  constructor(filename: string, language: string, options: { [string]: any }) {
+  constructor(filename: string, language: string, options?: { [string]: any }) {
     this.options =
       options === undefined
         ? Object.assign({}, defaultOptions)
@@ -102,6 +102,9 @@ export class TestSupport {
 
     content = content.replace(/ /g, nbsp).replace(/\t/g, nbsp.repeat(4));
 
-    assert(nodeValues.indexOf(content) >= 0);
+    assert(
+      nodeValues.indexOf(content) >= 0,
+      `Cannot find \`${content}\` in \`${className}\`.`
+    );
   }
 }
