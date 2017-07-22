@@ -230,10 +230,7 @@
       "error",
       "never"
     ],
-    "flowtype\/type-id-match": [
-      "error",
-      "^([A-Z][a-z0-9]+)+Type$"
-    ],
+    "flowtype\/type-id-match": "none",
     "flowtype\/union-intersection-spacing": [
       "error",
       "always"

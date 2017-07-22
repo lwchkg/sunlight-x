@@ -1,21 +1,21 @@
 // @flow
 
 import * as util from "./util.js";
-import { isIe, EOL, EMPTY, DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
+import { DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
 import { globalOptions } from "./globalOptions.js";
 import { fireEvent } from "./events.js";
 import { languages } from "./languages.js";
-import { CodeReader } from "./code-reader.js";
 import { AnalyzerContext } from "./analyzer-context.js";
-import { parseNextToken } from "./parse-next-token.js";
+import { Tokenize } from "./parser-context.js";
 
 import { document } from "./jsdom.js";
 
 import type { SunlightOptionsType } from "./globalOptions.js";
+import type { ParserContext } from "./parser-context.js";
 
 let HIGHLIGHTED_NODE_COUNT = 0;
 
-function appendAll(parent: Node, children: Node[]) {
+function appendAll<T: Node | Element>(parent: T, children: T[]) {
   for (let i = 0; i < children.length; i++) parent.appendChild(children[i]);
 }
 
@@ -30,15 +30,15 @@ export class Highlighter {
   }
 
   // called before processing the current
-  switchToEmbeddedLanguageIfNecessary(context) {
-    let i, embeddedLanguage;
-
-    for (i = 0; i < context.language.embeddedLanguages.length; i++) {
+  switchToEmbeddedLanguageIfNecessary(context: ParserContext) {
+    for (let i = 0; i < context.language.embeddedLanguages.length; i++) {
       if (!languages[context.language.embeddedLanguages[i].language])
         // unregistered language
         continue;
 
-      embeddedLanguage = util.clone(context.language.embeddedLanguages[i]);
+      const embeddedLanguage = util.clone(
+        context.language.embeddedLanguages[i]
+      );
 
       if (embeddedLanguage.switchTo(context)) {
         embeddedLanguage.oldItems = util.clone(context.items);
@@ -54,7 +54,7 @@ export class Highlighter {
   }
 
   // called after processing the current
-  switchBackFromEmbeddedLanguageIfNecessary(context) {
+  switchBackFromEmbeddedLanguageIfNecessary(context: ParserContext) {
     const current = util.lastElement(context.embeddedLanguageStack);
 
     if (current && current.switchBack(context)) {
@@ -67,120 +67,14 @@ export class Highlighter {
     }
   }
 
-  tokenize(
-    unhighlightedCode: string,
-    language: string,
-    partialContext,
-    options
-  ) {
-    let tokens = [];
-
-    fireEvent("beforeTokenize", this, {
-      code: unhighlightedCode,
-      language: language
-    });
-
-    const context: Object = {
-      reader: new CodeReader(unhighlightedCode),
-      language: language,
-      items: util.clone(language.contextItems),
-      token: function(index) {
-        return tokens[index];
-      },
-      getAllTokens: function() {
-        return tokens.slice(0);
-      },
-      count: function() {
-        return tokens.length;
-      },
-      options: options,
-      embeddedLanguageStack: [],
-      defaultData: { text: "", line: 1, column: 1 },
-      createToken: function(name, value, line, column) {
-        return {
-          name: name,
-          line: line,
-          value: isIe ? value.replace(/\n/g, "\r") : value,
-          column: column,
-          language: this.language.name
-        };
-      }
-    };
-
-    // if continuation is given, then we need to pick up where we left off from a previous parse
-    // basically it indicates that a scope was never closed, so we need to continue that scope
-    if (partialContext.continuation) {
-      const continuation = partialContext.continuation;
-      partialContext.continuation = null;
-      tokens.push(
-        continuation(
-          context,
-          continuation,
-          "",
-          context.reader.getLine(),
-          context.reader.getColumn(),
-          true
-        )
-      );
-    }
-
-    while (!context.reader.isEof()) {
-      this.switchToEmbeddedLanguageIfNecessary(context);
-      const token = parseNextToken(context);
-
-      // flush default data if needed (in pretty much all languages this is just whitespace)
-      if (token !== null) {
-        if (context.defaultData.text !== "") {
-          tokens.push(
-            context.createToken(
-              "default",
-              context.defaultData.text,
-              context.defaultData.line,
-              context.defaultData.column
-            )
-          );
-          context.defaultData.text = "";
-        }
-
-        if (token[0] !== undefined)
-          // multiple tokens
-          tokens = tokens.concat(token);
-        else
-          // single token
-          tokens.push(token);
-      }
-
-      this.switchBackFromEmbeddedLanguageIfNecessary(context);
-      context.reader.read();
-    }
-
-    // append the last default token, if necessary
-    if (context.defaultData.text !== "")
-      tokens.push(
-        context.createToken(
-          "default",
-          context.defaultData.text,
-          context.defaultData.line,
-          context.defaultData.column
-        )
-      );
-
-    fireEvent("afterTokenize", this, {
-      code: unhighlightedCode,
-      parserContext: context
-    });
-    return context;
-  }
-
-  createContainer(ctx): Element {
+  createContainer(ctx: AnalyzerContext): Element {
     const container = document.createElement("span");
     container.className = ctx.options.classPrefix + ctx.language.name;
     return container;
   }
 
   analyze(analyzerContext: AnalyzerContext, startIndex: number) {
-    let nodes, container, i, tokenName, func, language, analyzer;
-    // TODO: let lastIndex;
+    let tokenName, func, language, analyzer;
 
     fireEvent("beforeAnalyze", this, { analyzerContext: analyzerContext });
 
@@ -188,11 +82,10 @@ export class Highlighter {
       analyzerContext.language =
         languages[analyzerContext.tokens[0].language] ||
         languages[DEFAULT_LANGUAGE];
-      nodes = [];
-      // TODO: lastIndex = 0;
-      container = this.createContainer(analyzerContext);
+      const nodes = [];
+      let container = this.createContainer(analyzerContext);
 
-      for (i = startIndex; i < analyzerContext.tokens.length; i++) {
+      for (let i = startIndex; i < analyzerContext.tokens.length; i++) {
         language =
           languages[analyzerContext.tokens[i].language] ||
           languages[DEFAULT_LANGUAGE];
@@ -222,7 +115,7 @@ export class Highlighter {
       appendAll(container, analyzerContext.getNodes());
       nodes.push(container);
       analyzerContext.resetNodes();
-      for (i = 0; i < nodes.length; i++) analyzerContext.addNode(nodes[i]);
+      for (let i = 0; i < nodes.length; i++) analyzerContext.addNode(nodes[i]);
     }
 
     fireEvent("afterAnalyze", this, { analyzerContext: analyzerContext });
@@ -233,7 +126,7 @@ export class Highlighter {
   highlightText(
     unhighlightedCode: string,
     languageId: string,
-    partialContext: Object
+    partialContext: AnalyzerContext
   ): AnalyzerContext {
     let language = languages[languageId];
 
@@ -248,15 +141,9 @@ export class Highlighter {
       previousContext: partialContext
     });
 
-    //const analyzerContext = this.createAnalyzerContext(
     const analyzerContext = new AnalyzerContext(
-      this.tokenize.call(
-        this,
-        unhighlightedCode,
-        language,
-        partialContext,
-        this.options
-      ),
+      // this.tokenize.call(this, unhighlightedCode, language, partialContext, this.options),
+      Tokenize(this, unhighlightedCode, language, partialContext, this.options),
       partialContext,
       this.options
     );

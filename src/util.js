@@ -1,6 +1,9 @@
 // @flow
-
 import { document } from "./jsdom.js";
+
+import type { HashMapType } from "./languages.js";
+import type { ParserContext } from "./parser-context.js";
+import type { Token } from "./token.js";
 
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }]*/
 
@@ -98,11 +101,11 @@ export function contains<T>(
  * @returns {object} A token returned from context.createToken
  */
 export function matchWord(
-  context,
-  wordMap,
+  context: ParserContext,
+  wordMap: ?HashMapType,
   tokenName: string,
   doNotRead: boolean = false
-) {
+): ?Token {
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
   wordMap = wordMap || [];
@@ -114,7 +117,7 @@ export function matchWord(
 
   wordMap = wordMap[current];
 
-  const index = wordMap.findIndex(wordItem => {
+  const index = wordMap.findIndex((wordItem: *): boolean => {
     const word = wordItem.value;
     const peek = current + context.reader.peek(word.length);
     return word === peek || wordItem.regex.test(peek);
@@ -124,9 +127,9 @@ export function matchWord(
     return context.createToken(
       tokenName,
       context.reader.current() +
-        context.reader[doNotRead ? "peek" : "read"](
-          wordMap[index].value.length - 1
-        ),
+        (doNotRead
+          ? context.reader.peek(wordMap[index].value.length - 1)
+          : context.reader.read(wordMap[index].value.length - 1)),
       line,
       column
     );
@@ -149,9 +152,9 @@ export function matchWord(
  */
 export function createHashMap(
   wordMap: string[],
-  boundary: RegExp,
+  boundary: string,
   caseInsensitive: boolean = false
-) {
+): HashMapType {
   // creates a hash table where the hash is the first character of the word
   const newMap = {};
   for (let i = 0; i < wordMap.length; i++) {
@@ -161,10 +164,10 @@ export function createHashMap(
 
     newMap[firstChar].push({
       value: word,
-      regex: new RegExp(
-        "^" + regexEscape(word) + boundary,
-        caseInsensitive ? "i" : ""
-      )
+      // TODO: rewrite expression once flow issue #4435 is fixed.
+      regex: caseInsensitive
+        ? new RegExp("^" + regexEscape(word) + boundary, "i")
+        : new RegExp("^" + regexEscape(word) + boundary)
     });
   }
 

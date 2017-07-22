@@ -8,6 +8,29 @@
 import { createHashMap } from "./util.js";
 import { defaultAnalyzer, defaultNumberParser } from "./default-helpers.js";
 
+import type { ParserContext } from "./parser-context.js";
+import type { Token } from "./token.js";
+
+export type { ParserContext, Token };
+
+export type ScopeType = [ string, string, ?[string, string][], ?boolean ];
+
+export type Language = {
+  name: string,
+  analyzer: any,
+  customTokens: [],
+  namedIdentRules: {| follows: [], precedes: [], between: [] |},
+  punctuation: RegExp,
+  numberParser: (ParserContext) => ?Token,
+  caseInsensitive: boolean,
+  doNotParse: RegExp,
+  contextItems: { [string]: any },
+  embeddedLanguages: {},
+  customParseRules: {},
+  scopes: { [string]: ScopeType[] },
+  identFirstLetter: RegExp
+};
+
 const languageDefaults = Object.freeze({
   analyzer: new defaultAnalyzer(),
   customTokens: [],
@@ -21,6 +44,10 @@ const languageDefaults = Object.freeze({
 });
 
 export const languages: { [string]: any } = {};
+
+export type HashMapType = {
+  [string]: { value: string, regex: RegExp }[]
+};
 
 /**
  * Register a language to the highlighter.

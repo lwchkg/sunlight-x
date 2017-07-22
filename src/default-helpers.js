@@ -3,6 +3,8 @@
 import * as util from "./util.js";
 import { document } from "./jsdom.js";
 
+import type { AnalyzerContext } from "./analyzer-context.js";
+
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
 
 function defaultHandleToken(

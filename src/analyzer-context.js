@@ -1,11 +1,10 @@
 // @flow
 import { EOL, EMPTY } from "./constants.js";
 import { document } from "./jsdom.js";
-import { globalOptions } from "./globalOptions.js";
 
+import type { Token } from "./token.js";
+import type { ParserContext } from "./parser-context.js";
 import type { SunlightOptionsType } from "./globalOptions.js";
-
-const DEFAULT_TAB_WIDTH = 4;
 
 export class AnalyzerContext {
   options: SunlightOptionsType;
@@ -15,13 +14,14 @@ export class AnalyzerContext {
   getAnalyzer: () => void;
   continuation: any;
   items: any;
+  index: number; // TODO: initialize. But what to initialize with?
 
   nbsp: string;
   tab: string;
 
   constructor(
-    parserContext: any,
-    partialContext: any,
+    parserContext: ParserContext,
+    partialContext: AnalyzerContext,
     options: SunlightOptionsType
   ) {
     this.nodes = [];
@@ -29,26 +29,18 @@ export class AnalyzerContext {
 
     if (options.showWhitespace) {
       this.nbsp = "\u00b7";
-      this.tab = new Array(this._getTabWidth()).join("\u2014") + "\u2192";
+      this.tab = new Array(this.options.tabWidth).join("\u2014") + "\u2192";
     } else {
       this.nbsp = "\u00a0";
-      this.tab = new Array(this._getTabWidth() + 1).join(this.nbsp);
+      this.tab = new Array(this.options.tabWidth + 1).join(this.nbsp);
     }
 
-    // TODO: add code between
     this.tokens = (partialContext.tokens || [])
       .concat(parserContext.getAllTokens());
     this.language = null;
     this.getAnalyzer = EMPTY;
     this.continuation = parserContext.continuation;
     this.items = parserContext.items;
-  }
-
-  _getTabWidth(): number {
-    if (typeof this.options.tabWidth === "number") return this.options.tabWidth;
-    if (typeof globalOptions.tabWidth === "number")
-      return globalOptions.tabWidth;
-    return DEFAULT_TAB_WIDTH;
   }
 
   _prepareText(token: Token): string {
@@ -62,11 +54,11 @@ export class AnalyzerContext {
       const actualColumn =
         lastNewlineColumn >= 0 ? tabIndex - lastNewlineColumn - 1 : tabIndex;
       const tabLength =
-        this._getTabWidth() - actualColumn % this._getTabWidth(); // actual length of the TAB character
+        this.options.tabWidth - actualColumn % this.options.tabWidth; // actual length of the TAB character
 
       value =
         value.substring(0, tabIndex) +
-        this.tab.substring(this._getTabWidth() - tabLength) +
+        this.tab.substring(this.options.tabWidth - tabLength) +
         value.substring(tabIndex + 1);
     }
     return value;

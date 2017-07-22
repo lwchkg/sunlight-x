@@ -1,7 +1,14 @@
+// @flow
+import { Continuation } from "./continuation.js";
 import * as util from "./util.js";
+
+import type { ParserContext } from "./parser-context.js";
+import type { Token } from "./token.js";
+import type { ScopeType } from "./languages.js";
+
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2, 3] }]*/
 
-function isIdentMatch(context) {
+function isIdentMatch(context: ParserContext): boolean {
   return (
     context.language.identFirstLetter &&
     context.language.identFirstLetter.test(context.reader.current())
@@ -9,16 +16,15 @@ function isIdentMatch(context) {
 }
 
 // token parsing functions
-function parseKeyword(context) {
+function parseKeyword(context: ParserContext): ?Token {
   return util.matchWord(context, context.language.keywords, "keyword");
 }
 
-function parseCustomTokens(context) {
-  let tokenName, token;
+function parseCustomTokens(context: ParserContext): ?Token {
   if (context.language.customTokens === undefined) return null;
 
-  for (tokenName in context.language.customTokens) {
-    token = util.matchWord(
+  for (const tokenName in context.language.customTokens) {
+    const token = util.matchWord(
       context,
       context.language.customTokens[tokenName],
       tokenName
@@ -29,11 +35,11 @@ function parseCustomTokens(context) {
   return null;
 }
 
-function parseOperator(context) {
+function parseOperator(context: ParserContext): ?Token {
   return util.matchWord(context, context.language.operators, "operator");
 }
 
-function parsePunctuation(context) {
+function parsePunctuation(context: ParserContext): ?Token {
   const current = context.reader.current();
   if (context.language.punctuation.test(util.regexEscape(current)))
     return context.createToken(
@@ -46,7 +52,7 @@ function parsePunctuation(context) {
   return null;
 }
 
-function parseIdent(context) {
+function parseIdent(context: ParserContext): ?Token {
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
 
@@ -63,7 +69,7 @@ function parseIdent(context) {
   return context.createToken("ident", ident, line, column);
 }
 
-function parseDefault(context) {
+function parseDefault(context: ParserContext): ?Token {
   if (context.defaultData.text === "") {
     // new default token
     context.defaultData.line = context.reader.getLine();
@@ -74,81 +80,13 @@ function parseDefault(context) {
   return null;
 }
 
-function getScopeReaderFunction(scope, tokenName) {
-  const escapeSequences = scope[2] || [];
-  const closerLength = scope[1].length;
-  const closer =
-    typeof scope[1] === "string"
-      ? new RegExp(util.regexEscape(scope[1]))
-      : scope[1].regex;
-  const zeroWidth = scope[3] || false;
-
-  // processCurrent indicates that this is being called from a continuation
-  // which means that we need to process the current char, rather than peeking at the next
-  return function(context, continuation, buffer, line, column, processCurrent) {
-    let foundCloser = false;
-    buffer = buffer || "";
-
-    processCurrent = processCurrent ? 1 : 0;
-
-    function process(processCurrent) {
-      // check for escape sequences
-      let peekValue;
-      const current = context.reader.current();
-
-      for (let i = 0; i < escapeSequences.length; i++) {
-        peekValue =
-          (processCurrent ? current : "") +
-          context.reader.peek(escapeSequences[i].length - processCurrent);
-        if (peekValue === escapeSequences[i]) {
-          buffer += context.reader.read(peekValue.length - processCurrent);
-          return true;
-        }
-      }
-
-      peekValue =
-        (processCurrent ? current : "") +
-        context.reader.peek(closerLength - processCurrent);
-      if (closer.test(peekValue)) {
-        foundCloser = true;
-        return false;
-      }
-
-      buffer += processCurrent ? current : context.reader.read();
-      return true;
-    }
-
-    if (!processCurrent || process(true))
-      while (context.reader.peek() !== context.reader.EOF && process(false)) {
-        // empty
-      }
-
-    if (processCurrent) {
-      buffer += context.reader.current();
-      context.reader.read();
-    } else {
-      buffer +=
-        zeroWidth || context.reader.peek() === context.reader.EOF
-          ? ""
-          : context.reader.read(closerLength);
-    }
-
-    if (!foundCloser)
-      // we need to signal to the context that this scope was never properly closed
-      // this has significance for partial parses (e.g. for nested languages)
-      context.continuation = continuation;
-
-    return context.createToken(tokenName, buffer, line, column);
-  };
-}
-
-function parseScopes(context) {
+function parseScopes(context: ParserContext): ?Token {
   const current = context.reader.current();
 
   for (const tokenName in context.language.scopes) {
     const specificScopes = context.language.scopes[tokenName];
-    for (let j = 0; j < specificScopes.length; j++) {
-      const opener = specificScopes[j][0];
+    for (const scope of specificScopes) {
+      const opener = scope[0];
 
       const value = current + context.reader.peek(opener.length - 1);
 
@@ -162,19 +100,19 @@ function parseScopes(context) {
       const line = context.reader.getLine();
       const column = context.reader.getColumn();
       context.reader.read(opener.length - 1);
-      const continuation = getScopeReaderFunction(specificScopes[j], tokenName);
-      return continuation(context, continuation, value, line, column);
+      const continuation = new Continuation(scope, tokenName);
+      return continuation.Process(context, continuation, value, line, column);
     }
   }
 
   return null;
 }
 
-function parseNumber(context) {
+function parseNumber(context: ParserContext): ?Token {
   return context.language.numberParser(context);
 }
 
-function parseCustomRules(context) {
+function parseCustomRules(context: ParserContext): ?Token | Token[] {
   const customRules = context.language.customParseRules;
 
   if (customRules === undefined) return null;
@@ -187,7 +125,7 @@ function parseCustomRules(context) {
   return null;
 }
 
-export function parseNextToken(context) {
+export function parseNextToken(context: ParserContext): ?Token | Token[] {
   if (context.language.doNotParse.test(context.reader.current()))
     return parseDefault(context);
 

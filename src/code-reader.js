@@ -25,10 +25,8 @@ export class CodeReader {
     this.currentChar = this.length > 0 ? text.charAt(0) : this.EOF;
   }
 
-  getCharacters(count: ?number): string | void {
+  getCharacters(count: number = 1): string | void {
     if (count === 0) return "";
-
-    count = count || 1;
 
     const value = this.text.substring(this.index + 1, this.index + count + 1);
     return value === "" ? this.EOF : value;
@@ -41,7 +39,7 @@ export class CodeReader {
       .line}, column: ${this.column}, current: [${currentChar}]`;
   }
 
-  peek(count: number): string | void {
+  peek(count: number = 1): string | void {
     return this.getCharacters(count);
   }
 
@@ -53,40 +51,39 @@ export class CodeReader {
     return this.text.substring(this.index + 1);
   }
 
-  read(count: number): string | void {
+  read(count: number = 1): string | void {
     const value: string | void = this.getCharacters(count);
 
-    if (value === "")
-      // this is a result of reading/peeking/doing nothing
-      return value;
+    // this is a result of reading/peeking/doing nothing
+    if (value === "") return value;
 
     if (value !== this.EOF) {
       // TODO: remove the condition because EOF === undefined (required by flow)
-      if (value !== undefined) {
-        // advance index
-        this.index += value.length;
-        this.column += value.length;
+      if (value === undefined) return;
 
-        // update line count
-        if (this.nextReadBeginsLine) {
-          this.line++;
-          this.column = 1;
-          this.nextReadBeginsLine = false;
-        }
+      // advance index
+      this.index += value.length;
+      this.column += value.length;
 
-        const newlineCount = value
-          .substring(0, value.length - 1)
-          .replace(/[^\n]/g, "").length;
-        if (newlineCount > 0) {
-          this.line += newlineCount;
-          this.column = 1;
-        }
-
-        const lastChar = util.lastChar(value);
-        if (lastChar === "\n") this.nextReadBeginsLine = true;
-
-        this.currentChar = lastChar;
+      // update line count
+      if (this.nextReadBeginsLine) {
+        this.line++;
+        this.column = 1;
+        this.nextReadBeginsLine = false;
       }
+
+      const newlineCount = value
+        .substring(0, value.length - 1)
+        .replace(/[^\n]/g, "").length;
+      if (newlineCount > 0) {
+        this.line += newlineCount;
+        this.column = 1;
+      }
+
+      const lastChar = util.lastChar(value);
+      if (lastChar === "\n") this.nextReadBeginsLine = true;
+
+      this.currentChar = lastChar;
     } else {
       this.index = this.length;
       this.currentChar = this.EOF;
