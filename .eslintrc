@@ -230,7 +230,7 @@
       "error",
       "never"
     ],
-    "flowtype\/type-id-match": "none",
+    "flowtype\/type-id-match": "off",
     "flowtype\/union-intersection-spacing": [
       "error",
       "always"
