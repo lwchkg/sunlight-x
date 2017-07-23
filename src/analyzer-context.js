@@ -23,7 +23,7 @@ export class AnalyzerContext {
 
   constructor(
     parserContext: ParserContext,
-    partialContext: AnalyzerContext,
+    partialContext: ?AnalyzerContext,
     options: SunlightOptionsType
   ) {
     this.nodes = [];
@@ -37,10 +37,11 @@ export class AnalyzerContext {
       this.tab = new Array(this.options.tabWidth + 1).join(this.nbsp);
     }
 
-    this.tokens = (partialContext.tokens || [])
+    // this.tokens = (partialContext ? partialContext.tokens : []).concat(parserContext.getAllTokens());
+    this.tokens = ((partialContext && partialContext.tokens) || [])
       .concat(parserContext.getAllTokens());
     this.getAnalyzer = EMPTY;
-    this.continuation = parserContext.continuation; // TODO: dead code?
+    this.continuation = parserContext.continuation;
     this.items = parserContext.items;
   }
 

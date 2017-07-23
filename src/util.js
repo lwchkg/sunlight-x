@@ -1,11 +1,7 @@
 // @flow
 import { document } from "./jsdom.js";
 
-import type {
-  BetweenIdentRule,
-  FollowsOrPrecedesIdentRule,
-  HashMapType
-} from "./languages.js";
+import type { FollowsOrPrecedesIdentRule, HashMapType } from "./languages.js";
 import type { ParserContext } from "./parser-context.js";
 import type { Token } from "./token.js";
 
@@ -112,7 +108,7 @@ export function matchWord(
 ): ?Token {
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
-  wordMap = wordMap || [];
+  wordMap = wordMap || {};
 
   let current = context.reader.current();
   if (context.language.caseInsensitive) current = current.toUpperCase();
@@ -249,8 +245,15 @@ export function createProceduralRule(
   };
 }
 
+type Matcher = Token => boolean;
+
 // gets the next token in the specified direction while matcher matches the current token
-function getNextWhileInternal(tokens, index, direction, matcher) {
+function getNextWhileInternal(
+  tokens: Token[],
+  index: number,
+  direction: 1 | -1,
+  matcher: Matcher
+) {
   direction = direction || 1;
   let count = 1;
   let token;
@@ -262,53 +265,61 @@ function getNextWhileInternal(tokens, index, direction, matcher) {
 
 /**
  * Gets the next token while the matcher returns true.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index The index at which to start
  * @param {function} matcher Predicate for determining if the token matches
- * @returns {Object} The token or undefined
+ * @returns {Token?} The token or undefined
  */
-export function getNextWhile(tokens, index, matcher) {
+export function getNextWhile(
+  tokens: Token[],
+  index: number,
+  matcher: Matcher
+): ?Token {
   return getNextWhileInternal(tokens, index, 1, matcher);
 }
 
 /**
  * Gets the next non-whitespace token. This is not safe for looping.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index  The index at which to start
- * @returns {Object} The token or undefined
+ * @returns {Token?} The token or undefined
  */
-export function getNextNonWsToken(tokens, index) {
+export function getNextNonWsToken(tokens: Token[], index: number): ?Token {
   return getNextWhileInternal(
     tokens,
     index,
     1,
-    token => token.name === "default"
+    (token: Token): boolean => token.name === "default"
   );
 }
 
 /**
  * Gets the previous non-whitespace token. This is not safe for looping.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index  The index at which to start
  * @returns {Object} The token or undefined
  */
-export function getPreviousNonWsToken(tokens, index) {
+export function getPreviousNonWsToken(tokens: Token[], index: number): ?Token {
   return getNextWhileInternal(
     tokens,
     index,
     -1,
-    token => token.name === "default"
+    (token: Token): boolean => token.name === "default"
   );
 }
 
 /**
  * Gets the previous token while the matcher returns true.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index The index at which to start
  * @param {function} matcher Predicate for determining if the token matches
  * @returns {Object} The token or undefined
  */
-export function getPreviousWhile(tokens, index, matcher) {
+export function getPreviousWhile(
+  tokens: Token[],
+  index: number,
+  matcher: Matcher
+): ?Token {
   return getNextWhileInternal(tokens, index, -1, matcher);
 }
 
@@ -329,10 +340,13 @@ export function getComputedStyle(element: Element, style: string): string {
   if (document.defaultView && document.defaultView.getComputedStyle)
     func = document.defaultView.getComputedStyle;
   else
-    func = function(element: HTMLElement): Object {
+    func = function(element: Element): any {
       // TODO: Remove (IE compatibility)
       return element.currentStyle || {};
     };
 
-  return func(element, null)[style];
+  return func(element)[style];
 }
+
+// Export types for language support
+export type { ParserContext, Token };

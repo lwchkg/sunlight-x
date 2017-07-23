@@ -35,7 +35,7 @@ export class ParserContext {
     highlighter: Highlighter,
     unhighlightedCode: string,
     language: Language,
-    partialContext: AnalyzerContext,
+    partialContext: ?AnalyzerContext,
     options: SunlightOptionsType
   ) {
     this.highlighter = highlighter;
@@ -55,9 +55,11 @@ export class ParserContext {
 
     // if continuation is given, then we need to pick up where we left off from a previous parse
     // basically it indicates that a scope was never closed, so we need to continue that scope
-    if (partialContext.continuation) {
+    if (partialContext && partialContext.continuation) {
       const continuation = partialContext.continuation;
       partialContext.continuation = null;
+      // The following statement can write to this.continuation
+      // TODO: clean up
       this.tokens.push(
         continuation.process(
           this,
@@ -148,7 +150,7 @@ export function Tokenize(
   highlighter: Highlighter,
   unhighlightedCode: string,
   language: Language,
-  partialContext: AnalyzerContext,
+  partialContext: ?AnalyzerContext,
   options: SunlightOptionsType
 ): ParserContext {
   return new ParserContext(

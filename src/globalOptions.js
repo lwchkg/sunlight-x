@@ -6,7 +6,7 @@ export type SunlightOptionsObjectType = {
   tabWidth: number,
   classPrefix: string,
   showWhitespace: boolean,
-  maxHeight: false | number
+  maxHeight: false | string
 };
 export type SunlightOptionsType = SunlightOptionsMapType &
   SunlightOptionsObjectType;

@@ -7,18 +7,22 @@ import { languages } from "./languages.js";
 import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
 
-import { document } from "./jsdom.js";
+import { document, Element } from "./jsdom.js";
 
 import type { SunlightOptionsType } from "./globalOptions.js";
 import type { ParserContext } from "./parser-context.js";
 
 let HIGHLIGHTED_NODE_COUNT = 0;
 
+/**
+ * Append all children to the parent node.
+ * @param {Node} parent
+ * @param {Node[]} children
+ */
 function appendAll<T: Node | Element>(parent: T, children: T[]) {
   for (let i = 0; i < children.length; i++) parent.appendChild(children[i]);
 }
 
-/* eslint require-jsdoc: 0 */
 export class Highlighter {
   options: SunlightOptionsType;
   matchSunlightNodeRegEx: RegExp;
@@ -124,11 +128,10 @@ export class Highlighter {
   highlightText(
     unhighlightedCode: string,
     languageId: string,
-    partialContext: AnalyzerContext
+    partialContext: ?AnalyzerContext
   ): AnalyzerContext {
     let language = languages[languageId];
 
-    partialContext = partialContext || {};
     if (language === undefined)
       // use default language if one wasn't specified or hasn't been registered
       language = languages[DEFAULT_LANGUAGE];
@@ -140,7 +143,6 @@ export class Highlighter {
     });
 
     const analyzerContext = new AnalyzerContext(
-      // this.tokenize.call(this, unhighlightedCode, language, partialContext, this.options),
       Tokenize(this, unhighlightedCode, language, partialContext, this.options),
       partialContext,
       this.options
@@ -148,7 +150,7 @@ export class Highlighter {
 
     this.analyze(
       analyzerContext,
-      partialContext.index ? partialContext.index + 1 : 0
+      partialContext && partialContext.index ? partialContext.index + 1 : 0
     );
 
     fireEvent("afterHighlight", this, { analyzerContext: analyzerContext });
@@ -196,8 +198,7 @@ export class Highlighter {
     for (let j = 0; j < node.childNodes.length; j++)
       if (node.childNodes[j].nodeType === TEXT_NODE) {
         // text nodes
-        partialContext = this.highlightText.call(
-          this,
+        partialContext = this.highlightText(
           node.childNodes[j].nodeValue,
           languageId,
           partialContext
@@ -211,7 +212,7 @@ export class Highlighter {
           node.insertBefore(nodes[k], nodes[k - 1].nextSibling);
       } else if (node.childNodes[j].nodeType === 1) {
         // element nodes
-        this.highlightNode.call(this, node.childNodes[j]);
+        this.highlightNode(node.childNodes[j]);
       }
 
     // indicate that this node has been highlighted
@@ -236,8 +237,11 @@ export class Highlighter {
 
       container.appendChild(codeContainer);
 
-      node.parentNode.insertBefore(codeContainer, node);
-      node.parentNode.removeChild(node);
+      const parentNode = node.parentNode;
+      if (parentNode) {
+        parentNode.insertBefore(codeContainer, node);
+        parentNode.removeChild(node);
+      }
       codeContainer.appendChild(node);
 
       codeContainer.parentNode.insertBefore(container, codeContainer);
