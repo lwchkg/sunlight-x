@@ -34,13 +34,11 @@ export type EmbeddedLanguageDefinition = {|
   oldItems: ContextItemsType
 |};
 
-export type FollowsOrPrecedesIdentRule = [
-  {|
-    token: string,
-    values: string[],
-    optional: boolean
-  |}
-];
+export type FollowsOrPrecedesIdentRule = {|
+  token: string,
+  values?: string[],
+  optional?: boolean
+|}[];
 
 export type BetweenIdentRule = {|
   opener: { token: string, values: string[] },

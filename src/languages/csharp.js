@@ -1,4 +1,7 @@
+// @flow
 import * as util from "../util.js";
+
+import type { AnalyzerContext, ParserContext, Token } from "../util.js";
 
 /* eslint no-magic-numbers: 0 */
 const primitives = [
@@ -25,9 +28,11 @@ const acceptableKeywords = primitives.concat(["in", "out", "string", "object"]);
  * @param {function} func
  * @return {function}
  */
-function createNamedIdentFunction(func) {
+function createNamedIdentFunction(
+  func: AnalyzerContext => boolean
+): AnalyzerContext => boolean {
   const typeDefinitionRegex = /^T([A-Z0-9]\w*)?$/;
-  return function(context) {
+  return function(context: AnalyzerContext): boolean {
     return (
       !typeDefinitionRegex.test(context.tokens[context.index].value) &&
       func(context)
@@ -148,7 +153,7 @@ export const keywords = primitives.concat([
 
 export const customParseRules = [
   // xml doc comments
-  function(context) {
+  function(context: ParserContext): ?(Token[]) {
     const metaName = "xmlDocCommentMeta"; // tags and the "///" starting token
     const contentName = "xmlDocCommentContent"; // actual comments (words and stuff)
 
@@ -229,7 +234,7 @@ export const customParseRules = [
   },
 
   // get/set contextual keyword
-  function(context) {
+  function(context: ParseContext): ?Token {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -270,7 +275,7 @@ export const customParseRules = [
   },
 
   // value contextual keyword
-  function(context) {
+  function(context: ParserContext): ?Token {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -358,15 +363,13 @@ export const identAfterFirstLetter = /\w/;
 export const namedIdentRules = {
   custom: [
     // extends/implements/type constraints
-    createNamedIdentFunction(context => {
-      let index = context.index,
-        token,
-        foundColon = false,
-        nextToken;
-
+    createNamedIdentFunction((context: AnalyzerContext): boolean => {
       // between ":" and "{" but not case statements
 
       // look backward for a ":" not preceded by a "case"
+      let index = context.index;
+      let token;
+      let foundColon = false;
       while ((token = context.tokens[--index]) !== undefined) {
         if (token.name === "punctuation" && token.value === "{") return false;
 
@@ -380,7 +383,7 @@ export const namedIdentRules = {
           // or the "where" keyword for generic methods/classes with type constraints
 
           // if "class" is used as a type constraint, then ignore it
-          nextToken =
+          const nextToken =
             context.tokens[index + 1].name === "default"
               ? context.tokens[index + 2]
               : context.tokens[index + 1];
@@ -401,7 +404,7 @@ export const namedIdentRules = {
     }),
 
     // generic definitions/params between "<" and ">"
-    createNamedIdentFunction(context => {
+    createNamedIdentFunction((context: AnalyzerContext): boolean => {
       // between < and > and preceded by an ident and not preceded by "class"
       let index = context.index,
         token,
@@ -482,7 +485,7 @@ export const namedIdentRules = {
 
     // generic declarations and return values (ident preceding a generic definition)
     // this finds "Foo" in "Foo<Bar> foo"
-    createNamedIdentFunction(context => {
+    createNamedIdentFunction((context: AnalyzerContext): boolean => {
       // if it's preceded by an ident or a primitive/alias keyword then it's no good (i.e. a generic method definition like "public void Foo<T>")
       // also a big fail if it is preceded by a ., i.e. a generic method invocation like container.Resolve()
       {
@@ -567,7 +570,7 @@ export const namedIdentRules = {
     }),
 
     // using aliases, e.g. "Foo" in "using Foo = System.Linq.Enumerable;"
-    function(context) {
+    function(context: AnalyzerContext): boolean {
       // previous non-ws token must be "using" and next non-ws token must be "="
       const prevToken = util.getPreviousNonWsToken(
         context.tokens,
@@ -593,7 +596,7 @@ export const namedIdentRules = {
     },
 
     // attributes (friggin' attributes...)
-    createNamedIdentFunction(context => {
+    createNamedIdentFunction((context: AnalyzerContext): boolean => {
       {
         const token = util.getNextNonWsToken(context.tokens, context.index);
 
@@ -672,7 +675,7 @@ export const namedIdentRules = {
     }),
 
     // fully qualified type names
-    createNamedIdentFunction(context => {
+    createNamedIdentFunction((context: AnalyzerContext): boolean => {
       // next token is not "."
       const nextToken = util.getNextNonWsToken(context.tokens, context.index);
 
@@ -714,7 +717,7 @@ export const namedIdentRules = {
     }),
 
     // casting
-    (function() {
+    (function(): AnalyzerContext => boolean {
       const precedes = [
         [
           util.whitespace,
@@ -730,8 +733,8 @@ export const namedIdentRules = {
         ]
       ];
 
-      return createNamedIdentFunction(context => {
-        const precedesIsSatisfied = (function(tokens) {
+      return createNamedIdentFunction((context: AnalyzerContext): boolean => {
+        const precedesIsSatisfied = (function(tokens: Token[]): boolean {
           for (let i = 0; i < precedes.length; i++)
             if (
               util.createProceduralRule(
@@ -766,7 +769,7 @@ export const namedIdentRules = {
     })(),
 
     // using alias type names, e.g. "Foo" in "using Bar = My.Namespace.Foo;"
-    function(context) {
+    function(context: AnalyzerContext): boolean {
       const nextToken = util.getNextNonWsToken(context.tokens, context.index);
       if (
         !nextToken ||
@@ -799,7 +802,7 @@ export const namedIdentRules = {
     },
 
     // can't use the follows/precedes utilities since we need to verify that it doesn't match the type definition naming convention
-    createNamedIdentFunction(context => {
+    createNamedIdentFunction((context: AnalyzerContext): boolean => {
       const follows = [
         // method/property return values
         // special method parameters

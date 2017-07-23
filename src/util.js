@@ -155,7 +155,7 @@ export function createBetweenRule(
   opener: { token: string, values: string[] },
   closer: { token: string, values: string[] },
   caseInsensitive: boolean = false
-): * {
+): (Token[]) => boolean {
   return function(tokens: Token[]): boolean {
     // check to the left: if we run into a closer or never run into an opener, fail
     let token;
@@ -213,7 +213,7 @@ export function createProceduralRule(
   direction: number,
   tokenRequirements: FollowsOrPrecedesIdentRule,
   caseInsensitive: boolean = false
-): * {
+): (Token[]) => boolean {
   tokenRequirements = tokenRequirements.slice(0); // clone array
   // TODO: verify. Probably were buggy.
   if (direction === 1) tokenRequirements.reverse();
@@ -349,4 +349,5 @@ export function getComputedStyle(element: Element, style: string): string {
 }
 
 // Export types for language support
-export type { ParserContext, Token };
+export type { HashMapType, ParserContext, Token };
+export type { AnalyzerContext } from "./analyzer-context.js";

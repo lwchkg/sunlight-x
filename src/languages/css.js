@@ -1,11 +1,14 @@
+// @flow
 import * as util from "../util.js";
+
+import type { ParserContext, Token } from "../util.js";
 
 /**
  * Peek selector token.
  * @param {Object} context
  * @returns {Object}
  */
-function peekSelectorToken(context) {
+function peekSelectorToken(context: ParserContext): ?string {
   // make sure it's not part of a property value
   // basically if we run into "{" before "}" it's bad
   let token;
@@ -509,7 +512,7 @@ export const keywords = [
 
 export const customParseRules = [
   // functions
-  (function() {
+  (function(): ParserContext => ?Token {
     const functions = util.createHashMap(
       [
         "matrix",
@@ -546,7 +549,7 @@ export const customParseRules = [
       true
     );
 
-    return function(context) {
+    return function(context: ParserContext): ?Token {
       const token = util.matchWord(context, functions, "function", true);
       if (token === null) return null;
 
@@ -572,7 +575,7 @@ export const customParseRules = [
   })(),
 
   // pseudo classes
-  (function() {
+  (function(): ParserContext => ?Token {
     const pseudoClasses = util.createHashMap(
       [
         // http://www.w3.org/TR/css3-selectors/#selectors
@@ -619,7 +622,7 @@ export const customParseRules = [
       true
     );
 
-    return function(context) {
+    return function(context: ParserContext): ?Token {
       const previousToken = util.getPreviousNonWsToken(
         context.getAllTokens(),
         context.count()
@@ -636,7 +639,7 @@ export const customParseRules = [
   })(),
 
   // pseudo elements
-  (function() {
+  (function(): ParserContext => ?Token {
     const pseudoElements = util.createHashMap(
       [
         "before",
@@ -651,7 +654,7 @@ export const customParseRules = [
       true
     );
 
-    return function(context) {
+    return function(context: ParserContext): ?Token {
       const previousToken = util.getPreviousNonWsToken(
         context.getAllTokens(),
         context.count()
@@ -668,7 +671,7 @@ export const customParseRules = [
   })(),
 
   // classes
-  function(context) {
+  function(context: ParserContext): ?(Token[]) {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -688,7 +691,7 @@ export const customParseRules = [
   },
 
   // element selctors (div, html, body, etc.)
-  function(context) {
+  function(context: ParserContext): ?Token {
     const current = context.reader.current();
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
@@ -714,7 +717,7 @@ export const customParseRules = [
   },
 
   // hex color value
-  function(context) {
+  function(context: ParserContext): ?Token {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -748,7 +751,7 @@ export const customParseRules = [
  * @param {Object} context
  * @returns {Object}
  */
-export function numberParser(context) {
+export function numberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
   const line = context.reader.getLine();
   const column = context.reader.getColumn();

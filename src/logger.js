@@ -5,12 +5,20 @@
 
 // @flow
 
-export const logger = console;
+const logger = console;
 
 /**
  * Log to warn about invalid values.
  * @param {string} message The message to log.
  */
 export function warnInvalidValue(message: string, ...args: mixed[]) {
+  logger.warn(`Sunlight-X: ${message} Given value(s): `, ...args);
+}
+
+/**
+ * Log to warn about invalid values.
+ * @param {string} message The message to log.
+ */
+export function errorInvalidValue(message: string, ...args: mixed[]) {
   logger.warn(`Sunlight-X: ${message} Given value(s): `, ...args);
 }

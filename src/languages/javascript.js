@@ -1,4 +1,7 @@
+// @flow
 import * as util from "../util.js";
+
+import type { ParserContext, Token } from "../util.js";
 
 export const name = "javascript";
 
@@ -125,7 +128,7 @@ export const scopes = {
 
 export const customParseRules = [
   // regex literal
-  function(context) {
+  function(context: ParserContext): ?Token {
     const peek = context.reader.peek();
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
@@ -138,13 +141,15 @@ export const customParseRules = [
       // doesn't start with a / or starts with // (comment) or /* (multi line comment)
       return null;
 
-    const isValid = (function() {
+    const isValid = (function(): boolean {
       const previousNonWsToken = context.token(context.count() - 1);
       let previousToken = null;
       if (context.defaultData.text !== "")
         previousToken = context.createToken(
           "default",
-          context.defaultData.text
+          context.defaultData.text,
+          context.defaultData.line,
+          context.defaultData.column
         );
 
       if (!previousToken) previousToken = previousNonWsToken;
