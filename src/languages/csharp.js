@@ -170,8 +170,13 @@ export const customParseRules = [
     ];
     context.reader.read(2);
 
-    const current = { line: 0, column: 0, value: "", name: null };
-    let peek;
+    const current = {
+      line: 0,
+      column: 0,
+      value: "",
+      name: ""
+    };
+    let peek: string;
     while ((peek = context.reader.peek()) !== context.reader.EOF) {
       if (peek === "<" && current.name !== metaName) {
         // push the current token
@@ -204,14 +209,14 @@ export const customParseRules = [
             current.column
           )
         );
-        current.name = null;
+        current.name = "";
         current.value = "";
         continue;
       }
 
       if (peek === "\n") break;
 
-      if (current.name === null) {
+      if (current.name === "") {
         current.name = contentName;
         current.line = context.reader.getLine();
         current.column = context.reader.getColumn();
@@ -234,7 +239,7 @@ export const customParseRules = [
   },
 
   // get/set contextual keyword
-  function(context: ParseContext): ?Token {
+  function(context: ParserContext): ?Token {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -349,12 +354,12 @@ export const customParseRules = [
 
 export const scopes = {
   string: [
-    ['"', '"', util.escapeSequences.concat(['\\"'])],
-    ['@"', '"', ['""']]
+    ['"', '"', util.escapeSequences.concat(['\\"']), false],
+    ['@"', '"', ['""'], false]
   ],
-  char: [["'", "'", ["\\'", "\\\\"]]],
-  comment: [["//", "\n", null, true], ["/*", "*/"]],
-  pragma: [["#", "\n", null, true]]
+  char: [["'", "'", ["\\'", "\\\\"], false]],
+  comment: [["//", "\n", [], true], ["/*", "*/", [], false]],
+  pragma: [["#", "\n", [], true]]
 };
 
 export const identFirstLetter = /[A-Za-z_@]/;
@@ -490,7 +495,7 @@ export const namedIdentRules = {
       // also a big fail if it is preceded by a ., i.e. a generic method invocation like container.Resolve()
       {
         const token = util.getPreviousNonWsToken(context.tokens, context.index);
-        if (token !== undefined)
+        if (token)
           if (
             token.name === "ident" ||
             (token.name === "keyword" &&
@@ -618,7 +623,7 @@ export const namedIdentRules = {
       // TODO: unused var foundComma. Figure out it's actual purpose.
       // let foundComma = false;
       let token;
-      while ((token = context.tokens[--index]) !== undefined)
+      while ((token = context.tokens[--index]))
         if (token.name === "punctuation") {
           if (token.value === "[") {
             bracketCount[0]++;
@@ -646,7 +651,7 @@ export const namedIdentRules = {
       // next, verify we're inside a closing bracket
       index = context.index;
       let indexOfLastBracket = -1;
-      while ((token = context.tokens[++index]) !== undefined)
+      while ((token = context.tokens[++index]))
         if (token.name === "punctuation") {
           if (token.value === "[") {
             bracketCount[0]++;

@@ -8,7 +8,7 @@ import type { ParserContext, Token } from "../util.js";
  * @param {Object} context
  * @returns {Object}
  */
-function peekSelectorToken(context: ParserContext): ?string {
+function peekSelectorToken(context: ParserContext): string | null {
   // make sure it's not part of a property value
   // basically if we run into "{" before "}" it's bad
   let token;
@@ -551,7 +551,7 @@ export const customParseRules = [
 
     return function(context: ParserContext): ?Token {
       const token = util.matchWord(context, functions, "function", true);
-      if (token === null) return null;
+      if (!token) return null;
 
       // the next non-whitespace character must be a "("
       let count = token.value.length;
@@ -828,9 +828,12 @@ export const customTokens = {
 };
 
 export const scopes = {
-  string: [['"', '"', ['\\"', "\\\\"]], ["'", "'", ["\\'", "\\\\"]]],
-  comment: [["/*", "*/"]],
-  id: [["#", { length: 1, regex: /[^-\w]/ }, null, true]]
+  string: [
+    ['"', '"', ['\\"', "\\\\"], false],
+    ["'", "'", ["\\'", "\\\\"], false]
+  ],
+  comment: [["/*", "*/", [], false]],
+  id: [["#", { length: 1, regex: /[^-\w]/ }, [], true]]
 };
 
 export const identFirstLetter = /[A-Za-z-]/;

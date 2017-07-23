@@ -120,10 +120,10 @@ export const customTokens = {
 
 export const scopes = {
   string: [
-    ['"', '"', util.escapeSequences.concat(['\\"'])],
-    ["'", "'", util.escapeSequences.concat(["\\'", "\\\\"])]
+    ['"', '"', util.escapeSequences.concat(['\\"']), false],
+    ["'", "'", util.escapeSequences.concat(["\\'", "\\\\"]), false]
   ],
-  comment: [["//", "\n", null, true], ["/*", "*/"]]
+  comment: [["//", "\n", [], true], ["/*", "*/", [], false]]
 };
 
 export const customParseRules = [

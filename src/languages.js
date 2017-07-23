@@ -13,7 +13,12 @@ import type { Token } from "./token.js";
 
 export type { ParserContext, Token };
 
-export type ScopeType = [string, string, ?([string, string][]), ?boolean];
+export type ScopeType = [
+  string,
+  string | { length: number, regex: RegExp },
+  string[],
+  boolean
+];
 export type AnalyzerType = { [string]: (AnalyzerContext) => void };
 export type ContextItemsType = { [string]: mixed };
 
@@ -158,8 +163,8 @@ export function registerLanguage(languageData: LanguageBeforeCompile) {
     customTokens: {}, // initializer later
     doNotParse: languageData.doNotParse || /\s/,
     embeddedLanguages: [],
-    identAfterFirstLetter: languageData.identAfterFirstLetter || /regex/,
-    identFirstLetter: languageData.identFirstLetter || /regex/,
+    identAfterFirstLetter: languageData.identAfterFirstLetter || /(?!x)x/,
+    identFirstLetter: languageData.identFirstLetter || /(?!x)x/,
     keywords: {}, // initializer later
     name: languageData.name || "",
     namedIdentRules: (languageData.namedIdentRules && {

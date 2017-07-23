@@ -1,5 +1,5 @@
 // @flow
-import { EOL, EMPTY } from "./constants.js";
+import { EOL } from "./constants.js";
 import { document } from "./jsdom.js";
 
 import type { Continuation } from "./continuation.js";
@@ -13,7 +13,7 @@ export class AnalyzerContext {
   nodes: (Element | Text)[];
   tokens: Token[];
   language: Language; // Uninitizlized by constructor. Initialize before using!
-  getAnalyzer: () => AnalyzerType;
+  getAnalyzer: ?() => AnalyzerType;
   continuation: ?Continuation;
   items: ContextItemsType;
   index: number; // TODO: initialize. But what to initialize with?
@@ -40,7 +40,7 @@ export class AnalyzerContext {
     // this.tokens = (partialContext ? partialContext.tokens : []).concat(parserContext.getAllTokens());
     this.tokens = ((partialContext && partialContext.tokens) || [])
       .concat(parserContext.getAllTokens());
-    this.getAnalyzer = EMPTY;
+    this.getAnalyzer = null;
     this.continuation = parserContext.continuation;
     this.items = parserContext.items;
   }

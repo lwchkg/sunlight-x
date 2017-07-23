@@ -47,7 +47,7 @@ export class Highlighter {
         embeddedLanguage.oldItems = util.clone(context.items);
         context.embeddedLanguageStack.push(embeddedLanguage);
         context.language = languages[embeddedLanguage.language];
-        context.items = util.merge(
+        context.items = Object.assign(
           context.items,
           util.clone(context.language.contextItems)
         );
@@ -106,7 +106,8 @@ export class Highlighter {
         const func = "handle_" + tokenName;
 
         const analyzer =
-          analyzerContext.getAnalyzer.call(analyzerContext) ||
+          (analyzerContext.getAnalyzer &&
+            analyzerContext.getAnalyzer.call(analyzerContext)) ||
           analyzerContext.language.analyzer;
 
         if (analyzer[func]) analyzer[func](analyzerContext);
@@ -205,8 +206,9 @@ export class Highlighter {
         );
         HIGHLIGHTED_NODE_COUNT++;
         currentNodeCount = currentNodeCount || HIGHLIGHTED_NODE_COUNT;
-        const nodes = partialContext.getNodes();
 
+        const nodes = partialContext.getNodes();
+        if (!nodes[0]) nodes[0] = document.createTextNode("");
         node.replaceChild(nodes[0], node.childNodes[j]);
         for (let k = 1; k < nodes.length; k++)
           node.insertBefore(nodes[k], nodes[k - 1].nextSibling);

@@ -1,5 +1,5 @@
 // @flow
-import { logger } from "../logger.js";
+import * as logger from "../logger.js";
 import * as util from "../util.js";
 
 import type { ParserContext, Token } from "../util.js";
@@ -30,9 +30,9 @@ export const name = "xml";
 export const caseInsensitive = true;
 
 export const scopes = {
-  comment: [["<!--", "-->"], ["<%--", "--%>"]],
-  cdata: [["<![CDATA[", "]]>"]],
-  doctype: [["<!DOCTYPE", ">"]]
+  comment: [["<!--", "-->", [], false], ["<%--", "--%>", [], false]],
+  cdata: [["<![CDATA[", "]]>", [], false]],
+  doctype: [["<!DOCTYPE", ">", [], false]]
 };
 
 export const punctuation = /(?!x)x/;

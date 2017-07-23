@@ -3228,11 +3228,15 @@ export const customTokens = {
 
 export const scopes = {
   string: [
-    ['"', '"', util.escapeSequences.concat(['\\"'])],
-    ["'", "'", ["\\'", "\\\\"]]
+    ['"', '"', util.escapeSequences.concat(['\\"']), false],
+    ["'", "'", ["\\'", "\\\\"], false]
   ],
-  comment: [["//", "\n", null, true], ["/*", "*/"], ["#", "\n", null, true]],
-  variable: [["$", { length: 1, regex: /[^$A-Za-z0-9_]/ }, null, true]]
+  comment: [
+    ["//", "\n", [], true],
+    ["/*", "*/", [], false],
+    ["#", "\n", [], true]
+  ],
+  variable: [["$", { length: 1, regex: /[^$A-Za-z0-9_]/ }, [], true]]
 };
 
 export const customParseRules = [

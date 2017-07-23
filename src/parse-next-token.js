@@ -4,15 +4,11 @@ import * as util from "./util.js";
 
 import type { ParserContext } from "./parser-context.js";
 import type { Token } from "./token.js";
-import type { ScopeType } from "./languages.js";
 
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2, 3] }]*/
 
 function isIdentMatch(context: ParserContext): boolean {
-  return (
-    context.language.identFirstLetter &&
-    context.language.identFirstLetter.test(context.reader.current())
-  );
+  return context.language.identFirstLetter.test(context.reader.current());
 }
 
 // token parsing functions
@@ -21,8 +17,6 @@ function parseKeyword(context: ParserContext): ?Token {
 }
 
 function parseCustomTokens(context: ParserContext): ?Token {
-  if (context.language.customTokens === undefined) return null;
-
   for (const tokenName in context.language.customTokens) {
     const token = util.matchWord(
       context,
@@ -59,9 +53,14 @@ function parseIdent(context: ParserContext): ?Token {
   if (!isIdentMatch(context)) return null;
 
   let ident = context.reader.current();
-  let peek;
-  while ((peek = context.reader.peek()) !== context.reader.EOF) {
-    if (!context.language.identAfterFirstLetter.test(peek)) break;
+
+  for (;;) {
+    const peek = context.reader.peek();
+    if (
+      peek === context.reader.EOF ||
+      !context.language.identAfterFirstLetter.test(peek)
+    )
+      break;
 
     ident += context.reader.read();
   }

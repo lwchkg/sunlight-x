@@ -8,7 +8,7 @@ import type { Token } from "./token.js";
 export class Continuation {
   closer: RegExp;
   closerLength: number;
-  escapeSequences: [string, string][];
+  escapeSequences: string[];
   zeroWidth: boolean;
   tokenName: string;
 

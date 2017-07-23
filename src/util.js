@@ -5,7 +5,8 @@ import type { FollowsOrPrecedesIdentRule, HashMapType } from "./languages.js";
 import type { ParserContext } from "./parser-context.js";
 import type { Token } from "./token.js";
 
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }]*/
+/* eslint no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }] */
+/* eslint flowtype/no-weak-types: "warn" */
 
 /**
  * Gets the last element in an array.
@@ -42,16 +43,6 @@ const isIe = !+"\v1";
  * The EOL character ("\r" on IE, "\n" otherwise)
  */
 export const eol = isIe ? "\r" : "\n";
-
-// non-recursively merges one object into the other
-// TODO: remove because this is possible a polyfill
-export function merge<T: {}>(defaultObject: T, objectToMerge: T): T {
-  if (!objectToMerge) return defaultObject;
-
-  for (const key in objectToMerge) defaultObject[key] = objectToMerge[key];
-
-  return defaultObject;
-}
 
 /**
  * Returns a shallow clone of an object.
@@ -115,9 +106,9 @@ export function matchWord(
 
   if (!wordMap[current]) return null;
 
-  wordMap = wordMap[current];
+  const subMap = wordMap[current];
 
-  const index = wordMap.findIndex((wordItem: *): boolean => {
+  const index = subMap.findIndex((wordItem: *): boolean => {
     const word = wordItem.value;
     const peek = current + context.reader.peek(word.length);
     return word === peek || wordItem.regex.test(peek);
@@ -128,8 +119,8 @@ export function matchWord(
       tokenName,
       context.reader.current() +
         (doNotRead
-          ? context.reader.peek(wordMap[index].value.length - 1)
-          : context.reader.read(wordMap[index].value.length - 1)),
+          ? context.reader.peek(subMap[index].value.length - 1)
+          : context.reader.read(subMap[index].value.length - 1)),
       line,
       column
     );
@@ -247,7 +238,15 @@ export function createProceduralRule(
 
 type Matcher = Token => boolean;
 
-// gets the next token in the specified direction while matcher matches the current token
+/**
+ * Gets the next token in the specified direction while matcher matches the
+ * current token.
+ * @param {Token[]} tokens Array of tokens
+ * @param {number} index The index at which to start
+ * @param {number} direction The direction to search: 1 = forward, -1 = backward
+ * @param {function} matcher Predicate for determining if the token matches
+ * @returns {Token?} The token or undefined
+ */
 function getNextWhileInternal(
   tokens: Token[],
   index: number,

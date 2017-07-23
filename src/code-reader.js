@@ -5,31 +5,28 @@ export class CodeReader {
   index: number;
   line: number;
   column: number;
-  EOF: string | void; // TODO: is it always undefined???
-  nextReadBeginsLine: boolean | void; // TODO: remove undefined
+  EOF: string;
+  nextReadBeginsLine: boolean;
   text: string;
   length: number;
-  currentChar: string | void;
+  currentChar: string;
 
   constructor(text: string) {
     this.index = 0;
     this.line = 1;
     this.column = 1;
-    this.EOF = undefined;
-    this.nextReadBeginsLine = undefined;
+    this.EOF = ""; // TODO: remove
+    this.nextReadBeginsLine = false;
 
     // Normalize line endings to unix
     this.text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
     this.length = text.length;
-    this.currentChar = this.length > 0 ? text.charAt(0) : this.EOF;
+    this.currentChar = text.charAt(0);
   }
 
-  getCharacters(count: number = 1): string | void {
-    if (count === 0) return "";
-
-    const value = this.text.substring(this.index + 1, this.index + count + 1);
-    return value === "" ? this.EOF : value;
+  getCharacters(count: number = 1): string {
+    return this.text.substring(this.index + 1, this.index + count + 1);
   }
 
   toString(): string {
@@ -39,7 +36,7 @@ export class CodeReader {
       .line}, column: ${this.column}, current: [${currentChar}]`;
   }
 
-  peek(count: number = 1): string | void {
+  peek(count: number = 1): string {
     return this.getCharacters(count);
   }
 
@@ -51,21 +48,17 @@ export class CodeReader {
     return this.text.substring(this.index + 1);
   }
 
-  read(count: number = 1): string | void {
-    const value: string | void = this.getCharacters(count);
+  read(count: number = 1): string {
+    if (count === 0) return "";
 
-    // this is a result of reading/peeking/doing nothing
-    if (value === "") return value;
+    const value = this.getCharacters(count);
 
     if (value !== this.EOF) {
-      // TODO: remove the condition because EOF === undefined (required by flow)
-      if (value === undefined) return;
-
       // advance index
       this.index += value.length;
       this.column += value.length;
 
-      // update line count
+      // update line count. TODO: algorithm incorrect.
       if (this.nextReadBeginsLine) {
         this.line++;
         this.column = 1;
@@ -126,15 +119,15 @@ export class CodeReader {
     return true;
   }
 
-  isEol(): boolean | void {
+  isEol(): boolean {
     return this.nextReadBeginsLine;
   }
 
-  EOF(): string | void {
+  EOF(): string {
     return this.EOF;
   }
 
-  current(): string | void {
+  current(): string {
     return this.currentChar;
   }
 }
