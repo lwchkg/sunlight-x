@@ -67,7 +67,7 @@ function getLineNumberOptions(
   )
     parsedOptions.lineNumberStart = options.lineNumberStart;
   else
-    logger.warn(
+    warnInvalidValue(
       "Option lineNumberStart must be a non-negative integer.",
       options.lineNumberStart
     );

@@ -9,7 +9,10 @@ import { Tokenize } from "./parser-context.js";
 
 import { document, Element } from "./jsdom.js";
 
-import type { SunlightOptionsType } from "./globalOptions.js";
+import type {
+  SunlightOptionsType,
+  SunlightPartialOptionsType
+} from "./globalOptions.js";
 import type { ParserContext } from "./parser-context.js";
 
 let HIGHLIGHTED_NODE_COUNT = 0;
@@ -28,7 +31,7 @@ export class Highlighter {
   matchSunlightNodeRegEx: RegExp;
   isAlreadyHighlightedRegEx: RegExp;
 
-  constructor(options: ?SunlightOptionsType) {
+  constructor(options: ?SunlightPartialOptionsType) {
     this.options = Object.assign({}, globalOptions, options);
   }
 

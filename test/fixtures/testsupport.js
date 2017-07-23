@@ -7,9 +7,10 @@ const path = require("path");
 import { jsdom } from "jsdom";
 import { Highlighter } from "../../src/sunlight.js";
 
+import type { SunlightPartialOptionsType } from "../../src/globalOptions.js";
+
 const defaultOptions = {
   classPrefix: "sunlight-",
-  showMenu: true,
   enableDocLinks: true,
   maxHeight: undefined
 };
@@ -22,14 +23,17 @@ export class TestSupport {
    * @param {string} language
    * @param {Object|undefined} options
    */
-  options: { [string]: any };
+  options: SunlightPartialOptionsType;
+  classPrefix: string;
   codeElement: Element;
 
-  constructor(filename: string, language: string, options?: { [string]: any }) {
-    this.options =
-      options === undefined
-        ? Object.assign({}, defaultOptions)
-        : Object.assign({}, defaultOptions, options);
+  constructor(
+    filename: string,
+    language: string,
+    options?: SunlightPartialOptionsType
+  ) {
+    this.options = Object.assign({}, defaultOptions, options);
+    this.classPrefix = this.options.classPrefix || "sunlight-";
 
     const code = fs.readFileSync(
       path.join(__dirname, "..", "code-snippets", filename),
@@ -42,7 +46,7 @@ export class TestSupport {
     preElement.appendChild(document.createTextNode(code));
     preElement.setAttribute(
       "class",
-      this.options.classPrefix + "highlight-" + language
+      this.classPrefix + "highlight-" + language
     );
 
     this.codeElement = document.createElement("div");
@@ -59,9 +63,8 @@ export class TestSupport {
    */
   DoesElementsWithClassNameExist(className: string): boolean {
     return (
-      this.codeElement.querySelector(
-        "." + this.options.classPrefix + className
-      ) !== null
+      this.codeElement.querySelector("." + this.classPrefix + className) !==
+      null
     );
   }
 
@@ -81,7 +84,7 @@ export class TestSupport {
    */
   GetElementsWithClassName(className: string): NodeList<*> {
     return this.codeElement.querySelectorAll(
-      "." + this.options.classPrefix + className
+      "." + this.classPrefix + className
     );
   }
 
@@ -92,7 +95,7 @@ export class TestSupport {
    */
   AssertContentExists(className: string, content: string) {
     const elements = this.codeElement.querySelectorAll(
-      "." + this.options.classPrefix + className
+      "." + this.classPrefix + className
     );
 
     const nodeValues = [];
