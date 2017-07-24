@@ -7,6 +7,7 @@
 import { regexEscape } from "./util.js";
 import { defaultAnalyzer, defaultNumberParser } from "./default-helpers.js";
 
+import type { Analyzer } from "./analyzer.js";
 import type { AnalyzerContext } from "./analyzer-context.js";
 import type { ParserContext } from "./parser-context.js";
 import type { Token } from "./token.js";
@@ -19,7 +20,6 @@ export type ScopeType = [
   string[],
   boolean
 ];
-export type AnalyzerType = { [string]: (AnalyzerContext) => void };
 export type ContextItemsType = { [string]: mixed };
 
 export type EmbeddedLanguageDefinitionPrecompiled = {|
@@ -60,7 +60,7 @@ export type HashMapType = {
 
 export type Language = {
   name: string,
-  analyzer: AnalyzerType,
+  analyzer: Analyzer,
   customTokens: { [string]: HashMapType },
   operators: HashMapType,
   keywords: HashMapType,
@@ -103,7 +103,7 @@ export function createHashMap(
   caseInsensitive: boolean = false
 ): HashMapType {
   // creates a hash table where the hash is the first character of the word
-  const newMap = {};
+  const newMap: { [string]: { value: string, regex: RegExp }[] } = {};
   for (let i = 0; i < wordMap.length; i++) {
     const word = caseInsensitive ? wordMap[i].toUpperCase() : wordMap[i];
     const firstChar = word.charAt(0);
@@ -128,7 +128,7 @@ export type EmbeddedLanguageDefinitionBeforeCompile = {|
 
 export type LanguageBeforeCompile = {
   name?: string,
-  analyzer?: AnalyzerType,
+  analyzer?: Analyzer,
   customTokens?: { [string]: {| values: string[], boundary: string |} },
   operators?: string[],
   keywords?: string[],

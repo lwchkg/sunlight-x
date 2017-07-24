@@ -20,6 +20,7 @@ import type {
   SunlightOptionsType,
   SunlightPartialOptionsType
 } from "./globalOptions.js";
+import type { Analyzer } from "./analyzer.js";
 import type { ParserContext } from "./parser-context.js";
 
 let HIGHLIGHTED_NODE_COUNT = 0;
@@ -112,16 +113,19 @@ export class Highlighter {
 
         analyzerContext.index = i;
         const tokenName = analyzerContext.tokens[i].name;
-        // TODO: clean up!!!
-        const func = "handle_" + tokenName;
-
-        const analyzer =
-          (analyzerContext.getAnalyzer &&
-            analyzerContext.getAnalyzer.call(analyzerContext)) ||
-          analyzerContext.language.analyzer;
-
-        if (analyzer[func]) analyzer[func](analyzerContext);
-        else analyzer.handleToken(analyzerContext);
+        if (
+          ![
+            ...analyzerContext.analyzerOverrides,
+            analyzerContext.language.analyzer
+          ].some((analyzer: Analyzer): boolean => {
+            if (analyzer.handlers.hasOwnProperty(tokenName)) {
+              analyzer.handlers[tokenName](analyzerContext);
+              return true;
+            }
+            return false;
+          })
+        )
+          analyzerContext.language.analyzer.handleToken(analyzerContext);
       }
 
       // append the last nodes, and add the final nodes to the context

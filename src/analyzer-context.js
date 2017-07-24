@@ -2,8 +2,9 @@
 import { EOL } from "./constants.js";
 import { document } from "./jsdom.js";
 
+import type { Analyzer } from "./analyzer.js";
 import type { Continuation } from "./continuation.js";
-import type { AnalyzerType, ContextItemsType, Language } from "./languages.js";
+import type { ContextItemsType, Language } from "./languages.js";
 import type { ParserContext } from "./parser-context.js";
 import type { SunlightOptionsType } from "./globalOptions.js";
 import type { Token } from "./token.js";
@@ -13,7 +14,7 @@ export class AnalyzerContext {
   nodes: (Element | Text)[];
   tokens: Token[];
   language: Language; // Uninitizlized by constructor. Initialize before using!
-  getAnalyzer: ?() => AnalyzerType;
+  analyzerOverrides: Analyzer[];
   continuation: ?Continuation;
   items: ContextItemsType;
   index: number; // TODO: initialize. But what to initialize with?
@@ -40,7 +41,7 @@ export class AnalyzerContext {
     // this.tokens = (partialContext ? partialContext.tokens : []).concat(parserContext.getAllTokens());
     this.tokens = ((partialContext && partialContext.tokens) || [])
       .concat(parserContext.getAllTokens());
-    this.getAnalyzer = null;
+    this.analyzerOverrides = [];
     this.continuation = parserContext.continuation;
     this.items = parserContext.items;
   }

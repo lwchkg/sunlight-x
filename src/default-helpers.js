@@ -1,6 +1,6 @@
 // @flow
+import { Analyzer } from "./analyzer.js";
 import * as util from "./util.js";
-import { document } from "./jsdom.js";
 
 import type { AnalyzerContext } from "./analyzer-context.js";
 import type {
@@ -11,37 +11,28 @@ import type {
 import type { ParserContext } from "./parser-context.js";
 import type { Token } from "./token.js";
 
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
+/* eslint no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
 
-function defaultHandleToken(suffix: string): * {
-  return function(context: AnalyzerContext): true {
-    const element: Element = document.createElement("span");
-    element.className = context.options.classPrefix + suffix;
-    element.appendChild(context.createTextNode(context.tokens[context.index]));
-    context.addNode(element);
-    return true;
-  };
-}
-
-export class defaultAnalyzer {
-  handleToken(context: AnalyzerContext): true {
-    return defaultHandleToken(context.tokens[context.index].name)(context);
+export class defaultAnalyzer extends Analyzer {
+  constructor() {
+    super();
+    this.handlers.default = this.handleDefault;
+    this.handlers.ident = this.handleIdent;
   }
 
-  // TODO: clean up!!!
   // just append default content as a text node
-  handle_default(context: AnalyzerContext): true {
+  handleDefault(context: AnalyzerContext): true {
     context.addNode(context.createTextNode(context.tokens[context.index]));
     return true;
   }
 
   // this handles the named ident mayhem
-  handle_ident(context: AnalyzerContext): true {
+  handleIdent(context: AnalyzerContext): true {
     const _evaluateCustomRule = (rules: CustomIdentRule[]): boolean => {
       rules = rules || [];
       for (let i = 0; i < rules.length; i++)
         if (rules[i](context))
-          return defaultHandleToken("named-ident")(context);
+          return Analyzer.defaultHandleToken("named-ident")(context);
 
       return false;
     };
@@ -53,7 +44,7 @@ export class defaultAnalyzer {
       rules = rules || [];
       for (let i = 0; i < rules.length; i++)
         if (createRule && createRule(rules[i])(context.tokens))
-          return defaultHandleToken("named-ident")(context);
+          return Analyzer.defaultHandleToken("named-ident")(context);
 
       return false;
     };
@@ -84,11 +75,16 @@ export class defaultAnalyzer {
           context.language.caseInsensitive
         )
       ) ||
-      defaultHandleToken("ident")(context)
+      Analyzer.defaultHandleToken("ident")(context)
     );
   }
 }
 
+/**
+ * The default number parser.
+ * @param {ParserContext} context
+ * @returns {Token?}
+ */
 export function defaultNumberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
   const line = context.reader.getLine();
