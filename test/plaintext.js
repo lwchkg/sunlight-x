@@ -1,3 +1,5 @@
+// @flow
+
 import assert from "power-assert";
 const fs = require("fs");
 const path = require("path");
@@ -16,7 +18,7 @@ describe("Plaintext tests", function() {
     }
   ];
 
-  tests.forEach(function(test) {
+  tests.forEach(function(test: { name: string, language: string }) {
     it(test.name, function() {
       const snippetFileName = "plaintext.txt";
       const testSupport = new TestSupport(snippetFileName, test.language);

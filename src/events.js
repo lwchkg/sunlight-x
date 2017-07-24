@@ -3,43 +3,71 @@
 // Use of this source code is governed by a Apache License Version 2.0, that can
 // be found in the LICENSE file.
 
-const events = {
-  beforeHighlightNode: [],
-  beforeHighlight: [],
-  beforeTokenize: [],
-  afterTokenize: [],
-  beforeAnalyze: [],
-  afterAnalyze: [],
-  afterHighlight: [],
-  afterHighlightNode: []
+// @flow
+import type { AnalyzerContext } from "./analyzer-context.js";
+import type { Element } from "./jsdom.js";
+import type { Highlighter } from "./highlighter.js";
+import type { Language } from "./languages.js";
+import type { ParserContext } from "./parser-context.js";
+
+export type BeforeHighlightNodeEventArgs = { node: Element };
+export type BeforeHighlightEventArgs = {
+  code: string,
+  language: Language,
+  previousContext: ?AnalyzerContext
+};
+export type BeforeTokenizeEventArgs = {
+  code: string,
+  language: Language
+};
+export type AfterTokenizeEventArgs = {
+  code: string,
+  parserContext: ParserContext
+};
+export type BeforeAnalyzeEventArgs = { analyzerContext: AnalyzerContext };
+export type AfterAnalyzeEventArgs = { analyzerContext: AnalyzerContext };
+export type AfterHighlightEventArgs = { analyzerContext: AnalyzerContext };
+export type AfterHighlightNodeEventArgs = {
+  container: Element,
+  codeContainer: Element,
+  node: Element,
+  count: number
 };
 
-/**
- * Bind a callback function to a event.
- * @param {string} event
- * @param {highlightCallback} callback
- */
-export function bind(event, callback) {
-  if (!events[event]) throw new Error('Unknown event "' + event + '"');
-  events[event].push(callback);
+class EventClass<T> {
+  delegates: Array<(Highlighter, T) => void>;
+  constructor() {
+    this.delegates = [];
+  }
+  addListener(callback: (Highlighter, T) => void) {
+    this.delegates.push(callback);
+  }
+  raise(highlighter: Highlighter, eventArgs: T) {
+    for (const delegate of this.delegates) delegate(highlighter, eventArgs);
+  }
 }
 
-/**
- * Fire an event.
- * @param {string} eventName
- * @param {Object} highlighter
- * @param {Object} eventContext
- */
-export function fireEvent(eventName, highlighter, eventContext) {
-  const delegates = events[eventName] || [];
+// TODO: reformat after prettify recognize flow
+type BeforeHighlightNodeEventType = EventClass<BeforeHighlightNodeEventArgs>;
+export const BeforeHighlightNodeEvent: BeforeHighlightNodeEventType = new EventClass();
 
-  for (let i = 0; i < delegates.length; i++)
-    delegates[i](highlighter, eventContext);
-}
+type BeforeHighlightEventType = EventClass<BeforeHighlightEventArgs>;
+export const BeforeHighlightEvent: BeforeHighlightEventType = new EventClass();
 
-/**
- * Callback
- * @callback requestCallback
- * @param {Object} highlighter
- * @param {Object} eventContext
- */
+type BeforeTokenizeEventType = EventClass<BeforeTokenizeEventArgs>;
+export const BeforeTokenizeEvent: BeforeTokenizeEventType = new EventClass();
+
+type AfterTokenizeEventType = EventClass<AfterTokenizeEventArgs>;
+export const AfterTokenizeEvent: AfterTokenizeEventType = new EventClass();
+
+type BeforeAnalyzeEventType = EventClass<BeforeAnalyzeEventArgs>;
+export const BeforeAnalyzeEvent: BeforeAnalyzeEventType = new EventClass();
+
+type AfterAnalyzeEventType = EventClass<AfterAnalyzeEventArgs>;
+export const AfterAnalyzeEvent: AfterAnalyzeEventType = new EventClass();
+
+type AfterHighlightEventType = EventClass<AfterHighlightEventArgs>;
+export const AfterHighlightEvent: AfterHighlightEventType = new EventClass();
+
+type AfterHighlightNodeEventType = EventClass<AfterHighlightNodeEventArgs>;
+export const AfterHighlightNodeEvent: AfterHighlightNodeEventType = new EventClass();

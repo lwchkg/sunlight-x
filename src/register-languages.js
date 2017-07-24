@@ -1,3 +1,4 @@
+// @flow
 import { registerLanguage } from "./languages.js";
 
 import * as plaintext from "./languages/plaintext.js";
@@ -14,7 +15,5 @@ const languages = [plaintext, javascript, php, xml, css, csharp, brainfuck];
  * Register the languages into Sunlight-X highlighter.
  */
 export function registerLanguages() {
-  languages.forEach(language => {
-    registerLanguage(language);
-  });
+  for (const language of languages) registerLanguage(language);
 }

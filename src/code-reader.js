@@ -1,74 +1,79 @@
+// @flow
 import * as util from "./util.js";
 
 export class CodeReader {
-  constructor(text) {
+  index: number;
+  line: number;
+  column: number;
+  EOF: string;
+  nextReadBeginsLine: boolean;
+  text: string;
+  length: number;
+  currentChar: string;
+
+  constructor(text: string) {
     this.index = 0;
     this.line = 1;
     this.column = 1;
-    this.EOF = undefined;
-    this.nextReadBeginsLine = undefined;
+    this.EOF = ""; // TODO: remove
+    this.nextReadBeginsLine = false;
 
     // Normalize line endings to unix
     this.text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
     this.length = text.length;
-    this.currentChar = this.length > 0 ? text.charAt(0) : this.EOF;
+    this.currentChar = text.charAt(0);
   }
 
-  getCharacters(count) {
-    if (count === 0) return "";
-
-    count = count || 1;
-
-    const value = this.text.substring(this.index + 1, this.index + count + 1);
-    return value === "" ? this.EOF : value;
+  getCharacters(count: number = 1): string {
+    return this.text.substring(this.index + 1, this.index + count + 1);
   }
 
-  toString() {
+  toString(): string {
+    const currentChar: string =
+      this.currentChar === undefined ? "undefined" : this.currentChar;
     return `length: ${this.length}, index: ${this.index}, line: ${this
-      .line}, column: ${this.column}, current: [${this.currentChar}]`;
+      .line}, column: ${this.column}, current: [${currentChar}]`;
   }
 
-  peek(count) {
+  peek(count: number = 1): string {
     return this.getCharacters(count);
   }
 
-  substring() {
+  substring(): string {
     return this.text.substring(this.index);
   }
 
-  peekSubstring() {
+  peekSubstring(): string {
     return this.text.substring(this.index + 1);
   }
 
-  read(count) {
-    const value = this.getCharacters(count);
-    let newlineCount, lastChar;
+  read(count: number = 1): string {
+    if (count === 0) return "";
 
-    if (value === "")
-      // this is a result of reading/peeking/doing nothing
-      return value;
+    const value = this.getCharacters(count);
 
     if (value !== this.EOF) {
       // advance index
       this.index += value.length;
       this.column += value.length;
 
-      // update line count
+      // update line count. TODO: algorithm incorrect.
       if (this.nextReadBeginsLine) {
         this.line++;
         this.column = 1;
         this.nextReadBeginsLine = false;
       }
 
-      newlineCount = value.substring(0, value.length - 1).replace(/[^\n]/g, "")
-        .length;
+      const newlineCount = value
+        .substring(0, value.length - 1)
+        .replace(/[^\n]/g, "").length;
       if (newlineCount > 0) {
         this.line += newlineCount;
         this.column = 1;
       }
 
-      lastChar = util.last(value);
+      const lastChar = util.lastChar(value);
       if (lastChar === "\n") this.nextReadBeginsLine = true;
 
       this.currentChar = lastChar;
@@ -80,27 +85,27 @@ export class CodeReader {
     return value;
   }
 
-  text() {
+  text(): string {
     return this.text;
   }
 
-  getLine() {
+  getLine(): number {
     return this.line;
   }
 
-  getColumn() {
+  getColumn(): number {
     return this.column;
   }
 
-  isEof() {
+  isEof(): boolean {
     return this.index >= this.length;
   }
 
-  isSol() {
+  isSol(): boolean {
     return this.column === 1;
   }
 
-  isSolWs() {
+  isSolWs(): boolean {
     let temp = this.index;
     if (this.column === 1) return true;
 
@@ -114,15 +119,15 @@ export class CodeReader {
     return true;
   }
 
-  isEol() {
+  isEol(): boolean {
     return this.nextReadBeginsLine;
   }
 
-  EOF() {
+  EOF(): string {
     return this.EOF;
   }
 
-  current() {
+  current(): string {
     return this.currentChar;
   }
 }

@@ -1,3 +1,5 @@
+// @flow
+
 import assert from "power-assert";
 import { TestSupport } from "./fixtures/testsupport.js";
 
@@ -8,7 +10,10 @@ const lineNumberExtractorRegExp = /^#sunlight-\d+-line-(\d+)$/;
  * @param {TestSupport} testSupport Test support object.
  * @param {number} lineNumberStart The starting line number.
  */
-function checkLineNumbers(testSupport, lineNumberStart = 1) {
+function checkLineNumbers(
+  testSupport: TestSupport,
+  lineNumberStart: number = 1
+) {
   const lineNumberElements = testSupport.querySelectorAll(
     "[href|=\\#sunlight][href*=-line-]"
   );

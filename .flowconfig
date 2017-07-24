@@ -1,0 +1,16 @@
+[ignore]
+<PROJECT_ROOT>/babel-out/.*
+<PROJECT_ROOT>/compiled-assets/.*
+<PROJECT_ROOT>/node_modules/.*
+<PROJECT_ROOT>/test/code-snippets/.*
+
+[include]
+
+[libs]
+
+[options]
+all=true
+module.use_strict=true
+munge_underscores=true
+
+[lints]

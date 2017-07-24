@@ -1,11 +1,15 @@
+// @flow
+import * as logger from "../logger.js";
 import * as util from "../util.js";
+
+import type { ParserContext, Token } from "../util.js";
 
 /**
  * See if |context| is inside an open bracket.
- * @param {Object} context
+ * @param {ParserContext} context
  * @returns {boolean}
  */
-function isInsideOpenBracket(context) {
+function isInsideOpenBracket(context: ParserContext): boolean {
   let token;
   let index = context.count();
   while ((token = context.token(--index))) {
@@ -26,9 +30,9 @@ export const name = "xml";
 export const caseInsensitive = true;
 
 export const scopes = {
-  comment: [["<!--", "-->"], ["<%--", "--%>"]],
-  cdata: [["<![CDATA[", "]]>"]],
-  doctype: [["<!DOCTYPE", ">"]]
+  comment: [["<!--", "-->", [], false], ["<%--", "--%>", [], false]],
+  cdata: [["<![CDATA[", "]]>", [], false]],
+  doctype: [["<!DOCTYPE", ">", [], false]]
 };
 
 export const punctuation = /(?!x)x/;
@@ -43,7 +47,7 @@ export const customTokens = {
 
 export const customParseRules = [
   // tag names
-  function(context) {
+  function(context: ParserContext): ?Token {
     const current = context.reader.current();
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
@@ -72,7 +76,7 @@ export const customParseRules = [
   },
 
   // strings (attribute values)
-  function(context) {
+  function(context: ParserContext): ?Token {
     const delimiter = context.reader.current();
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
@@ -94,7 +98,7 @@ export const customParseRules = [
   },
 
   // attributes
-  function(context) {
+  function(context: ParserContext): ?Token {
     const current = context.reader.current();
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
@@ -128,7 +132,7 @@ export const customParseRules = [
   },
 
   // entities
-  function(context) {
+  function(context: ParserContext): ?Token {
     const current = context.reader.current();
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
@@ -155,7 +159,7 @@ export const customParseRules = [
   },
 
   // asp.net server side comments: <%-- --%>
-  function(context) {
+  function(context: ParserContext): ?Token {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -185,7 +189,7 @@ export const customParseRules = [
 
 export const embeddedLanguages = {
   css: {
-    switchTo: function(context) {
+    switchTo: function(context: ParserContext): boolean {
       let prevToken = context.token(context.count() - 1),
         index;
 
@@ -222,14 +226,14 @@ export const embeddedLanguages = {
       return false;
     },
 
-    switchBack: function(context) {
+    switchBack: function(context: ParserContext): boolean {
       const endStyleToken = "</style";
       return context.reader.peek(endStyleToken.length) === endStyleToken;
     }
   },
 
   javascript: {
-    switchTo: function(context) {
+    switchTo: function(context: ParserContext): boolean {
       let prevToken = context.token(context.count() - 1),
         index;
 
@@ -266,14 +270,14 @@ export const embeddedLanguages = {
       return false;
     },
 
-    switchBack: function(context) {
+    switchBack: function(context: ParserContext): boolean {
       const endScriptToken = "</script";
       return context.reader.peek(endScriptToken.length) === endScriptToken;
     }
   },
 
   php: {
-    switchTo: function(context) {
+    switchTo: function(context: ParserContext): boolean {
       const phpToken = "?php";
       const peek = context.reader.peek(phpToken.length);
       return (
@@ -282,26 +286,26 @@ export const embeddedLanguages = {
       );
     },
 
-    switchBack: function(context) {
+    switchBack: function(context: ParserContext): boolean {
       const prevToken = context.token(context.count() - 1);
       return prevToken && prevToken.name === "closeTag";
     }
   },
 
   csharp: {
-    switchTo: function(context) {
+    switchTo: function(context: ParserContext): boolean {
       const prevToken = context.token(context.count() - 1);
       return prevToken && prevToken.name === "aspOpenTag";
     },
 
-    switchBack: function(context) {
+    switchBack: function(context: ParserContext): boolean {
       const endCSToken = "%>";
       return context.reader.peek(endCSToken.length) === endCSToken;
     }
   },
 
   scala: {
-    switchTo: function(context) {
+    switchTo: function(context: ParserContext): boolean {
       if (!context.options.enableScalaXmlInterpolation) return false;
 
       if (context.reader.current() === "{") return true;
@@ -309,8 +313,16 @@ export const embeddedLanguages = {
       return false;
     },
 
-    switchBack: function(context) {
+    switchBack: function(context: ParserContext): boolean {
       const prevToken = context.token(context.count() - 1);
+
+      if (typeof context.items.scalaBracketNestingLevel !== "number") {
+        logger.errorInvalidValue(
+          `scalaBracketNestingLevel is not a number.`,
+          context.items.scalaBracketNestingLevel
+        );
+        return true;
+      }
 
       if (prevToken.name === "punctuation")
         if (prevToken.value === "{") {

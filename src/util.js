@@ -1,15 +1,29 @@
+// @flow
 import { document } from "./jsdom.js";
 
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }]*/
+import type { FollowsOrPrecedesIdentRule, HashMapType } from "./languages.js";
+import type { ParserContext } from "./parser-context.js";
+import type { Token } from "./token.js";
 
-/** Gets the last character in a string or the last element in an array.
- * @param {Array|string} thing
+/* eslint no-magic-numbers: ["error", { "ignore": [-1, 0, 1] }] */
+/* eslint flowtype/no-weak-types: "warn" */
+
+/**
+ * Gets the last element in an array.
+ * @param {Array} arr
  * @returns {*}
  */
-export function last(thing) {
-  return thing.charAt
-    ? thing.charAt(thing.length - 1)
-    : thing[thing.length - 1];
+export function lastElement<T>(arr: T[]): T {
+  return arr[arr.length - 1];
+}
+
+/**
+ * Gets the last character in a string
+ * @param {string} s
+ * @returns {string}
+ */
+export function lastChar(s: string): string {
+  return s.charAt(s.length - 1);
 }
 
 /**
@@ -18,7 +32,7 @@ export function last(thing) {
  * @param {string} s The string to escape
  * @returns {string}
  */
-export function regexEscape(s) {
+export function regexEscape(s: string): string {
   return s.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
@@ -30,23 +44,12 @@ const isIe = !+"\v1";
  */
 export const eol = isIe ? "\r" : "\n";
 
-// non-recursively merges one object into the other
-// TODO: remove because this is possible a polyfill
-export function merge(defaultObject, objectToMerge) {
-  let key;
-  if (!objectToMerge) return defaultObject;
-
-  for (key in objectToMerge) defaultObject[key] = objectToMerge[key];
-
-  return defaultObject;
-}
-
 /**
  * Returns a shallow clone of an object.
  * @param {Object} object
  * @returns {Object}
  */
-export function clone(object) {
+export function clone<T: {}>(object: T): T {
   return Object.assign({}, object);
 }
 
@@ -62,11 +65,15 @@ export const escapeSequences = ["\\n", "\\t", "\\r", "\\\\", "\\v", "\\f"];
  * @param {boolean|undefined} caseInsensitive Set to true to enable case insensitivity.
  * @returns {boolean}
  */
-export function contains(arr, value, caseInsensitive) {
+export function contains<T>(
+  arr: T[],
+  value: T,
+  caseInsensitive: boolean = false
+): boolean {
   if (!caseInsensitive) return arr.indexOf(value) >= 0;
 
   return arr.some(
-    element =>
+    (element: T): boolean =>
       element === value ||
       (caseInsensitive &&
         typeof element === "string" &&
@@ -84,19 +91,24 @@ export function contains(arr, value, caseInsensitive) {
  * @param {boolean|undefined} doNotRead Whether or not to advance the internal pointer
  * @returns {object} A token returned from context.createToken
  */
-export function matchWord(context, wordMap, tokenName, doNotRead) {
+export function matchWord(
+  context: ParserContext,
+  wordMap: ?HashMapType,
+  tokenName: string,
+  doNotRead: boolean = false
+): ?Token {
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
-  wordMap = wordMap || [];
+  wordMap = wordMap || {};
 
   let current = context.reader.current();
   if (context.language.caseInsensitive) current = current.toUpperCase();
 
   if (!wordMap[current]) return null;
 
-  wordMap = wordMap[current];
+  const subMap = wordMap[current];
 
-  const index = wordMap.findIndex(wordItem => {
+  const index = subMap.findIndex((wordItem: *): boolean => {
     const word = wordItem.value;
     const peek = current + context.reader.peek(word.length);
     return word === peek || wordItem.regex.test(peek);
@@ -106,9 +118,9 @@ export function matchWord(context, wordMap, tokenName, doNotRead) {
     return context.createToken(
       tokenName,
       context.reader.current() +
-        context.reader[doNotRead ? "peek" : "read"](
-          wordMap[index].value.length - 1
-        ),
+        (doNotRead
+          ? context.reader.peek(subMap[index].value.length - 1)
+          : context.reader.read(subMap[index].value.length - 1)),
       line,
       column
     );
@@ -116,38 +128,7 @@ export function matchWord(context, wordMap, tokenName, doNotRead) {
   return null;
 }
 
-/**
- * Creates a hash map from the given array. This is crucial for performance.
- *
- * @param {string[]} wordMap An array of strings to hash.
- * @param {string} boundary A regular expression representing the boundary of
- *                          each string (e.g. "\\b")
- * @param {boolean|undefined} caseInsensitive Indicates if the words are case
- *                            insensitive (defaults to false)
- * @returns {Object} Each string in the array is hashed by its first letter. The
- *                   value is transformed into an object with properties value
- *                   (the original value) and a regular expression to match the
- *                   word.
- */
-export function createHashMap(wordMap, boundary, caseInsensitive) {
-  // creates a hash table where the hash is the first character of the word
-  const newMap = {};
-  for (let i = 0; i < wordMap.length; i++) {
-    const word = caseInsensitive ? wordMap[i].toUpperCase() : wordMap[i];
-    const firstChar = word.charAt(0);
-    if (!newMap[firstChar]) newMap[firstChar] = [];
-
-    newMap[firstChar].push({
-      value: word,
-      regex: new RegExp(
-        "^" + regexEscape(word) + boundary,
-        caseInsensitive ? "i" : ""
-      )
-    });
-  }
-
-  return newMap;
-}
+export { createHashMap } from "./languages.js";
 
 /**
  * Creates a between rule
@@ -160,8 +141,13 @@ export function createHashMap(wordMap, boundary, caseInsensitive) {
  * @returns {function} Accepts an array of tokens as the single parameter and
  *                     returns a boolean.
  */
-export function createBetweenRule(startIndex, opener, closer, caseInsensitive) {
-  return function(tokens) {
+export function createBetweenRule(
+  startIndex: number,
+  opener: { token: string, values: string[] },
+  closer: { token: string, values: string[] },
+  caseInsensitive: boolean = false
+): (Token[]) => boolean {
+  return function(tokens: Token[]): boolean {
     // check to the left: if we run into a closer or never run into an opener, fail
     let token;
     let success = false;
@@ -214,16 +200,16 @@ export function createBetweenRule(startIndex, opener, closer, caseInsensitive) {
  * @returns {function} Accepts an array of tokens as the single parameter and returns a boolean
  */
 export function createProceduralRule(
-  startIndex,
-  direction,
-  tokenRequirements,
-  caseInsensitive
-) {
+  startIndex: number,
+  direction: number,
+  tokenRequirements: FollowsOrPrecedesIdentRule,
+  caseInsensitive: boolean = false
+): (Token[]) => boolean {
   tokenRequirements = tokenRequirements.slice(0); // clone array
   // TODO: verify. Probably were buggy.
   if (direction === 1) tokenRequirements.reverse();
 
-  return function(tokens) {
+  return function(tokens: Token[]): boolean {
     let tokenIndexStart = startIndex;
 
     for (let j = 0; j < tokenRequirements.length; j++) {
@@ -250,8 +236,23 @@ export function createProceduralRule(
   };
 }
 
-// gets the next token in the specified direction while matcher matches the current token
-function getNextWhileInternal(tokens, index, direction, matcher) {
+type Matcher = Token => boolean;
+
+/**
+ * Gets the next token in the specified direction while matcher matches the
+ * current token.
+ * @param {Token[]} tokens Array of tokens
+ * @param {number} index The index at which to start
+ * @param {number} direction The direction to search: 1 = forward, -1 = backward
+ * @param {function} matcher Predicate for determining if the token matches
+ * @returns {Token?} The token or undefined
+ */
+function getNextWhileInternal(
+  tokens: Token[],
+  index: number,
+  direction: 1 | -1,
+  matcher: Matcher
+) {
   direction = direction || 1;
   let count = 1;
   let token;
@@ -263,53 +264,61 @@ function getNextWhileInternal(tokens, index, direction, matcher) {
 
 /**
  * Gets the next token while the matcher returns true.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index The index at which to start
  * @param {function} matcher Predicate for determining if the token matches
- * @returns {Object} The token or undefined
+ * @returns {Token?} The token or undefined
  */
-export function getNextWhile(tokens, index, matcher) {
+export function getNextWhile(
+  tokens: Token[],
+  index: number,
+  matcher: Matcher
+): ?Token {
   return getNextWhileInternal(tokens, index, 1, matcher);
 }
 
 /**
  * Gets the next non-whitespace token. This is not safe for looping.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index  The index at which to start
- * @returns {Object} The token or undefined
+ * @returns {Token?} The token or undefined
  */
-export function getNextNonWsToken(tokens, index) {
+export function getNextNonWsToken(tokens: Token[], index: number): ?Token {
   return getNextWhileInternal(
     tokens,
     index,
     1,
-    token => token.name === "default"
+    (token: Token): boolean => token.name === "default"
   );
 }
 
 /**
  * Gets the previous non-whitespace token. This is not safe for looping.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index  The index at which to start
  * @returns {Object} The token or undefined
  */
-export function getPreviousNonWsToken(tokens, index) {
+export function getPreviousNonWsToken(tokens: Token[], index: number): ?Token {
   return getNextWhileInternal(
     tokens,
     index,
     -1,
-    token => token.name === "default"
+    (token: Token): boolean => token.name === "default"
   );
 }
 
 /**
  * Gets the previous token while the matcher returns true.
- * @param {Array} tokens Array of tokens
+ * @param {Token[]} tokens Array of tokens
  * @param {number} index The index at which to start
  * @param {function} matcher Predicate for determining if the token matches
  * @returns {Object} The token or undefined
  */
-export function getPreviousWhile(tokens, index, matcher) {
+export function getPreviousWhile(
+  tokens: Token[],
+  index: number,
+  matcher: Matcher
+): ?Token {
   return getNextWhileInternal(tokens, index, -1, matcher);
 }
 
@@ -321,18 +330,23 @@ export const whitespace = { token: "default", optional: true };
 /**
  * Gets the computed style of the element
  * Adapted from http://blargh.tommymontgomery.com/2010/04/get-computed-style-in-javascript/
- * @param {Object} element A DOM element
+ * @param {HTMLElement} element A DOM element
  * @param {string} style The name of the CSS style to retrieve
  * @returns {string}
  */
-export function getComputedStyle(element, style) {
+export function getComputedStyle(element: Element, style: string): string {
   let func = null;
   if (document.defaultView && document.defaultView.getComputedStyle)
     func = document.defaultView.getComputedStyle;
   else
-    func = function(element) {
+    func = function(element: Element): any {
+      // TODO: Remove (IE compatibility)
       return element.currentStyle || {};
     };
 
-  return func(element, null)[style];
+  return func(element)[style];
 }
+
+// Export types for language support
+export type { HashMapType, ParserContext, Token };
+export type { AnalyzerContext } from "./analyzer-context.js";

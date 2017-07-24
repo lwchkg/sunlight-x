@@ -10,45 +10,132 @@
  *  - lineHighlight: <array> (array of line numbers to highlight)
  */
 
+// @flow
+
 import { TEXT_NODE } from "../constants.js";
-import { bind } from "../events.js";
+import { AfterHighlightNodeEvent } from "../events.js";
 import { globalOptions } from "../globalOptions.js";
+import { warnInvalidValue } from "../logger.js";
 import * as util from "../util.js";
 
 import { document } from "../jsdom.js";
+
+import type { AfterHighlightNodeEventArgs } from "../events.js";
+import type { SunlightOptionsType } from "../globalOptions.js";
+import type { Highlighter } from "../highlighter.js";
+
+type LineNumberOptionsType = {
+  lineNumbers: boolean,
+  lineNumberStart: number,
+  lineHighlight: number[]
+};
+
+const defaultLineNumberOptions: LineNumberOptionsType = {
+  lineNumbers: false, // TODO: was "automatic"
+  lineNumberStart: 1,
+  lineHighlight: []
+};
 const eolElement = document.createTextNode(util.eol);
 
 /**
+ * Get line numbering options from Sunlight highlighter options, and do
+ * validation. Invalid options are logged.
+ * @param {SunlightOptionsType} options
+ * @returns {LineNumberOptionsType}
+ */
+function getLineNumberOptions(
+  options: SunlightOptionsType
+): LineNumberOptionsType {
+  const logger = console;
+  const parsedOptions: LineNumberOptionsType = Object.assign(
+    {},
+    defaultLineNumberOptions
+  );
+
+  if (typeof options.lineNumbers === "boolean")
+    parsedOptions.lineNumbers = options.lineNumbers;
+  else
+    warnInvalidValue(
+      "Option lineNumbers must be boolean.",
+      options.lineNumbers
+    );
+
+  if (
+    // TODO: remove typeof check when Flow issue #4441 is resolved.
+    typeof options.lineNumberStart === "number" &&
+    Number.isInteger(options.lineNumberStart) &&
+    options.lineNumberStart >= 0
+  )
+    parsedOptions.lineNumberStart = options.lineNumberStart;
+  else
+    warnInvalidValue(
+      "Option lineNumberStart must be a non-negative integer.",
+      options.lineNumberStart
+    );
+
+  if (Array.isArray(options.lineHighlight)) {
+    // TODO: remove typeof check when Flow issue #4441 is resolved.
+    for (const line: mixed of options.lineHighlight)
+      if (typeof line === "number" && Number.isInteger(line) && line >= 0)
+        if (parsedOptions.lineHighlight.indexOf(line) >= 0)
+          parsedOptions.lineHighlight.push(line);
+        else
+          logger.warn(
+            "Duplicate elements in option lineHighlight found.",
+            line
+          );
+      else
+        logger.warn(
+          "Elements of option lineHighlight must be a non-negative integer.",
+          line
+        );
+    parsedOptions.lineHighlight.sort();
+  } else {
+    logger.warn(
+      "Option lineHighlight must be an array of non-negative integers.",
+      options.lineHighlight
+    );
+  }
+
+  return parsedOptions;
+}
+
+/**
  * Get the line count
- * @param {Object} node
+ * TODO: rewrite in non-functional manner.
+ * @param {Element} node
  * @returns {number}
  */
-function getLineCount(node) {
+function getLineCount(node: Element): number {
   // browsers don't render the last trailing newline, so we make sure that the
   // line numbers reflect that by disregarding the last trailing newline
 
   // get the last text node
-  const lastTextNode = (function getLastNode(node) {
+  const lastTextNode = (function getLastNode(node: Node): ?Node {
     if (!node.lastChild) return null;
-
     if (node.lastChild.nodeType === TEXT_NODE) return node.lastChild;
-
     return getLastNode(node.lastChild);
-  })(node) || { lastChild: "" };
+  })(node) || { nodeValue: "" };
 
   return (
     node.innerHTML.replace(/[^\n]/g, "").length -
-    /\n$/.test(lastTextNode.nodeValue)
+    (/\n$/.test(lastTextNode.nodeValue) ? 1 : 0)
   );
 }
 
 /**
  * Add line numbers to the highlighted nodes, if configured to do so.
- * @param {Object} highlighter
+ * @param {Highlighter} highlighter
  * @param {Object} context
  */
-function maybeAddLineNumbers(highlighter, context) {
-  if (!highlighter.options.lineNumbers) return;
+function maybeAddLineNumbers(
+  highlighter: Highlighter,
+  context: AfterHighlightNodeEventArgs
+) {
+  const options: LineNumberOptionsType = getLineNumberOptions(
+    highlighter.options
+  );
+  if (!options.lineNumbers) return;
 
   // Skip if it's not a block level element or the lineNumbers option is not set
   // to "automatic"
@@ -58,13 +145,11 @@ function maybeAddLineNumbers(highlighter, context) {
   )
     return;
 
-  let lineHighlightOverlay;
-  const lineHighlightingEnabled = highlighter.options.lineHighlight.length > 0;
-  if (lineHighlightingEnabled) {
-    lineHighlightOverlay = document.createElement("div");
+  const lineHighlightOverlay: HTMLElement = document.createElement("div");
+  const lineHighlightingEnabled = options.lineHighlight.length > 0;
+  if (lineHighlightingEnabled)
     lineHighlightOverlay.className =
       highlighter.options.classPrefix + "line-highlight-overlay";
-  }
 
   const lineContainer = document.createElement("pre");
   lineContainer.className =
@@ -72,8 +157,8 @@ function maybeAddLineNumbers(highlighter, context) {
 
   const lineCount = getLineCount(context.node);
   for (
-    let i = highlighter.options.lineNumberStart;
-    i <= highlighter.options.lineNumberStart + lineCount;
+    let i = options.lineNumberStart;
+    i <= options.lineNumberStart + lineCount;
     ++i
   ) {
     const link = document.createElement("a");
@@ -93,7 +178,7 @@ function maybeAddLineNumbers(highlighter, context) {
 
     if (lineHighlightingEnabled) {
       const currentLineOverlay = document.createElement("div");
-      if (util.contains(highlighter.options.lineHighlight, i))
+      if (options.lineHighlight.indexOf(i) >= 0)
         currentLineOverlay.className =
           highlighter.options.classPrefix + "line-highlight-active";
 
@@ -115,8 +200,6 @@ function maybeAddLineNumbers(highlighter, context) {
 }
 
 // Initialization of plugin
-bind("afterHighlightNode", maybeAddLineNumbers);
+AfterHighlightNodeEvent.addListener(maybeAddLineNumbers);
 
-globalOptions.lineNumbers = false; // TODO: was "automatic"
-globalOptions.lineNumberStart = 1;
-globalOptions.lineHighlight = [];
+Object.assign(globalOptions, defaultLineNumberOptions);

@@ -1,49 +1,57 @@
+// @flow
+import { Analyzer } from "./analyzer.js";
 import * as util from "./util.js";
-import { document } from "./jsdom.js";
 
-/* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
+import type { AnalyzerContext } from "./analyzer-context.js";
+import type {
+  BetweenIdentRule,
+  CustomIdentRule,
+  FollowsOrPrecedesIdentRule
+} from "./languages.js";
+import type { ParserContext } from "./parser-context.js";
+import type { Token } from "./token.js";
 
-function defaultHandleToken(suffix) {
-  return function(context) {
-    const element = document.createElement("span");
-    element.className = context.options.classPrefix + suffix;
-    element.appendChild(context.createTextNode(context.tokens[context.index]));
-    return context.addNode(element) || true;
-  };
-}
+/* eslint no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2] }], camelcase: 0 */
 
-export class defaultAnalyzer {
-  handleToken(context) {
-    return defaultHandleToken(context.tokens[context.index].name)(context);
+export class defaultAnalyzer extends Analyzer {
+  constructor() {
+    super();
+    this.handlers.default = this.handleDefault;
+    this.handlers.ident = this.handleIdent;
   }
 
-  // TODO: clean up!!!
   // just append default content as a text node
-  handle_default(context) {
-    return context.addNode(
-      context.createTextNode(context.tokens[context.index])
-    );
+  handleDefault(context: AnalyzerContext): true {
+    context.addNode(context.createTextNode(context.tokens[context.index]));
+    return true;
   }
 
   // this handles the named ident mayhem
-  handle_ident(context) {
-    const evaluate = function(rules, createRule) {
-      let i;
+  handleIdent(context: AnalyzerContext): true {
+    const _evaluateCustomRule = (rules: CustomIdentRule[]): boolean => {
       rules = rules || [];
-      for (i = 0; i < rules.length; i++)
-        if (typeof rules[i] === "function") {
-          if (rules[i](context))
-            return defaultHandleToken("named-ident")(context);
-        } else if (createRule && createRule(rules[i])(context.tokens)) {
-          return defaultHandleToken("named-ident")(context);
-        }
+      for (let i = 0; i < rules.length; i++)
+        if (rules[i](context))
+          return Analyzer.defaultHandleToken("named-ident")(context);
+
+      return false;
+    };
+
+    const _evaluate = <T: FollowsOrPrecedesIdentRule | BetweenIdentRule>(
+      rules: T[],
+      createRule: T => (Token[]) => boolean
+    ): boolean => {
+      rules = rules || [];
+      for (let i = 0; i < rules.length; i++)
+        if (createRule && createRule(rules[i])(context.tokens))
+          return Analyzer.defaultHandleToken("named-ident")(context);
 
       return false;
     };
 
     return (
-      evaluate(context.language.namedIdentRules.custom) ||
-      evaluate(context.language.namedIdentRules.follows, ruleData =>
+      _evaluateCustomRule(context.language.namedIdentRules.custom) ||
+      _evaluate(context.language.namedIdentRules.follows, (ruleData: *): * =>
         util.createProceduralRule(
           context.index - 1,
           -1,
@@ -51,7 +59,7 @@ export class defaultAnalyzer {
           context.language.caseInsensitive
         )
       ) ||
-      evaluate(context.language.namedIdentRules.precedes, ruleData =>
+      _evaluate(context.language.namedIdentRules.precedes, (ruleData: *): * =>
         util.createProceduralRule(
           context.index + 1,
           1,
@@ -59,7 +67,7 @@ export class defaultAnalyzer {
           context.language.caseInsensitive
         )
       ) ||
-      evaluate(context.language.namedIdentRules.between, ruleData =>
+      _evaluate(context.language.namedIdentRules.between, (ruleData: *): * =>
         util.createBetweenRule(
           context.index,
           ruleData.opener,
@@ -67,17 +75,22 @@ export class defaultAnalyzer {
           context.language.caseInsensitive
         )
       ) ||
-      defaultHandleToken("ident")(context)
+      Analyzer.defaultHandleToken("ident")(context)
     );
   }
 }
 
-export function defaultNumberParser(context) {
+/**
+ * The default number parser.
+ * @param {ParserContext} context
+ * @returns {Token?}
+ */
+export function defaultNumberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
 
-  let number;
+  let number: string;
   let allowDecimal = true;
   if (!/\d/.test(current)) {
     // is it a decimal followed by a number?

@@ -1,7 +1,11 @@
-/* eslint require-jsdoc: 0 */
+// @flow
 
 export const name = "plaintext";
 export const punctuation = /(?!x)x/;
-export function numberParser() {
+/**
+ * Null number parser.
+ * @returns {null}
+ */
+export function numberParser(): null {
   return null;
 }

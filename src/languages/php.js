@@ -1,4 +1,7 @@
+// @flow
 import * as util from "../util.js";
+
+import type { AnalyzerContext, ParserContext, Token } from "../util.js";
 
 export const name = "php";
 export const keywords = [
@@ -3225,16 +3228,20 @@ export const customTokens = {
 
 export const scopes = {
   string: [
-    ['"', '"', util.escapeSequences.concat(['\\"'])],
-    ["'", "'", ["\\'", "\\\\"]]
+    ['"', '"', util.escapeSequences.concat(['\\"']), false],
+    ["'", "'", ["\\'", "\\\\"], false]
   ],
-  comment: [["//", "\n", null, true], ["/*", "*/"], ["#", "\n", null, true]],
-  variable: [["$", { length: 1, regex: /[^$A-Za-z0-9_]/ }, null, true]]
+  comment: [
+    ["//", "\n", [], true],
+    ["/*", "*/", [], false],
+    ["#", "\n", [], true]
+  ],
+  variable: [["$", { length: 1, regex: /[^$A-Za-z0-9_]/ }, [], true]]
 };
 
 export const customParseRules = [
   // heredoc/nowdoc
-  function(context) {
+  function(context: ParserContext): ?Token {
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
@@ -3287,7 +3294,7 @@ export const identAfterFirstLetter = /\w/;
 
 export const namedIdentRules = {
   custom: [
-    function(context) {
+    function(context: AnalyzerContext): boolean {
       // must be preceded by "new"
       const prevToken = util.getPreviousNonWsToken(
         context.tokens,
@@ -3313,7 +3320,7 @@ export const namedIdentRules = {
     },
 
     // use alias type names, e.g. "Foo" in "use My\Namespace\Foo;"
-    function(context) {
+    function(context: AnalyzerContext): boolean {
       const nextToken = util.getNextNonWsToken(context.tokens, context.index);
 
       if (
@@ -3339,7 +3346,7 @@ export const namedIdentRules = {
       return false;
     },
 
-    function(context) {
+    function(context: AnalyzerContext): boolean {
       // next token is not the namespace delimiter
       const nextToken = util.getNextNonWsToken(context.tokens, context.index);
 
