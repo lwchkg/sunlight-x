@@ -5,7 +5,6 @@
 
 // @flow
 import type { AnalyzerContext } from "./analyzer-context.js";
-import type { Element } from "./jsdom.js";
 import type { Highlighter } from "./highlighter.js";
 import type { Language } from "./languages.js";
 import type { ParserContext } from "./parser-context.js";
@@ -28,8 +27,8 @@ export type BeforeAnalyzeEventArgs = { analyzerContext: AnalyzerContext };
 export type AfterAnalyzeEventArgs = { analyzerContext: AnalyzerContext };
 export type AfterHighlightEventArgs = { analyzerContext: AnalyzerContext };
 export type AfterHighlightNodeEventArgs = {
-  container: Element,
-  codeContainer: Element,
+  container?: HTMLElement,
+  codeContainer?: HTMLElement,
   node: Element,
   count: number
 };

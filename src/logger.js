@@ -19,6 +19,14 @@ export function warnInvalidValue(message: string, ...args: mixed[]) {
  * Log to warn about invalid values.
  * @param {string} message The message to log.
  */
+export function error(message: string) {
+  logger.warn(`Sunlight-X: ${message}`);
+}
+
+/**
+ * Log to warn about invalid values.
+ * @param {string} message The message to log.
+ */
 export function errorInvalidValue(message: string, ...args: mixed[]) {
   logger.warn(`Sunlight-X: ${message} Given value(s): `, ...args);
 }

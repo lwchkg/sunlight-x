@@ -1,12 +1,12 @@
 // @flow
 import { jsdom } from "jsdom";
 export { jsdom };
-export const document = jsdom("", {});
+export const document: Document = jsdom("", {});
 
 const window = document.defaultView;
 
-const Element = window.Element;
-const HTMLElement = window.HTMLElement;
-const Text = window.Text;
+const element: Element = window.Element;
+const htmlElement: HTMLElement = window.HTMLElement;
+const text: Text = window.Text;
 
-export { Element, HTMLElement, Text };
+export { element as Element, htmlElement as HTMLElement, text as Text };

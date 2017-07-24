@@ -13,8 +13,9 @@ import {
 import { languages } from "./languages.js";
 import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
+import { errorInvalidValue } from "./logger.js";
 
-import { document, Element } from "./jsdom.js";
+import { document, Element as element } from "./jsdom.js";
 
 import type {
   SunlightOptionsType,
@@ -199,7 +200,7 @@ export class Highlighter {
   }
 
   // recursively highlights a DOM node
-  highlightNode(node: Element) {
+  highlightNode(node: Element, addContainer: ?boolean) {
     let partialContext;
 
     if (this.isAlreadyHighlighted(node)) return;
@@ -227,7 +228,7 @@ export class Highlighter {
         node.replaceChild(nodes[0], node.childNodes[j]);
         for (let k = 1; k < nodes.length; k++)
           node.insertBefore(nodes[k], nodes[k - 1].nextSibling);
-      } else if (node.childNodes[j].nodeType === 1) {
+      } else if (node.childNodes[j] instanceof element) {
         // element nodes
         this.highlightNode(node.childNodes[j]);
       }
@@ -235,13 +236,17 @@ export class Highlighter {
     // indicate that this node has been highlighted
     node.className += " " + this.options.classPrefix + "highlighted";
 
-    let container, codeContainer;
-    // if the node is block level, we put it in a container, otherwise we just leave it alone
-    if (util.getComputedStyle(node, "display") === "block") {
-      container = document.createElement("div");
+    // If the node is block level, or if we cannot know the style, put the code
+    // inside a container.
+    const style = util.getComputedStyle(node, "display");
+    if (
+      addContainer === true ||
+      (addContainer !== false && (!style || style === "block"))
+    ) {
+      const container: HTMLElement = document.createElement("div");
       container.className = this.options.classPrefix + "container";
 
-      codeContainer = document.createElement("div");
+      const codeContainer: HTMLElement = document.createElement("div");
       codeContainer.className = this.options.classPrefix + "code-container";
 
       // apply max height if specified in options
@@ -256,21 +261,23 @@ export class Highlighter {
 
       const parentNode = node.parentNode;
       if (parentNode) {
-        parentNode.insertBefore(codeContainer, node);
-        parentNode.removeChild(node);
+        parentNode.insertBefore(container, node);
+        codeContainer.appendChild(parentNode.removeChild(node));
+      } else {
+        errorInvalidValue("highlightNode: node has no parent node.");
       }
-      codeContainer.appendChild(node);
 
-      codeContainer.parentNode.insertBefore(container, codeContainer);
-      codeContainer.parentNode.removeChild(codeContainer);
-      container.appendChild(codeContainer);
+      AfterHighlightNodeEvent.raise(this, {
+        container: container,
+        codeContainer: codeContainer,
+        node: node,
+        count: currentNodeCount
+      });
+    } else {
+      AfterHighlightNodeEvent.raise(this, {
+        node: node,
+        count: currentNodeCount
+      });
     }
-
-    AfterHighlightNodeEvent.raise(this, {
-      container: container,
-      codeContainer: codeContainer,
-      node: node,
-      count: currentNodeCount
-    });
   }
 }

@@ -132,6 +132,9 @@ function maybeAddLineNumbers(
   highlighter: Highlighter,
   context: AfterHighlightNodeEventArgs
 ) {
+  const codeContainer = context.codeContainer;
+  if (!codeContainer) return;
+
   const options: LineNumberOptionsType = getLineNumberOptions(
     highlighter.options
   );
@@ -172,7 +175,7 @@ function maybeAddLineNumbers(
     link.setAttribute("name", name);
     link.setAttribute("href", "#" + name);
 
-    link.appendChild(document.createTextNode(i));
+    link.appendChild(document.createTextNode(i.toString()));
     lineContainer.appendChild(link);
     lineContainer.appendChild(eolElement.cloneNode(false));
 
@@ -186,17 +189,13 @@ function maybeAddLineNumbers(
     }
   }
 
-  context.codeContainer.insertBefore(
-    lineContainer,
-    context.codeContainer.firstChild
-  );
+  codeContainer.insertBefore(lineContainer, codeContainer.firstChild);
 
-  if (lineHighlightingEnabled)
-    context.codeContainer.appendChild(lineHighlightOverlay);
+  if (lineHighlightingEnabled) codeContainer.appendChild(lineHighlightOverlay);
 
   // enable the border on the code container
-  context.codeContainer.style.borderWidth = "1px";
-  context.codeContainer.style.borderStyle = "solid";
+  codeContainer.style.borderWidth = "1px";
+  codeContainer.style.borderStyle = "solid";
 }
 
 // Initialization of plugin
