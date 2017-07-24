@@ -15,7 +15,7 @@ import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
 import { errorInvalidValue } from "./logger.js";
 
-import { document, Element as element } from "./jsdom.js";
+import { document, window } from "./jsdom.js";
 
 import type {
   SunlightOptionsType,
@@ -174,24 +174,25 @@ export class Highlighter {
     return analyzerContext;
   }
 
-  // matches the language of the node to highlight
-  matchSunlightNode(node: Element): * {
-    if (!this.matchSunlightNodeRegEx)
-      this.matchSunlightNodeRegEx = new RegExp(
-        "(?:\\s|^)" + this.options.classPrefix + "highlight-(\\S+)(?:\\s|$)"
-      );
+  getAllHighlightableNodes(): NodeList<HTMLElement> {
+    const classPrefix = this.options.classPrefix + "highlight-";
+    return document.querySelectorAll(`[class^="${classPrefix}"]`);
+  }
 
-    return this.matchSunlightNodeRegEx.exec(node.className);
+  getLanguageFromNode(node: Element): ?string {
+    const classPrefix = this.options.classPrefix + "highlight-";
+    const classList = node.className.split(" ");
+    for (const classItem of classList)
+      if (classItem.startsWith(classPrefix))
+        return classItem.substring(classPrefix.length);
+
+    // FIXME: Code goes to here when switching languages.
+    return undefined;
   }
 
   // determines if the node has already been highlighted
   isAlreadyHighlighted(node: Element): boolean {
-    if (!this.isAlreadyHighlightedRegEx)
-      this.isAlreadyHighlightedRegEx = new RegExp(
-        "(?:\\s|^)" + this.options.classPrefix + "highlighted(?:\\s|$)"
-      );
-
-    return this.isAlreadyHighlightedRegEx.test(node.className);
+    return node.classList.contains(this.options.classPrefix + "highlighted");
   }
 
   // highlights a block of text
@@ -201,22 +202,20 @@ export class Highlighter {
 
   // recursively highlights a DOM node
   highlightNode(node: Element, addContainer: ?boolean) {
-    let partialContext;
-
     if (this.isAlreadyHighlighted(node)) return;
 
-    const match = this.matchSunlightNode(node);
-    if (match === null) return;
+    const languageId = this.getLanguageFromNode(node);
+    if (!languageId) return;
 
     BeforeHighlightNodeEvent.raise(this, { node: node });
 
-    const languageId = match[1];
     let currentNodeCount = 0;
-    for (let j = 0; j < node.childNodes.length; j++)
-      if (node.childNodes[j].nodeType === TEXT_NODE) {
+    let partialContext: ?AnalyzerContext = undefined;
+    for (const childNode of node.childNodes)
+      if (childNode.nodeType === TEXT_NODE) {
         // text nodes
         partialContext = this.highlightText(
-          node.childNodes[j].nodeValue,
+          childNode.nodeValue,
           languageId,
           partialContext
         );
@@ -225,12 +224,12 @@ export class Highlighter {
 
         const nodes = partialContext.getNodes();
         if (!nodes[0]) nodes[0] = document.createTextNode("");
-        node.replaceChild(nodes[0], node.childNodes[j]);
+        node.replaceChild(nodes[0], childNode);
         for (let k = 1; k < nodes.length; k++)
           node.insertBefore(nodes[k], nodes[k - 1].nextSibling);
-      } else if (node.childNodes[j] instanceof element) {
+      } else if (childNode instanceof window.Element) {
         // element nodes
-        this.highlightNode(node.childNodes[j]);
+        this.highlightNode(childNode);
       }
 
     // indicate that this node has been highlighted

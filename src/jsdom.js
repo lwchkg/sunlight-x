@@ -1,12 +1,23 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
 import { jsdom } from "jsdom";
 export { jsdom };
 export const document: Document = jsdom("", {});
 
-const window = document.defaultView;
+const defaultView = document.defaultView;
 
-const element: Element = window.Element;
-const htmlElement: HTMLElement = window.HTMLElement;
-const text: Text = window.Text;
+const window: {
+  Element: Element,
+  HTMLElement: HTMLElement,
+  Text: Text
+} = {
+  Element: defaultView.Element,
+  HTMLElement: defaultView.HTMLElement,
+  Text: defaultView.Text
+};
 
-export { element as Element, htmlElement as HTMLElement, text as Text };
+export { window };

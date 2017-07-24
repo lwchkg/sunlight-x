@@ -1,7 +1,13 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
+// @flow
 import { TestSupport } from "./fixtures/testsupport.js";
 
-let testSupport;
 describe("PHP tests", function() {
+  let testSupport: TestSupport;
   describe("file #1", function() {
     before(function() {
       testSupport = new TestSupport("php1.php", "php");

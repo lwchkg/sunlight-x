@@ -1,6 +1,6 @@
 // @flow
 
-import assert from "power-assert";
+import assert from "assert";
 import { TestSupport } from "./fixtures/testsupport.js";
 
 const lineNumberExtractorRegExp = /^#sunlight-\d+-line-(\d+)$/;
@@ -18,14 +18,13 @@ function checkLineNumbers(
     "[href|=\\#sunlight][href*=-line-]"
   );
 
-  for (let i = 0; i < lineNumberElements.length; ++i) {
-    const lineNumber = Number.parseInt(
-      lineNumberElements[i]
-        .getAttribute("href")
-        .match(lineNumberExtractorRegExp)[1]
-    );
-    assert.strictEqual(lineNumberStart + i, lineNumber);
-  }
+  lineNumberElements.forEach((node: Element, index: number) => {
+    const attribute = node.getAttribute("href") || "";
+    const match: ?(string[]) = attribute.match(lineNumberExtractorRegExp);
+    const lineNumber: string = (match && match[1]) || "";
+    assert.notStrictEqual("", lineNumber);
+    assert.strictEqual(lineNumberStart + index, Number.parseInt(lineNumber));
+  });
 }
 
 describe("Line numbering plugin", function() {

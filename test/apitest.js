@@ -1,6 +1,3 @@
-// Do not pass sunlight-all-min.js to babel. It is broken after compilation.
-// import assert from 'power-assert';
-
 // @flow
 import { jsdom } from "jsdom";
 import { Highlighter } from "../src/sunlight.js";
@@ -11,7 +8,7 @@ describe("API tests", function() {
     const code = 'console.log("test")\nconsole.log("test")';
     const language = "javascript";
 
-    const document = jsdom("", {});
+    const document: Document = jsdom("", {});
 
     const preElement = document.createElement("div");
     // Note: setting innerText does not work in jsdoc 9.4.2
@@ -27,7 +24,7 @@ describe("API tests", function() {
     const codeSnippets = ["\n", " ", "\n\n", ""];
     const language = "javascript";
 
-    const document = jsdom("", {});
+    const document: Document = jsdom("", {});
 
     for (const code of codeSnippets) {
       const preElement = document.createElement("div");

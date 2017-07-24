@@ -1,6 +1,10 @@
-// @flow
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
 
-import assert from "power-assert";
+// @flow
+import assert from "assert";
 const fs = require("fs");
 const path = require("path");
 import { TEXT_NODE } from "../src/constants.js";

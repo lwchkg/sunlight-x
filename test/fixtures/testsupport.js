@@ -1,10 +1,14 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
-
-import assert from "power-assert";
-const fs = require("fs");
-const path = require("path");
-
+import * as assert from "assert";
+import * as fs from "fs";
 import { jsdom } from "jsdom";
+import * as path from "path";
+
 import { Highlighter } from "../../src/sunlight.js";
 
 import type { SunlightPartialOptionsType } from "../../src/globalOptions.js";
@@ -40,7 +44,7 @@ export class TestSupport {
       "utf8"
     );
 
-    const document = jsdom("", {});
+    const document: Document = jsdom("", {});
     const preElement = document.createElement("div");
     // Note: setting innerText does not work in jsdom 9.4.2
     preElement.appendChild(document.createTextNode(code));
@@ -82,7 +86,7 @@ export class TestSupport {
    * @param {string} className
    * @returns {NodeList}
    */
-  GetElementsWithClassName(className: string): NodeList<*> {
+  GetElementsWithClassName(className: string): NodeList<HTMLElement> {
     return this.codeElement.querySelectorAll(
       "." + this.classPrefix + className
     );

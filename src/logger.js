@@ -4,7 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-
 const logger = console;
 
 /**
