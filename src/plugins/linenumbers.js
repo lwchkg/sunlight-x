@@ -13,13 +13,14 @@
 // @flow
 
 import { TEXT_NODE } from "../constants.js";
-import { bind } from "../events.js";
+import { AfterHighlightNodeEvent } from "../events.js";
 import { globalOptions } from "../globalOptions.js";
 import { warnInvalidValue } from "../logger.js";
 import * as util from "../util.js";
 
 import { document } from "../jsdom.js";
 
+import type { AfterHighlightNodeEventArgs } from "../events.js";
 import type { SunlightOptionsType } from "../globalOptions.js";
 import type { Highlighter } from "../highlighter.js";
 
@@ -127,7 +128,10 @@ function getLineCount(node: Element): number {
  * @param {Highlighter} highlighter
  * @param {Object} context
  */
-function maybeAddLineNumbers(highlighter: Highlighter, context) {
+function maybeAddLineNumbers(
+  highlighter: Highlighter,
+  context: AfterHighlightNodeEventArgs
+) {
   const options: LineNumberOptionsType = getLineNumberOptions(
     highlighter.options
   );
@@ -196,6 +200,6 @@ function maybeAddLineNumbers(highlighter: Highlighter, context) {
 }
 
 // Initialization of plugin
-bind("afterHighlightNode", maybeAddLineNumbers);
+AfterHighlightNodeEvent.addListener(maybeAddLineNumbers);
 
 Object.assign(globalOptions, defaultLineNumberOptions);

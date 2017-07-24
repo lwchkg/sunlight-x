@@ -12,6 +12,7 @@ import {} from "./load-plugins.js";
 import { document } from "./jsdom.js";
 
 import type { SunlightPartialOptionsType } from "./globalOptions.js";
+import type { AnalyzerType } from "./languages.js";
 
 /* eslint require-jsdoc: 0 */
 
@@ -24,7 +25,7 @@ export { registerLanguage, isRegistered } from "./languages.js";
 
 export { Highlighter };
 
-export function createAnalyzer() {
+export function createAnalyzer(): () => AnalyzerType {
   return new defaultAnalyzer();
 }
 

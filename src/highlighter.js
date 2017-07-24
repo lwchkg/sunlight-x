@@ -2,7 +2,14 @@
 import * as util from "./util.js";
 import { DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
 import { globalOptions } from "./globalOptions.js";
-import { fireEvent } from "./events.js";
+import {
+  BeforeHighlightNodeEvent,
+  AfterHighlightNodeEvent,
+  BeforeHighlightEvent,
+  AfterHighlightEvent,
+  BeforeAnalyzeEvent,
+  AfterAnalyzeEvent
+} from "./events.js";
 import { languages } from "./languages.js";
 import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
@@ -81,7 +88,7 @@ export class Highlighter {
   }
 
   analyze(analyzerContext: AnalyzerContext, startIndex: number) {
-    fireEvent("beforeAnalyze", this, { analyzerContext: analyzerContext });
+    BeforeAnalyzeEvent.raise(this, { analyzerContext: analyzerContext });
 
     if (analyzerContext.tokens.length > 0) {
       analyzerContext.language =
@@ -124,7 +131,7 @@ export class Highlighter {
       for (let i = 0; i < nodes.length; i++) analyzerContext.addNode(nodes[i]);
     }
 
-    fireEvent("afterAnalyze", this, { analyzerContext: analyzerContext });
+    AfterAnalyzeEvent.raise(this, { analyzerContext: analyzerContext });
   }
 
   // partialContext allows us to perform a partial parse, and then pick up where we left off at a later time
@@ -140,7 +147,7 @@ export class Highlighter {
       // use default language if one wasn't specified or hasn't been registered
       language = languages[DEFAULT_LANGUAGE];
 
-    fireEvent("beforeHighlight", this, {
+    BeforeHighlightEvent.raise(this, {
       code: unhighlightedCode,
       language: language,
       previousContext: partialContext
@@ -157,7 +164,7 @@ export class Highlighter {
       partialContext && partialContext.index ? partialContext.index + 1 : 0
     );
 
-    fireEvent("afterHighlight", this, { analyzerContext: analyzerContext });
+    AfterHighlightEvent.raise(this, { analyzerContext: analyzerContext });
 
     return analyzerContext;
   }
@@ -196,9 +203,10 @@ export class Highlighter {
     const match = this.matchSunlightNode(node);
     if (match === null) return;
 
+    BeforeHighlightNodeEvent.raise(this, { node: node });
+
     const languageId = match[1];
     let currentNodeCount = 0;
-    fireEvent("beforeHighlightNode", this, { node: node });
     for (let j = 0; j < node.childNodes.length; j++)
       if (node.childNodes[j].nodeType === TEXT_NODE) {
         // text nodes
@@ -254,7 +262,7 @@ export class Highlighter {
       container.appendChild(codeContainer);
     }
 
-    fireEvent("afterHighlightNode", this, {
+    AfterHighlightNodeEvent.raise(this, {
       container: container,
       codeContainer: codeContainer,
       node: node,

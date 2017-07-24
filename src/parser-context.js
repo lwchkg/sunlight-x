@@ -5,7 +5,7 @@
 
 // @flow
 import { CodeReader } from "./code-reader.js";
-import { fireEvent } from "./events.js";
+import { BeforeTokenizeEvent, AfterTokenizeEvent } from "./events.js";
 import { Token } from "./token.js";
 import { parseNextToken } from "./parse-next-token.js";
 import * as util from "./util.js";
@@ -42,7 +42,7 @@ export class ParserContext {
     this.options = options;
     this.tokens = [];
 
-    fireEvent("beforeTokenize", this.highlighter, {
+    BeforeTokenizeEvent.raise(this.highlighter, {
       code: unhighlightedCode,
       language: language
     });
@@ -109,7 +109,7 @@ export class ParserContext {
         )
       );
 
-    fireEvent("afterTokenize", this.highlighter, {
+    AfterTokenizeEvent.raise(this.highlighter, {
       code: unhighlightedCode,
       parserContext: this
     });
