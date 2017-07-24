@@ -4,7 +4,7 @@
 // be found in the LICENSE file.
 
 // @flow
-const logger = console;
+export const logger = console;
 
 /**
  * Log to warn about invalid values.
