@@ -25,19 +25,21 @@ export class CodeReader {
     this.currentChar = text.charAt(0);
   }
 
-  getCharacters(count: number = 1): string {
-    return this.text.substring(this.index + 1, this.index + count + 1);
+  toString(): string {
+    return `length: ${this.length}, index: ${this.index}, line: ${this
+      .line}, column: ${this.column}, current: [${this.currentChar}]`;
   }
 
-  toString(): string {
-    const currentChar: string =
-      this.currentChar === undefined ? "undefined" : this.currentChar;
-    return `length: ${this.length}, index: ${this.index}, line: ${this
-      .line}, column: ${this.column}, current: [${currentChar}]`;
+  current(): string {
+    return this.currentChar;
+  }
+
+  currentAndPeek(count: number = 1): string {
+    return this.text.substr(this.index, count);
   }
 
   peek(count: number = 1): string {
-    return this.getCharacters(count);
+    return this.text.substr(this.index + 1, count);
   }
 
   substring(): string {
@@ -51,7 +53,7 @@ export class CodeReader {
   read(count: number = 1): string {
     if (count === 0) return "";
 
-    const value = this.getCharacters(count);
+    const value = this.peek(count);
 
     if (value !== this.EOF) {
       // advance index
@@ -97,8 +99,12 @@ export class CodeReader {
     return this.column;
   }
 
-  isEof(): boolean {
+  isEOF(): boolean {
     return this.index >= this.length;
+  }
+
+  isPeekEOF(): boolean {
+    return this.index + 1 >= this.length;
   }
 
   isSol(): boolean {
@@ -127,7 +133,7 @@ export class CodeReader {
     return this.EOF;
   }
 
-  current(): string {
-    return this.currentChar;
+  match(str: string): boolean {
+    return this.text.substr(this.index, str.length) === str;
   }
 }

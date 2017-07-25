@@ -157,8 +157,8 @@ export const customParseRules = [
     const metaName = "xmlDocCommentMeta"; // tags and the "///" starting token
     const contentName = "xmlDocCommentContent"; // actual comments (words and stuff)
 
-    if (context.reader.current() !== "/" || context.reader.peek(2) !== "//")
-      return null;
+    const tag = "///";
+    if (!context.reader.match(tag)) return null;
 
     const tokens = [
       context.createToken(
@@ -168,7 +168,7 @@ export const customParseRules = [
         context.reader.getColumn()
       )
     ];
-    context.reader.read(2);
+    context.reader.read(tag.length - 1);
 
     const current = {
       line: 0,
@@ -176,8 +176,8 @@ export const customParseRules = [
       value: "",
       name: ""
     };
-    let peek: string;
-    while ((peek = context.reader.peek()) !== context.reader.EOF) {
+    while (!context.reader.isPeekEOF()) {
+      const peek = context.reader.peek();
       if (peek === "<" && current.name !== metaName) {
         // push the current token
         if (current.value !== "")
@@ -243,8 +243,7 @@ export const customParseRules = [
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
-    if (!/^(get|set)\b/.test(context.reader.current() + context.reader.peek(3)))
-      return null;
+    if (!/^(get|set)\b/.test(context.reader.currentAndPeek(4))) return null;
 
     const rule = util.createProceduralRule(context.count() - 1, -1, [
       { token: "punctuation", values: ["}", "{", ";"] },
@@ -284,8 +283,7 @@ export const customParseRules = [
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
-    if (!/^value\b/.test(context.reader.current() + context.reader.peek(5)))
-      return null;
+    if (!/^value\b/.test(context.reader.currentAndPeek(6))) return null;
 
     // comes after "set" but not after the closing "}" (we'll have to count them to make sure scoping is correct)
     // can't be on the left side of an assignment

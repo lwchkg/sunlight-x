@@ -69,6 +69,10 @@
          * This does something
          */
         private static function doSomething() {
+            $emptyheredoc = <<<EMPTYHEREDOC
+EMPTYHEREDOC;
+            $emptynowdoc = <<<'EMPTYNOWDOC'
+EMPTYNOWDOC;
             $heredoc = "this one is my \"favorite\"";
             $heredoc .= <<<LOL
 oh 'look'

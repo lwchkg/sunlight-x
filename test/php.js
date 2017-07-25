@@ -191,6 +191,18 @@ describe("PHP tests", function() {
     it("-> operator", function() {
       testSupport.AssertContentExists("operator", "->");
     });
+    it("emptyheredoc", function() {
+      testSupport.AssertContentExists(
+        "nowdoc",
+        "<<<'EMPTYNOWDOC'\nEMPTYNOWDOC"
+      );
+    });
+    it("emptynowdoc", function() {
+      testSupport.AssertContentExists(
+        "heredoc",
+        "<<<EMPTYHEREDOC\nEMPTYHEREDOC"
+      );
+    });
     it("nowdoc", function() {
       testSupport.AssertContentExists(
         "nowdoc",
