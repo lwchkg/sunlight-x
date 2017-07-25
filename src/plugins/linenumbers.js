@@ -154,7 +154,7 @@ function maybeAddLineNumbers(
     lineHighlightOverlay.className =
       highlighter.options.classPrefix + "line-highlight-overlay";
 
-  const lineContainer = document.createElement("pre");
+  const lineContainer = document.createElement("div");
   lineContainer.className =
     highlighter.options.classPrefix + "line-number-margin";
 

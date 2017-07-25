@@ -45,7 +45,7 @@ export class TestSupport {
     );
 
     const document: Document = jsdom("", {});
-    const preElement = document.createElement("div");
+    const preElement = document.createElement("pre");
     // Note: setting innerText does not work in jsdom 9.4.2
     preElement.appendChild(document.createTextNode(code));
     preElement.setAttribute(

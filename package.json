@@ -32,7 +32,7 @@
   "scripts": {
     "babel": "babel",
     "compile": "yarn run compile-js && yarn run compile-css",
-    "compile-css": "lessc style/sunlight.less compiled-assets/sunlight.css",
+    "compile-css": "lessc style/sunlight.less compiled-assets/sunlight.css && lessc style/sunlight-defaultfont.less compiled-assets/sunlight-defaultfont.css",
     "compile-debug": "yarn run compile-js-debug && yarn run compile-css",
     "compile-js": "cross-env NODE_ENV=production babel -d babel-out/ src/",
     "compile-js-debug": "babel -d babel-out/ src/",

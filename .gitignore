@@ -3,6 +3,9 @@ babel-out
 compiled-assets
 flow-typed
 
+# Test output
+test/output/*-actual.*
+
 # Logs
 logs
 *.log
