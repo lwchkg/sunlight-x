@@ -3350,10 +3350,12 @@ export const namedIdentRules = {
 
       // go backward and make sure that there are only idents and dots before the new keyword
       // "previous" is used to make sure that method declarations like "public new Object Value()..." are treated correctly
-      let index = context.index;
-      let previous = context.tokens[index];
-      let token;
-      while ((token = context.tokens[--index]) !== undefined) {
+      let previous = context.tokens[context.index];
+      for (
+        let index = context.index - 1, token;
+        (token = context.tokens[index]) !== undefined;
+        --index
+      ) {
         if (
           token.name === "keyword" &&
           (token.value === "new" || token.value === "instanceof")

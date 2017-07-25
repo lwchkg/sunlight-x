@@ -107,18 +107,20 @@ export class CodeReader {
     return this.index + 1 >= this.length;
   }
 
+  // SOL = start of line
   isSol(): boolean {
     return this.column === 1;
   }
 
+  // Check if it is the first non-whitespace character of the line
   isSolWs(): boolean {
-    let temp = this.index;
+    // TODO: rewrite. This can be done in a simple regex.
     if (this.column === 1) return true;
 
     // look backward until we find a newline or a non-whitespace character
-    let c;
-    while ((c = this.text.charAt(--temp)) !== "") {
-      if (c === "\n") return true;
+    for (let temp = this.index - 1; temp >= 0; --temp) {
+      const c = this.text.charAt(temp);
+      if (c === "\n") break;
       if (!/\s/.test(c)) return false;
     }
 
@@ -135,5 +137,9 @@ export class CodeReader {
 
   match(str: string): boolean {
     return this.text.substr(this.index, str.length) === str;
+  }
+
+  matchPeek(str: string): boolean {
+    return this.text.substr(this.index + 1, str.length) === str;
   }
 }
