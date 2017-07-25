@@ -62,15 +62,11 @@ export const customParseRules = [
       return null;
 
     // read the tag name
-    let peek;
     let tagName = current;
-    while ((peek = context.reader.peek())) {
-      // allow periods in tag names so that ASP.NET web.config files
-      // work correctly
-      if (!/[.\w-]/.test(peek)) break;
-
+    // allow periods in tag names so that ASP.NET web.config files
+    // work correctly
+    while (!context.reader.isPeekEOF() && /[.\w-]/.test(context.reader.peek()))
       tagName += context.reader.read();
-    }
 
     return context.createToken("tagName", tagName, line, column);
   },
@@ -87,11 +83,11 @@ export const customParseRules = [
 
     // read until the delimiter
     let stringValue = delimiter;
-    let peek;
-    while ((peek = context.reader.peek())) {
-      stringValue += context.reader.read();
+    while (!context.reader.isPeekEOF()) {
+      const next = context.reader.read();
+      stringValue += next;
 
-      if (peek === delimiter) break;
+      if (next === delimiter) break;
     }
 
     return context.createToken("string", stringValue, line, column);
@@ -166,22 +162,15 @@ export const customParseRules = [
     const startAspToken = "<%--";
     const endAspToken = "--%>";
     // have to do these manually or else they get swallowed by the open tag: <%
-    if (
-      context.reader.current() !== startAspToken.charAt(0) ||
-      context.reader.peek(startAspToken.length - 1) !== startAspToken.slice(1)
-    )
-      return null;
+    if (!context.reader.match(startAspToken)) return null;
 
-    let value = startAspToken;
-    context.reader.read(startAspToken.length - 1);
-    while (context.reader.peek()) {
-      if (context.reader.peek(endAspToken.length) === endAspToken) {
-        value += context.reader.read(endAspToken.length);
-        break;
-      }
+    let value = context.reader.currentChar;
+    value += context.reader.read(startAspToken.length);
 
+    while (!context.reader.isPeekEOF() && !context.reader.match(endAspToken))
       value += context.reader.read();
-    }
+
+    value += context.reader.read(endAspToken.length - 1);
 
     return context.createToken("comment", value, line, column);
   }
@@ -190,23 +179,15 @@ export const customParseRules = [
 export const embeddedLanguages = {
   css: {
     switchTo: function(context: ParserContext): boolean {
-      let prevToken = context.token(context.count() - 1),
-        index;
-
+      let prevToken = context.token(context.count() - 1);
       const endStyleToken = "</style";
-      if (
-        !prevToken ||
-        context.reader.current() +
-          context.reader.peek(endStyleToken.length - 1) ===
-          endStyleToken
-      )
-        return false;
+      if (!prevToken || context.reader.match(endStyleToken)) return false;
 
       if (prevToken.name !== "operator" || prevToken.value !== ">")
         return false;
 
       // look backward for a tag name, if it's "style", then we go to css mode
-      index = context.count() - 1;
+      let index = context.count() - 1;
       while ((prevToken = context.token(--index)))
         if (prevToken.name === "tagName") {
           if (prevToken.value === "style") {
@@ -234,23 +215,15 @@ export const embeddedLanguages = {
 
   javascript: {
     switchTo: function(context: ParserContext): boolean {
-      let prevToken = context.token(context.count() - 1),
-        index;
-
+      let prevToken = context.token(context.count() - 1);
       const endScriptToken = "</script";
-      if (
-        !prevToken ||
-        context.reader.current() +
-          context.reader.peek(endScriptToken.length - 1) ===
-          endScriptToken
-      )
-        return false;
+      if (!prevToken || context.reader.match(endScriptToken)) return false;
 
       if (prevToken.name !== "operator" || prevToken.value !== ">")
         return false;
 
       // look backward for a tag name, if it's "script", then we go to javascript mode
-      index = context.count() - 1;
+      let index = context.count() - 1;
       while ((prevToken = context.token(--index)))
         if (prevToken.name === "tagName") {
           if (prevToken.value === "script") {
@@ -271,19 +244,13 @@ export const embeddedLanguages = {
     },
 
     switchBack: function(context: ParserContext): boolean {
-      const endScriptToken = "</script";
-      return context.reader.peek(endScriptToken.length) === endScriptToken;
+      return context.reader.matchPeek("</script");
     }
   },
 
   php: {
     switchTo: function(context: ParserContext): boolean {
-      const phpToken = "?php";
-      const peek = context.reader.peek(phpToken.length);
-      return (
-        context.reader.current() === "<" &&
-        (peek === "?php" || /^\?(?!xml)/.test(peek))
-      );
+      return context.reader.match("<?") && !context.reader.match("<?xml");
     },
 
     switchBack: function(context: ParserContext): boolean {
@@ -299,18 +266,16 @@ export const embeddedLanguages = {
     },
 
     switchBack: function(context: ParserContext): boolean {
-      const endCSToken = "%>";
-      return context.reader.peek(endCSToken.length) === endCSToken;
+      return context.reader.matchPeek("%>");
     }
   },
 
   scala: {
     switchTo: function(context: ParserContext): boolean {
-      if (!context.options.enableScalaXmlInterpolation) return false;
-
-      if (context.reader.current() === "{") return true;
-
-      return false;
+      return (
+        context.options.enableScalaXmlInterpolation === true &&
+        context.reader.current() === "{"
+      );
     },
 
     switchBack: function(context: ParserContext): boolean {
