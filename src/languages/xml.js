@@ -164,7 +164,7 @@ export const customParseRules = [
     // have to do these manually or else they get swallowed by the open tag: <%
     if (!context.reader.match(startAspToken)) return null;
 
-    let value = context.reader.currentChar;
+    let value = context.reader.current();
     value += context.reader.read(startAspToken.length);
 
     while (!context.reader.isPeekEOF() && !context.reader.match(endAspToken))

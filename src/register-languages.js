@@ -1,6 +1,7 @@
 // @flow
 import { registerLanguage } from "./languages.js";
 
+import * as asm6502 from "./languages/6502asm.js";
 import * as batch from "./languages/batch.js";
 import * as brainfuck from "./languages/brainfuck.js";
 import * as csharp from "./languages/csharp.js";
@@ -11,6 +12,7 @@ import * as plaintext from "./languages/plaintext.js";
 import * as xml from "./languages/xml.js";
 
 const languages = [
+  asm6502,
   batch,
   brainfuck,
   csharp,
