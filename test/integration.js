@@ -7,19 +7,12 @@
 import assert from "assert";
 import fs from "fs";
 import path from "path";
-import { logger } from "../src/logger.js";
 import { TestSupport } from "./fixtures/testsupport.js";
 
 const HTMLTemplate = `<html>
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="../../compiled-assets/sunlight.css">
-  <style>
-.sunlight-code-container, .sunlight-line-number-margin {
-  font-family: Dejavu Sans Mono, Consolas, Menlo;
-  font-size: 13px;
-}
-  </style>
+  <link rel="stylesheet" href="../../compiled-assets/sunlight-defaultfont.css">
   <title>$$TITLE$$</title>
 </head>
 <body>
@@ -83,7 +76,9 @@ function compareResult(filename: string, actualContent: string) {
     }
   } else {
     fs.writeFileSync(expectedFilename, actualContent, "utf8");
-    logger.warn(`Written expectation ${expectedFilename}`);
+    throw new Error(
+      `Test expectation file \`${expectedFilename}\` does not exist. New expectation written. Please commit the file.`
+    );
   }
 }
 

@@ -8,6 +8,7 @@
 }
 .sunlight-line-number-margin {
 	border-right: 1px solid #9A9A9A !important;
+	border-left: 1px solid #3E3E3E !important;
 	background-color: #3E3E3E !important;
 	color: #9A9A9A !important;
 }
