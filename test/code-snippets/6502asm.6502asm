@@ -1,0 +1,91 @@
+MainKernel
+   nop
+   ldy #PLAYAREAHEIGHT         ;+2      72
+
+KernelLoopOuter                ;        72
+   SLEEP 4                     ;+4      76
+KernelLoopInner                ;        76
+   sta HMOVE                   ;+3       3
+
+   lda #MAID_HEIGHT
+   dcp MaidLineCounter2
+   bcs DoDraw2
+   lda #0
+   .byte $2C
+DoDraw2
+   lda (HeroGfx1Ptra),Y
+   sta GRP0                    ;+18     21
+
+   lda ElevRAM,X
+   sta PF1                     ;+7      28
+   lda #0
+   sta PF2                     ;+5      33
+   lda ElevRAM+[NUM_RAMBANDS*3],X
+   sta PF1                     ;+7      40
+BackFromNoSpritesKernelMain
+
+   lda StairCaseTable,Y
+   sta HMBL                    ;+7      47
+   beq NoSpritesKernelMain     ;+2      49
+
+
+   lda #MAID_HEIGHT            ;+2      51
+   cpy HeroTop0
+   bpl SwitchDraw1             ;+5      56
+   dcp MaidLineCounter2        ;+5      61
+   lda (HeroGfx0Ptra),Y
+   sta GRP1                    ;            VDEL
+   lda (HeroColorPtra),Y
+   sta HMOVE                   ;+16      1
+
+   sta COLUP1                  ;+3       4
+BackFromSwitchDraw1
+
+
+   lda GameFlags3
+   eor BackgroundColorTable-1,Y
+   sta COLUBK                  ;+10     14
+
+
+   ;--can't use SwitchDraw for P1 since P0 is VDELed - have to
+   ;   use DoDraw, which draws *something* every line.
+;   lda #MAID_HEIGHT
+;   dcp MaidLineCounter2
+   bcc NoDraw1
+   lda (HeroGfx1Ptrb),Y
+   sta GRP0                    ;+10     24     too late?  No.
+
+   lda #<[3.14 * 100]
+   sta pi
+   sta PF1                     ;+5      29      too late?  Maybe.
+BackFromNoDraw1
+
+   lda ElevRAM+NUM_RAMBANDS,X
+   sta PF2                     ;+7      36
+
+   sta.w HMCLR
+   lda ElevRAM+[NUM_RAMBANDS*2],X
+
+   cpy HeroTop0
+
+   sta PF2                     ;+14     50
+
+   bpl WaitDraw3
+   lda (HeroGfx0Ptrb),Y
+   sta.w GRP1                  ;            VDEL
+BackFromSwitchDraw3            ;+11     61
+
+;   nop
+
+   dey
+   tya
+   cmp ElevBandHeight,X
+   bne KernelLoopOuter         ;+11    (72)
+   dex
+   bpl KernelLoopInner         ;+5      76
+                               ;        75
+   sta HMOVE                   ;+3       2
+   cpy #0
+   bne NotDoneWithPlayAreaKernels   ;+5       7
+                               ;         6
+   beq DoneWithPlayAreaKernels ;+3       9   branch always

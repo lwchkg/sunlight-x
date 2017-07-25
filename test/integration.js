@@ -30,6 +30,7 @@ function getHighlightLanguage(filename: string): string {
   if (filename === "README.md") return "";
   const extension = path.parse(filename).ext;
   const map: { [string]: string } = {
+    ".6502asm": "6502asm",
     ".bat": "batch",
     ".bf": "brainfuck",
     ".cs": "csharp",
