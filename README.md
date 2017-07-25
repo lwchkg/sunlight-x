@@ -12,15 +12,28 @@ While the highlighter can be run, it is still a WIP.
 The API of the highlighter is still evolving.
 Please read the test to infer on how to use the highlighter.
 
+If you want badly to generate HTML snippets, see `test/integration.js` for examples.
+
+
+# Difference from original Sunlight
+
+- Flow annotation.
+- Continuous integration. Old Sunlight has tests, but they are invoked manually.
+- API is being refactored. Check Flow annotation for the new API.
+- Put the original code in modules and classes.
+- Modified CSS (themes not supported in HTML output yet).
+
 
 # TODO
 
-- Put the original code in modules (and classes in some cases).
+- Add all languages and plugins
 - Reorganize API
-- Add tests
-- Browserify
+- Add API for theme selection
+- Add more tests
+- Webpack for browsers
 - Clarify owners of code snippets (some unknown code are used now).
-
+  - Brainfuck: http://bf.doleczek.pl (license unknown) - any known free alternatives?
+  - Others: no other owners found yet
 
 # Copyright
 
