@@ -129,80 +129,63 @@ export const scopes = {
 export const customParseRules = [
   // regex literal
   function(context: ParserContext): ?Token {
+    // Not a regex if it doesn't start with a / or starts with // (comment) or /*
+    // (multi line comment).
     const peek = context.reader.peek();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-    let regexLiteral = "/",
-      charClass = false,
-      peek2,
-      next;
-
     if (context.reader.current() !== "/" || peek === "/" || peek === "*")
-      // doesn't start with a / or starts with // (comment) or /* (multi line comment)
       return null;
 
-    const isValid = (function(): boolean {
-      const previousNonWsToken = context.token(context.count() - 1);
-      let previousToken = null;
-      if (context.defaultData.text !== "")
-        previousToken = context.createToken(
-          "default",
-          context.defaultData.text,
-          context.defaultData.line,
-          context.defaultData.column
-        );
+    const previousNonWsToken = context.token(context.count() - 1);
+    let previousToken = null;
+    if (context.defaultData.text !== "")
+      previousToken = context.createToken(
+        "default",
+        context.defaultData.text,
+        context.defaultData.line,
+        context.defaultData.column
+      );
 
-      if (!previousToken) previousToken = previousNonWsToken;
+    if (!previousToken) previousToken = previousNonWsToken;
 
-      // first token of the string
-      if (previousToken === undefined) return true;
-
-      // since JavaScript doesn't require statement terminators, if the previous token was whitespace and contained a newline, then we're good
-      if (
-        previousToken.name === "default" &&
-        previousToken.value.indexOf("\n") >= 0
-      )
-        return true;
-
+    if (
+      // The first token of the string
+      previousToken !== undefined &&
+      // Since JavaScript doesn't require statement terminators, if the previous
+      // token was whitespace and contained a newline, then we're good.
+      (previousToken.name !== "default" ||
+        previousToken.value.indexOf("\n") < 0)
+    ) {
+      // In these case the / stands for division.
       if (
         util.contains(["keyword", "ident", "number"], previousNonWsToken.name)
       )
-        return false;
-
+        return null;
       if (
         previousNonWsToken.name === "punctuation" &&
         !util.contains(["(", "{", "[", ",", ";"], previousNonWsToken.value)
       )
-        return false;
-
-      return true;
-    })();
-
-    if (!isValid) return null;
-
-    // read the regex literal
-    while (context.reader.peek() !== context.reader.EOF) {
-      peek2 = context.reader.peek(2);
-      if (peek2 === "\\/" || peek2 === "\\\\") {
-        // escaped backslash or escaped forward slash
-        regexLiteral += context.reader.read(2);
-        continue;
-      }
-      if (peek2 === "\\[" || peek2 === "\\]") {
-        regexLiteral += context.reader.read(2);
-        continue;
-      } else if (next === "[") {
-        charClass = true;
-      } else if (next === "]") {
-        charClass = false;
-      }
-
-      regexLiteral += next = context.reader.read();
-      if (next === "/" && !charClass) break;
+        return null;
     }
 
-    // read the regex modifiers
-    // only "g", "i" and "m" are allowed, but for the sake of simplicity we'll just say any alphabetical character is valid
+    const line = context.reader.getLine();
+    const column = context.reader.getColumn();
+
+    // read the regex literal
+    let regexLiteral = "/";
+    let charClass = false;
+    while (!context.reader.isPeekEOF()) {
+      const next = context.reader.read();
+      regexLiteral += next;
+
+      if (next === "\\") regexLiteral += context.reader.read();
+      else if (next === "[") charClass = true;
+      else if (next === "]") charClass = false;
+      else if (next === "/" && !charClass) break;
+    }
+
+    // Read the regex modifiers. Only "g", "i" and "m", "u" and "y" are allowed,
+    // but in the future extra letters may be allowed, so we allow any
+    // alphabetical character here.
     while (context.reader.peek() !== context.reader.EOF) {
       if (!/[A-Za-z]/.test(context.reader.peek())) break;
 

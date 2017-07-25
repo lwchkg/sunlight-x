@@ -3245,40 +3245,31 @@ export const customParseRules = [
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
-    if (context.reader.current() !== "<" || context.reader.peek(2) !== "<<")
-      return null;
-
-    context.reader.read(2);
-
     let value = "<<<";
+    if (!context.reader.match(value)) return null;
+    context.reader.read(value.length - 1);
+
     let ident = "";
     let isNowdoc = false;
-    let peek = context.reader.peek();
-    while (peek !== context.reader.EOF && peek !== "\n") {
-      value += context.reader.read();
+    while (!context.reader.isPeekEOF() && context.reader.peek() !== "\n") {
+      const next = context.reader.read();
+      value += next;
 
-      if (peek !== "'")
-        // ignore NOWDOC apostophres
-        ident += context.reader.current();
+      // Ignore NOWDOC apostophres. If an apostophre is found in places other
+      // than the first or the last character of the identifier, PHP fails
+      // parsing. But we are lax here.
+      if (next !== "'") ident += next;
       else isNowdoc = true;
-
-      peek = context.reader.peek();
     }
 
-    if (peek !== context.reader.EOF) {
-      // read the newline
+    // Read until "\n{ident};"
+    while (
+      !context.reader.isPeekEOF() &&
+      !context.reader.match("\n" + ident + ";")
+    )
       value += context.reader.read();
 
-      // read until "\n{ident};"
-      while (context.reader.peek() !== context.reader.EOF) {
-        if (context.reader.peek(ident.length + 2) === "\n" + ident + ";") break;
-
-        value += context.reader.read();
-      }
-
-      if (context.reader.peek() !== context.reader.EOF)
-        value += context.reader.read(ident.length + 1); // don't read the semicolon
-    }
+    value += context.reader.read(ident.length); // don't read the semicolon
 
     return context.createToken(
       isNowdoc ? "nowdoc" : "heredoc",

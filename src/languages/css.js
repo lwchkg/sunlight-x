@@ -556,7 +556,7 @@ export const customParseRules = [
       // the next non-whitespace character must be a "("
       let count = token.value.length;
       let peek = context.reader.peek(count);
-      while (peek.length === count && peek !== context.reader.EOF) {
+      while (peek.length === count) {
         if (!/\s$/.test(peek)) {
           if (peek.charAt(peek.length - 1) === "(") {
             // this token really is a function
