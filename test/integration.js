@@ -15,7 +15,10 @@ const HTMLTemplate = `<html>
   <meta charset="utf-8">
   <link rel="stylesheet" href="../../compiled-assets/sunlight.css">
   <style>
-.sunlight-code-container {font-family: Dejavu Sans Mono, Consolas, Menlo}
+.sunlight-code-container, .sunlight-line-number-margin {
+  font-family: Dejavu Sans Mono, Consolas, Menlo;
+  font-size: 13px;
+}
   </style>
   <title>$$TITLE$$</title>
 </head>
@@ -72,11 +75,12 @@ function compareResult(filename: string, actualContent: string) {
       resultsDir,
       fileData.name + "-actual" + fileData.ext
     );
-    fs.writeFileSync(actualFilename, actualContent, "utf8");
-    if (expectedContent !== actualContent)
+    if (expectedContent !== actualContent) {
+      fs.writeFileSync(actualFilename, actualContent, "utf8");
       throw new Error(
         `Content doesn't match. \`${actualFilename}\` written for comparison.`
       );
+    }
   } else {
     fs.writeFileSync(expectedFilename, actualContent, "utf8");
     logger.warn(`Written expectation ${expectedFilename}`);
@@ -86,6 +90,7 @@ function compareResult(filename: string, actualContent: string) {
 describe("HTML files generation test", function() {
   const snippetsDir = path.join(__dirname, "code-snippets");
   const snippetList: string[] = fs.readdirSync(snippetsDir);
+  const options = { lineNumbers: true };
 
   this.timeout(10000);
 
@@ -95,7 +100,7 @@ describe("HTML files generation test", function() {
       const language = getHighlightLanguage(snippetFilename);
       if (language === "") continue;
 
-      const testSupport = new TestSupport(snippetFilename, language);
+      const testSupport = new TestSupport(snippetFilename, language, options);
       allResults.push({
         filename: snippetFilename,
         highlightedCode: testSupport.codeElement.innerHTML
@@ -109,10 +114,11 @@ describe("HTML files generation test", function() {
       content += `${result.highlightedCode}\n`;
     }
 
-    const generatedHTML = HTMLTemplate.replace("$$TITLE$$", testname).replace(
-      "$$CONTENT$$",
-      content
-    );
+    // Replacement are put into functions to avoid unescapes of "$" character.
+    const generatedHTML = HTMLTemplate.replace(
+      "$$TITLE$$",
+      (): string => testname
+    ).replace("$$CONTENT$$", (): string => content);
 
     compareResult("testsupport.html", generatedHTML);
   });
