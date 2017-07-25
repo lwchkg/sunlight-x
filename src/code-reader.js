@@ -107,24 +107,17 @@ export class CodeReader {
     return this.index + 1 >= this.length;
   }
 
-  // SOL = start of line
-  isSol(): boolean {
+  isStartOfLine(): boolean {
     return this.column === 1;
   }
 
-  // Check if it is the first non-whitespace character of the line
-  isSolWs(): boolean {
-    // TODO: rewrite. This can be done in a simple regex.
-    if (this.column === 1) return true;
-
-    // look backward until we find a newline or a non-whitespace character
-    for (let temp = this.index - 1; temp >= 0; --temp) {
-      const c = this.text.charAt(temp);
-      if (c === "\n") break;
-      if (!/\s/.test(c)) return false;
-    }
-
-    return true;
+  // Check if the current character is preceded by whitespace or nothing.
+  isPrecededByWhitespaceOnly(): boolean {
+    const lineBeforeCurrent = this.text.substring(
+      this.index - this.column + 1,
+      this.index
+    );
+    return /^\s*$/.test(lineBeforeCurrent);
   }
 
   isEol(): boolean {
