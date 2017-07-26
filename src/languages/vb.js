@@ -6,9 +6,13 @@
 // @flow
 import * as util from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
-import { TokenWalker } from "../token-walker.js";
 
-import type { AnalyzerContext, ParserContext, Token } from "../util.js";
+import type {
+  AnalyzerContext,
+  ParserContext,
+  Token,
+  TokenWalker
+} from "../util.js";
 
 /* eslint no-magic-numbers: 1 */
 export const name = "vb";
