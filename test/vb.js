@@ -10,7 +10,7 @@ let testSupport: TestSupport;
 describe("VB tests", function() {
   describe("File #1", function() {
     before(function() {
-      testSupport = new TestSupport("vb.vb", "vb");
+      testSupport = new TestSupport("vb1.vb", "vb");
     });
     it("'comment", function() {
       testSupport.AssertContentExists("comment", "'comment");
@@ -210,6 +210,69 @@ describe("VB tests", function() {
 
     it("& operator", function() {
       testSupport.AssertContentExists("operator", "&");
+    });
+  });
+
+  describe("File #2 (VB2017 number literals)", function() {
+    before(function() {
+      testSupport = new TestSupport("vb2.vb", "vb");
+    });
+    it("number 12_34_5%", function() {
+      testSupport.AssertContentExists("number", "12_34_5%");
+    });
+    it("number &ha_BC_d23_8&", function() {
+      testSupport.AssertContentExists("number", "&ha_BC_d23_8&");
+    });
+    it("number &O42_7i", function() {
+      testSupport.AssertContentExists("number", "&O42_7i");
+    });
+    it("number &B01_1_0l", function() {
+      testSupport.AssertContentExists("number", "&B01_1_0l");
+    });
+    it("number 123S", function() {
+      testSupport.AssertContentExists("number", "123S");
+    });
+    it("number 123UI", function() {
+      testSupport.AssertContentExists("number", "123UI");
+    });
+    it("number 123uL", function() {
+      testSupport.AssertContentExists("number", "123uL");
+    });
+    it("number 123us", function() {
+      testSupport.AssertContentExists("number", "123us");
+    });
+    it("number 2398", function() {
+      testSupport.AssertContentExists("number", "2398");
+    });
+    it("ident _123", function() {
+      testSupport.AssertContentExists("ident", "_123");
+    });
+    it("number 123", function() {
+      testSupport.AssertContentExists("number", "123");
+    });
+    it("ident _", function() {
+      testSupport.AssertContentExists("ident", "_");
+    });
+    it("number 1F", function() {
+      testSupport.AssertContentExists("number", "1F");
+    });
+    it("number 2.0E3R", function() {
+      testSupport.AssertContentExists("number", "2.0E3R");
+    });
+    it("number .3E+8D", function() {
+      testSupport.AssertContentExists("number", ".3E+8D");
+    });
+    it("number 4E-9", function() {
+      testSupport.AssertContentExists("number", "4E-9");
+    });
+    it("number 5___2.3_1_3e-4_6_4!", function() {
+      testSupport.AssertContentExists("number", "5___2.3_1_3e-4_6_4!");
+    });
+    it("number 6#", function() {
+      testSupport.AssertContentExists("number", "6.2#");
+    });
+    it("number 7@", function() {
+      testSupport.AssertContentExists("number", "7@");
     });
   });
 });

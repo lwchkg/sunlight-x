@@ -131,6 +131,25 @@ export function matchWord(
 export { createHashMap } from "./languages.js";
 
 /**
+ * Return the regex string of non-capturing group with quantifier. i.e.
+ * (?:expr1|expr2|...)quantifier. Tip: Put all OR conditions into a
+ * non-capturing group before mixing with other expressions. If not, the first
+ * or the last condition may be mix with other parts of the regular expression,
+ * producing unpredictable results.
+ * @param {string | string[]} expressions
+ * @param {string?} quantifier
+ * @returns {string}
+ */
+export function nonCapturingGroup(
+  expressions: string | string[],
+  quantifier: string = ""
+): string {
+  const expression =
+    typeof expressions === "string" ? expressions : expressions.join("|");
+  return "(?:" + expression + ")" + quantifier;
+}
+
+/**
  * Returns a parser from a regular expression. The parser match the content from
  * the index to the end of line against the regular expression.
  * @param {string} tokenName The type of the token returned for successful

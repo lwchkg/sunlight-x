@@ -1,9 +1,15 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
 import * as util from "../util.js";
+import * as DotNetCommon from "./common/dotnet.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
 
-/* eslint no-magic-numbers: 0 */
+/* eslint no-magic-numbers: 1 */
 const primitives = [
   "int",
   "bool",
@@ -152,92 +158,7 @@ export const keywords = primitives.concat([
 ]);
 
 export const customParseRules = [
-  // xml doc comments
-  function(context: ParserContext): ?(Token[]) {
-    const metaName = "xmlDocCommentMeta"; // tags and the "///" starting token
-    const contentName = "xmlDocCommentContent"; // actual comments (words and stuff)
-
-    const tag = "///";
-    if (!context.reader.match(tag)) return null;
-
-    const tokens = [
-      context.createToken(
-        metaName,
-        "///",
-        context.reader.getLine(),
-        context.reader.getColumn()
-      )
-    ];
-    context.reader.read(tag.length - 1);
-
-    const current: {
-      name: string,
-      value: string,
-      line: number,
-      column: number
-    } = { line: 0, column: 0, value: "", name: "" };
-
-    while (!context.reader.isPeekEOF()) {
-      const peek = context.reader.peek();
-      if (peek === "<" && current.name !== metaName) {
-        // push the current token
-        if (current.value !== "")
-          tokens.push(
-            context.createToken(
-              current.name,
-              current.value,
-              current.line,
-              current.column
-            )
-          );
-
-        // amd create a token for the tag
-        current.line = context.reader.getLine();
-        current.column = context.reader.getColumn();
-        current.name = metaName;
-        current.value = context.reader.read();
-        continue;
-      }
-
-      if (peek === ">" && current.name === metaName) {
-        // close the tag
-        current.value += context.reader.read();
-        tokens.push(
-          context.createToken(
-            current.name,
-            current.value,
-            current.line,
-            current.column
-          )
-        );
-        current.name = "";
-        current.value = "";
-        continue;
-      }
-
-      if (peek === "\n") break;
-
-      if (current.name === "") {
-        current.name = contentName;
-        current.line = context.reader.getLine();
-        current.column = context.reader.getColumn();
-      }
-
-      current.value += context.reader.read();
-    }
-
-    if (current.name === contentName)
-      tokens.push(
-        context.createToken(
-          current.name,
-          current.value,
-          current.line,
-          current.column
-        )
-      );
-
-    return tokens.length > 0 ? tokens : null;
-  },
+  DotNetCommon.XMLDocComment("///"),
 
   // get/set contextual keyword
   function(context: ParserContext): ?Token {
@@ -361,6 +282,7 @@ export const scopes = {
   pragma: [["#", "\n", [], true]]
 };
 
+// TODO: accept all .NET identifier characters, not just ASCII
 export const identFirstLetter = /[A-Za-z_@]/;
 export const identAfterFirstLetter = /\w/;
 
@@ -602,9 +524,9 @@ export const namedIdentRules = {
     // attributes (friggin' attributes...)
     createNamedIdentFunction((context: AnalyzerContext): boolean => {
       {
+        // If the next token is an equals sign, this is a named parameter, or
+        // something else not inside of an attribute)
         const token = util.getNextNonWsToken(context.tokens, context.index);
-
-        // if the next token is an equals sign, this is a named parameter (or something else not inside of an attribute)
         if (
           token &&
           token.name === "operator" &&
@@ -613,14 +535,13 @@ export const namedIdentRules = {
           return false;
       }
 
-      // this is annoyingly complicated
-      // we need to verify that we're between [], but not in something like "new string[foo]" for instance
+      // This is annoyingly complicated...
+      // We need to verify that we're between [], but not in something like "new
+      // string[foo]" for instance
 
       // first, verify that we're inside an opening bracket
-      const bracketCount = [0, 0];
+      const bracketCount: [number, number] = [0, 0];
       let index = context.index;
-      // TODO: unused var foundComma. Figure out it's actual purpose.
-      // let foundComma = false;
       let token;
       while ((token = context.tokens[--index]))
         if (token.name === "punctuation") {
@@ -634,17 +555,15 @@ export const namedIdentRules = {
             continue;
           }
 
-          // if (token.value === ",") foundComma = true;
-
-          // exit rules
+          // Start of named ident token
           if (token.value === "{" || token.value === "}" || token.value === ";")
             break;
         }
 
+      // if no brackets were found OR...
+      // all the found brackets are closed, so this ident is actually outside of
+      // the brackets duh.
       if (bracketCount[0] === 0 || bracketCount[0] === bracketCount[1])
-        // if no brackets were found OR...
-        // all the found brackets are closed, so this ident is actually outside of the brackets
-        // duh.
         return false;
 
       // next, verify we're inside a closing bracket
@@ -662,7 +581,7 @@ export const namedIdentRules = {
             continue;
           }
 
-          // some early exit rules
+          // End of named ident token
           if (token.value === "{" || token.value === "}" || token.value === ";")
             break;
         }

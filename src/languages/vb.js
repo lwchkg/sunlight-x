@@ -1,8 +1,16 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
 import * as util from "../util.js";
+import * as DotNetCommon from "./common/dotnet.js";
+import { TokenWalker } from "../token-walker.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
 
+/* eslint no-magic-numbers: 1 */
 export const name = "vb";
 
 export const keywords = [
@@ -208,124 +216,22 @@ export const scopes = {
 };
 
 export const customParseRules = [
-  // xml doc comments (copypasted from c# file)
-  function(context: ParserContext): ?(Token[]) {
-    let metaName = "xmlDocCommentMeta",
-      contentName = "xmlDocCommentContent",
-      tokens,
-      peek,
-      current;
-
-    if (context.reader.current() !== "'" || context.reader.peek(2) !== "''")
-      return null;
-
-    tokens = [
-      context.createToken(
-        metaName,
-        "'''",
-        context.reader.getLine(),
-        context.reader.getColumn()
-      )
-    ];
-    current = { line: 0, column: 0, value: "", name: null };
-    context.reader.read(2);
-
-    while ((peek = context.reader.peek()) !== context.reader.EOF) {
-      if (peek === "<" && current.name !== metaName) {
-        // push the current token
-        if (current.value !== "")
-          tokens.push(
-            context.createToken(
-              current.name,
-              current.value,
-              current.line,
-              current.column
-            )
-          );
-
-        // amd create a token for the tag
-        current.line = context.reader.getLine();
-        current.column = context.reader.getColumn();
-        current.name = metaName;
-        current.value = context.reader.read();
-        continue;
-      }
-
-      if (peek === ">" && current.name === metaName) {
-        // close the tag
-        current.value += context.reader.read();
-        tokens.push(
-          context.createToken(
-            current.name,
-            current.value,
-            current.line,
-            current.column
-          )
-        );
-        current.name = null;
-        current.value = "";
-        continue;
-      }
-
-      if (peek === "\n") break;
-
-      if (current.name === null) {
-        current.name = contentName;
-        current.line = context.reader.getLine();
-        current.column = context.reader.getColumn();
-      }
-
-      current.value += context.reader.read();
-    }
-
-    if (current.name === contentName)
-      tokens.push(
-        context.createToken(
-          current.name,
-          current.value,
-          current.line,
-          current.column
-        )
-      );
-
-    return tokens.length > 0 ? tokens : null;
-  },
+  DotNetCommon.XMLDocComment("'''"),
 
   // keyword escaping: e.g. "[In]"
-  function(context: ParserContext): ?Token {
-    let line = context.reader.getLine(),
-      column = context.reader.getColumn(),
-      next,
-      value = "[";
-
-    if (context.reader.current() !== "[") return null;
-
-    // read until "]"
-    next = context.reader.read();
-    while (next !== context.reader.EOF) {
-      value += next;
-
-      if (next === "]") break;
-
-      next = context.reader.read();
-    }
-
-    return context.createToken("escapedKeyword", value, line, column);
-  },
+  util.getRegexpParser("escapedKeyword", new RegExp(/^\[[A-Za-z_]\w*\]/)),
 
   // handles New/GetType contextual keywords
   // e.g. prevents "New" in "SomeClass.New()" from being a keyword
   (function(): * {
     const hashmap = util.createHashMap(["New", "GetType"], "\\b");
     return function(context: ParserContext): ?Token {
-      let token = util.matchWord(context, hashmap, "keyword"),
-        prevToken;
-
+      const token = util.matchWord(context, hashmap, "keyword");
       if (!token) return null;
 
       // if the previous non-ws token is the "." operator then it's an ident, not a keyword
       // or if it's a subprocedure name
-      prevToken = util.getPreviousNonWsToken(
+      const prevToken = util.getPreviousNonWsToken(
         context.getAllTokens(),
         context.count()
       );
@@ -341,6 +247,7 @@ export const customParseRules = [
   })()
 ];
 
+// TODO: accept all .NET identifier characters, not just ASCII
 export const identFirstLetter = /[A-Za-z_]/;
 export const identAfterFirstLetter = /\w/;
 
@@ -348,24 +255,24 @@ export const namedIdentRules = {
   custom: [
     // attributes (copypasted (mostly) from c# file)
     function(context: AnalyzerContext): boolean {
-      // if the next token is an equals sign, this is a named parameter (or something else not inside of an attribute)
-      let token,
-        nextToken = util.getNextNonWsToken(context.tokens, context.index),
-        index = context.index,
-        bracketCount = [0, 0],
-        indexOfLastBracket = -1;
+      {
+        // If the next token is an equals sign, this is a named parameter, or
+        // something else not inside of an attribute)
+        const token = util.getNextNonWsToken(context.tokens, context.index);
+        if (
+          token &&
+          token.name === "operator" &&
+          (token.value === "=" || token.value === ".")
+        )
+          return false;
+      }
 
-      if (
-        nextToken &&
-        nextToken.name === "operator" &&
-        (nextToken.value === "=" || nextToken.value === ".")
-      )
-        return false;
-
+      const bracketCount: [number, number] = [0, 0];
       // we need to verify that we're between <>
-
       // first, verify that we're inside an opening bracket
-      while ((token = context.tokens[--index]) !== undefined)
+      let walker = new TokenWalker(context);
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (token.name === "operator") {
           if (token.value === "<") bracketCount[0]++;
           else if (token.value === ">") bracketCount[1]++;
@@ -376,42 +283,43 @@ export const namedIdentRules = {
             token.value
           )
         ) {
-          // early exits
           break;
         }
+      }
 
+      // if no brackets were found OR...
+      // all the found brackets are closed, so this ident is actually outside
+      // of the brackets duh.
       if (bracketCount[0] === 0 || bracketCount[0] === bracketCount[1])
-        // if no brackets were found OR...
-        // all the found brackets are closed, so this ident is actually outside of the brackets
-        // duh.
         return false;
 
-      // next, verify we're inside a closing bracket
-      index = context.index;
-      while ((token = context.tokens[++index]) !== undefined)
+      let indexOfLastBracket = -1;
+      walker = new TokenWalker(context);
+      while (walker.hasNext()) {
+        const token = walker.next();
         if (token.name === "operator") {
           if (token.value === "<") {
             bracketCount[0]++;
           } else if (token.value === ">") {
-            indexOfLastBracket = index;
+            indexOfLastBracket = walker.index;
             bracketCount[1]++;
           }
         } else if (
+          // End of named ident token
           token.name === "keyword" &&
           util.contains(
             ["Public", "Class", "Protected", "Private", "Friend", "ByVal"],
             token.value
           )
         ) {
-          // early exits
           break;
         }
-
+      }
       if (indexOfLastBracket < 0 || bracketCount[0] !== bracketCount[1])
         return false;
 
       // next token after the last closing bracket should be either a keyword or an ident
-      token = util.getNextNonWsToken(context.tokens, indexOfLastBracket);
+      const token = util.getNextNonWsToken(context.tokens, indexOfLastBracket);
       if (token && (token.name === "keyword" || token.name === "ident"))
         return true;
 
@@ -420,9 +328,6 @@ export const namedIdentRules = {
 
     // casts
     function(context: AnalyzerContext): boolean {
-      let token,
-        index = context.index,
-        parenCount = 1;
       // look backward for CType, DirectCast or TryCast
       // could be goofy because of nesting, so we need to count parens
 
@@ -435,40 +340,44 @@ export const namedIdentRules = {
       )
         return false;
 
-      while ((token = context.tokens[--index]))
+      let parenCount = 1;
+      const walker = new TokenWalker(context);
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (token.name === "punctuation" && token.value === "(") {
           parenCount--;
           if (parenCount === 0) {
-            // we found the opening paren, so if the previous token is one of the cast functions, this is a cast
-            token = context.tokens[--index];
-            if (
-              token &&
-              token.name === "keyword" &&
-              util.contains(["CType", "DirectCast", "TryCast"], token.value)
-            )
-              return true;
-
-            return false;
+            // we found the opening paren, so if the previous token is one of
+            // the cast functions, this is a cast
+            if (!walker.hasPrev()) return false;
+            const token2 = walker.prev();
+            return (
+              token2.name === "keyword" &&
+              util.contains(["CType", "DirectCast", "TryCast"], token2.value)
+            );
           }
         } else if (token.name === "punctuation" && token.value === ")") {
           parenCount++;
         }
+      }
 
       return false;
     },
 
     // implemented interfaces
     function(context: AnalyzerContext): boolean {
-      let prevToken = util.getPreviousNonWsToken(context.tokens, context.index),
-        token,
-        index = context.index;
-
       // if previous non-ws token was a "." then it's an implemented method
+      const prevToken = util.getPreviousNonWsToken(
+        context.tokens,
+        context.index
+      );
       if (prevToken && prevToken.name === "operator" && prevToken.value === ".")
         return false;
 
       // look backward for "Implements"
-      while ((token = context.tokens[--index]))
+      const walker = new TokenWalker(context);
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (token.name === "keyword")
           switch (token.value) {
             case "Class":
@@ -482,6 +391,7 @@ export const namedIdentRules = {
         else if (token.name === "default" && token.value.indexOf(util.eol) >= 0)
           // apparently they must be on the same line...?
           return false;
+      }
 
       return false;
     },
@@ -489,44 +399,43 @@ export const namedIdentRules = {
     // type constraints: "As {ident, ident, ...}"
     function(context: AnalyzerContext): boolean {
       // look backward for "As {"
-      let token,
-        index = context.index,
-        isValid = (function(): boolean {
-          while ((token = context.tokens[--index]))
-            if (token.name === "punctuation")
-              switch (token.value) {
-                case "(":
-                case ")":
+      const isValid = (function(): boolean {
+        for (
+          let index = context.index - 1, token;
+          (token = context.tokens[index]);
+          --index
+        )
+          if (token.name === "punctuation")
+            switch (token.value) {
+              case "(":
+              case ")":
+                return false;
+              case "{":
+                // previous non-ws token should be keyword "As"
+                token = util.getPreviousNonWsToken(context.tokens, index);
+                if (!token || token.name !== "keyword" || token.value !== "As")
                   return false;
-                case "{":
-                  // previous non-ws token should be keyword "As"
-                  token = util.getPreviousNonWsToken(context.tokens, index);
-                  if (
-                    !token ||
-                    token.name !== "keyword" ||
-                    token.value !== "As"
-                  )
-                    return false;
 
-                  return true;
-              }
-            else if (
-              token.name === "keyword" &&
-              util.contains(
-                ["Public", "Protected", "Friend", "Private", "End"],
-                token.value
-              )
+                return true;
+            }
+          else if (
+            token.name === "keyword" &&
+            util.contains(
+              ["Public", "Protected", "Friend", "Private", "End"],
+              token.value
             )
-              return false;
+          )
+            return false;
 
-          return false;
-        })();
+        return false;
+      })();
 
       if (!isValid) return false;
 
       // "}" before )
-      index = context.index;
-      while ((token = context.tokens[++index]))
+      const walker = new TokenWalker(context);
+      while (walker.hasNext()) {
+        const token = walker.next();
         if (token.name === "punctuation")
           switch (token.value) {
             case "}":
@@ -536,6 +445,7 @@ export const namedIdentRules = {
             case ";":
               return false;
           }
+      }
 
       return false;
     }
@@ -571,26 +481,42 @@ export const namedIdentRules = {
   ]
 };
 
-const int = "[0-9](?:[0-9_]*[0-9])?";
-const hex = "&H[0-9A-F](?:[0-9A-F_]*[0-9A-F])?";
-const oct = "&O[0-7](?:[0-7_]*[0-7])?";
-const bin = "&B[01](?:[01_]*[01])?";
+const numberLiteral: string = ((): string => {
+  const int = "[0-9](?:[0-9_]*[0-9])?";
+  const hex = "&H[0-9A-F](?:[0-9A-F_]*[0-9A-F])?";
+  const oct = "&O[0-7](?:[0-7_]*[0-7])?";
+  const bin = "&B[01](?:[01_]*[01])?";
 
-const intTypeChars = "(?:U?[SIL]|[%&])?";
+  const intTypeChars = util.nonCapturingGroup(["U?[SIL]", "[%&]"]);
 
-const integerLiteral = `(?:${int}|${hex}|${oct}|${bin})${intTypeChars}`;
+  const nonDecIntegerLiteral =
+    util.nonCapturingGroup([hex, oct, bin]) + intTypeChars + "?";
+  const exponent = "E[+-]?" + int;
+  const fpValue1 = util.nonCapturingGroup([
+    util.nonCapturingGroup(int, "?") +
+      "\\." +
+      int +
+      util.nonCapturingGroup(exponent, "?"),
+    int + exponent
+  ]);
+  const fpTypeChars = "[DFR@!#]";
 
-const exponent = "E[+-]" + int;
-const fpValue = `(?:${int})?\\.${int}(?:${exponent})?|${int}${exponent}`;
-const fpTypeChars = "[DFR@!#]";
+  const fpLiteral1 = fpValue1 + fpTypeChars + "?";
+  // Denary numbers must be matched with all integer and floating point suffixes
+  // at the same time. Otherwise a match may be made without the suffix.
+  const decIntegerLiteral =
+    int + util.nonCapturingGroup([intTypeChars, fpTypeChars], "?");
 
-const fpLiteral = fpValue + fpTypeChars;
-
-const numberLiteral = `${integerLiteral}|${fpLiteral}`;
+  return util.nonCapturingGroup([
+    fpLiteral1, // must come first, otherwise may match without exponent
+    decIntegerLiteral,
+    nonDecIntegerLiteral
+  ]);
+})();
 
 export const numberParser = util.getRegexpParser(
   "number",
-  new RegExp(numberLiteral, "i")
+  new RegExp("^" + numberLiteral, "i")
 );
 
 export const operators = [
