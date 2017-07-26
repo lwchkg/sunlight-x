@@ -170,12 +170,13 @@ export const customParseRules = [
     ];
     context.reader.read(tag.length - 1);
 
-    const current = {
-      line: 0,
-      column: 0,
-      value: "",
-      name: ""
-    };
+    const current: {
+      name: string,
+      value: string,
+      line: number,
+      column: number
+    } = { line: 0, column: 0, value: "", name: "" };
+
     while (!context.reader.isPeekEOF()) {
       const peek = context.reader.peek();
       if (peek === "<" && current.name !== metaName) {

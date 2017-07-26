@@ -50,6 +50,13 @@ export class CodeReader {
     return this.text.substring(this.index + 1);
   }
 
+  currentAndPeekTillEOL(): string {
+    const startIndex = this.index;
+    const endIndex: number = this.text.indexOf("\n", startIndex);
+    if (endIndex >= 0) return this.text.substring(startIndex, endIndex);
+    return this.text.substring(startIndex);
+  }
+
   read(count: number = 1): string {
     if (count === 0) return "";
 

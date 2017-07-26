@@ -38,6 +38,7 @@ function getHighlightLanguage(filename: string): string {
     ".js": "javascript",
     ".php": "php",
     ".txt": "plaintext",
+    ".vb": "vb",
     ".xml": "xml"
   };
   const language = map[extension] || "";

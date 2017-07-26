@@ -131,6 +131,36 @@ export function matchWord(
 export { createHashMap } from "./languages.js";
 
 /**
+ * Returns a parser from a regular expression. The parser match the content from
+ * the index to the end of line against the regular expression.
+ * @param {string} tokenName The type of the token returned for successful
+ *                           parsing.
+ * @param {RegExp} regex The regular expression. The regular expression should
+ * always start with `^` to match only the beginning of a string, otherwise it
+ * will be inefficient.
+ * @returns {function}
+ */
+export function getRegexpParser(
+  tokenName: string,
+  regex: RegExp
+): ParserContext => ?Token {
+  return function(context: ParserContext): ?Token {
+    const match = context.reader.currentAndPeekTillEOL().match(regex);
+    // Fail if no match or not matching the start of a string.
+    if (!match || match.index !== 0) return null;
+
+    const line = context.reader.line;
+    const column = context.reader.column;
+    return context.createToken(
+      tokenName,
+      context.reader.current() + context.reader.read(match[0].length - 1),
+      line,
+      column
+    );
+  };
+}
+
+/**
  * Creates a between rule
  *
  * @param {number} startIndex The index at which to start examining the tokens.
