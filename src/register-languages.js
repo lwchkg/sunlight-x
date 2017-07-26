@@ -9,6 +9,7 @@ import * as css from "./languages/css.js";
 import * as javascript from "./languages/javascript.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
+import * as vb from "./languages/vb.js";
 import * as xml from "./languages/xml.js";
 
 const languages = [
@@ -20,6 +21,7 @@ const languages = [
   javascript,
   php,
   plaintext,
+  vb,
   xml
 ];
 
