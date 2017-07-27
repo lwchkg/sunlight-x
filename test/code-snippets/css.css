@@ -57,3 +57,9 @@ a:fake-pseudo-class {
 pseudotest1:before, pseudotest2:after {
     /* stuff goes here */
 }
+
+/* do not mix up id selectors and hex color */
+#abc {
+    color: #12345678;
+    background-color: #def;
+}
