@@ -399,4 +399,3 @@ export function getComputedStyle(element: Element, style: string): string {
 // Export types for language support
 export type { HashMapType, ParserContext, Token };
 export type { AnalyzerContext } from "./analyzer-context.js";
-export { TokenWalker } from "./token-walker.js";
