@@ -4,7 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TokenWalker } from "../util.js";
 import * as util from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
 
@@ -238,9 +237,11 @@ export const customParseRules = [
 
     // now go backward until we run into a "set" keyword, keeping track of all brackets along the way
     const bracketCount = [0, 0]; // open, close
-    let index = context.count() - 1;
+    const walker = context.getTokenWalker();
     let token;
-    tokenLoop: while ((token = context.token(index--)) !== undefined)
+    tokenLoop: for (;;) {
+      if (!walker.hasPrev()) return null;
+      token = walker.prev();
       if (token.name === "punctuation") {
         if (token.value === "{") bracketCount[0]++;
         else if (token.value === "}") bracketCount[1]++;
@@ -258,10 +259,7 @@ export const customParseRules = [
             return null;
         }
       }
-
-    if (token === undefined)
-      // EOF FTL
-      return null;
+    }
 
     // examine the bracket count and make sure we're in the correct scope
     if (bracketCount[1] >= bracketCount[0])
@@ -294,7 +292,7 @@ export const namedIdentRules = {
       // between ":" and "{" but not case statements
 
       // look backward for a ":" not preceded by a "case"
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       let foundColon = false;
       while (walker.hasPrev()) {
         const token = walker.prev();
@@ -342,7 +340,7 @@ export const namedIdentRules = {
       // if we run into ">" before "," or "<" then it's a big fail
       let foundIdent = false;
       const bracketCountLeft = [0, 0];
-      let walker = new TokenWalker(context);
+      let walker = context.getTokenWalker();
       while (walker.hasPrev()) {
         const token = walker.prev();
         if (token.name === "keyword" && token.value === "class")
@@ -389,7 +387,7 @@ export const namedIdentRules = {
 
       // now look forward to make sure the generic definition is closed
       // this avoids false positives like "foo < bar"
-      walker = new TokenWalker(context);
+      walker = context.getTokenWalker();
       while (walker.hasNext()) {
         const token = walker.next();
         if (
@@ -444,7 +442,7 @@ export const namedIdentRules = {
       }
 
       const bracketCount = [0, 0]; // open (<), close (>)
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       while (walker.hasNext()) {
         const token = walker.next();
         if (token.name === "operator") {
@@ -544,7 +542,7 @@ export const namedIdentRules = {
 
       // first, verify that we're inside an opening bracket
       const bracketCount: [number, number] = [0, 0];
-      let walker = new TokenWalker(context);
+      let walker = context.getTokenWalker();
       while (walker.hasPrev()) {
         const token = walker.prev();
         if (token.name !== "punctuation") continue;
@@ -571,7 +569,7 @@ export const namedIdentRules = {
         return false;
 
       // next, verify we're inside a closing bracket
-      walker = new TokenWalker(context);
+      walker = context.getTokenWalker();
       let indexOfLastBracket = -1;
       while (walker.hasNext()) {
         const token = walker.next();
@@ -613,7 +611,7 @@ export const namedIdentRules = {
 
       // go backward and make sure that there are only idents and dots before the new keyword
       // "previous" is used to make sure that method declarations like "public new Object Value()..." are treated correctly
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       let previous = walker.current();
       while (walker.hasPrev()) {
         const token = walker.prev();
@@ -680,7 +678,7 @@ export const namedIdentRules = {
         // make sure the previous tokens are "(" and then not a keyword
         // this'll make sure that things like "if (foo) doSomething();" won't color "foo"
 
-        const walker = new TokenWalker(context);
+        const walker = context.getTokenWalker();
         while (walker.hasPrev()) {
           const token = walker.prev();
           if (token.name === "punctuation" && token.value === "(") {
@@ -707,7 +705,7 @@ export const namedIdentRules = {
         return false;
 
       // should be preceded by idents and dots, and then "using ="
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       while (walker.hasPrev()) {
         const token = walker.prev();
         if (

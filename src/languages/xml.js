@@ -10,9 +10,9 @@ import type { ParserContext, Token } from "../util.js";
  * @returns {boolean}
  */
 function isInsideOpenBracket(context: ParserContext): boolean {
-  let token;
-  let index = context.count();
-  while ((token = context.token(--index))) {
+  const walker = context.getTokenWalker();
+  while (walker.hasPrev()) {
+    const token = walker.prev();
     if (
       token.name === "operator" &&
       (token.value === ">" || token.value === "/>" || token.value === "</")
@@ -179,56 +179,56 @@ export const customParseRules = [
 export const embeddedLanguages = {
   css: {
     switchTo: function(context: ParserContext): boolean {
-      let prevToken = context.token(context.count() - 1);
-      const endStyleToken = "</style";
-      if (!prevToken || context.reader.match(endStyleToken)) return false;
+      if (context.reader.match("</style")) return false;
+
+      const walker = context.getTokenWalker();
+      if (!walker.hasPrev()) return false;
+      const prevToken = walker.prev();
 
       if (prevToken.name !== "operator" || prevToken.value !== ">")
         return false;
 
       // look backward for a tag name, if it's "style", then we go to css mode
-      let index = context.count() - 1;
-      while ((prevToken = context.token(--index)))
+      while (walker.hasPrev()) {
+        const prevToken = walker.prev();
         if (prevToken.name === "tagName") {
           if (prevToken.value === "style") {
             // make sure it's not a closing tag
-            prevToken = context.token(--index);
-            if (
-              prevToken &&
-              prevToken.name === "operator" &&
-              prevToken.value === "<"
-            )
+            if (!walker.hasPrev()) break;
+            const prevToken = walker.prev();
+            if (prevToken.name === "operator" && prevToken.value === "<")
               return true;
           }
-
           break;
         }
-
+      }
       return false;
     },
 
     switchBack: function(context: ParserContext): boolean {
-      const endStyleToken = "</style";
-      return context.reader.peek(endStyleToken.length) === endStyleToken;
+      return context.reader.matchPeek("</style");
     }
   },
 
   javascript: {
     switchTo: function(context: ParserContext): boolean {
-      let prevToken = context.token(context.count() - 1);
-      const endScriptToken = "</script";
-      if (!prevToken || context.reader.match(endScriptToken)) return false;
+      if (context.reader.match("</script")) return false;
+
+      const walker = context.getTokenWalker();
+      if (!walker.hasPrev()) return false;
+      const prevToken = walker.prev();
 
       if (prevToken.name !== "operator" || prevToken.value !== ">")
         return false;
 
       // look backward for a tag name, if it's "script", then we go to javascript mode
-      let index = context.count() - 1;
-      while ((prevToken = context.token(--index)))
+      while (walker.hasPrev()) {
+        const prevToken = walker.prev();
         if (prevToken.name === "tagName") {
           if (prevToken.value === "script") {
             // make sure it's not a closing tag
-            prevToken = context.token(--index);
+            if (!walker.hasPrev()) break;
+            const prevToken = walker.prev();
             if (
               prevToken &&
               prevToken.name === "operator" &&
@@ -236,10 +236,9 @@ export const embeddedLanguages = {
             )
               return true;
           }
-
           break;
         }
-
+      }
       return false;
     },
 

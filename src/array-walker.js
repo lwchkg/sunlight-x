@@ -4,9 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-import type { AnalyzerContext } from "./analyzer-context.js";
-import type { Token } from "./token.js";
-
 export class ArrayWalker<T> {
   _data: T[];
   index: number;
@@ -66,11 +63,5 @@ export class ArrayWalker<T> {
 
   peekUnsafe(offset: number): ?T {
     return this._data[this.index + offset];
-  }
-}
-
-export class TokenWalker extends ArrayWalker<Token> {
-  constructor(context: AnalyzerContext) {
-    super(context.tokens, context.index);
   }
 }

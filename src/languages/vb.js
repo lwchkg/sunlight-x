@@ -5,7 +5,6 @@
 
 // @flow
 import * as util from "../util.js";
-import { TokenWalker } from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
@@ -270,7 +269,7 @@ export const namedIdentRules = {
       const bracketCount: [number, number] = [0, 0];
       // we need to verify that we're between <>
       // first, verify that we're inside an opening bracket
-      let walker = new TokenWalker(context);
+      let walker = context.getTokenWalker();
       while (walker.hasPrev()) {
         const token = walker.prev();
         if (token.name === "operator") {
@@ -294,7 +293,7 @@ export const namedIdentRules = {
         return false;
 
       let indexOfLastBracket = -1;
-      walker = new TokenWalker(context);
+      walker = context.getTokenWalker();
       while (walker.hasNext()) {
         const token = walker.next();
         if (token.name === "operator") {
@@ -341,7 +340,7 @@ export const namedIdentRules = {
         return false;
 
       let parenCount = 1;
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       while (walker.hasPrev()) {
         const token = walker.prev();
         if (token.name === "punctuation" && token.value === "(") {
@@ -375,7 +374,7 @@ export const namedIdentRules = {
         return false;
 
       // look backward for "Implements"
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       while (walker.hasPrev()) {
         const token = walker.prev();
         if (token.name === "keyword")
@@ -400,11 +399,10 @@ export const namedIdentRules = {
     function(context: AnalyzerContext): boolean {
       // look backward for "As {"
       const isValid = (function(): boolean {
-        for (
-          let index = context.index - 1, token;
-          (token = context.tokens[index]);
-          --index
-        )
+        const walker = context.getTokenWalker();
+        while (walker.hasPrev()) {
+          const token = walker.prev();
+          let token2;
           if (token.name === "punctuation")
             switch (token.value) {
               case "(":
@@ -412,8 +410,15 @@ export const namedIdentRules = {
                 return false;
               case "{":
                 // previous non-ws token should be keyword "As"
-                token = util.getPreviousNonWsToken(context.tokens, index);
-                if (!token || token.name !== "keyword" || token.value !== "As")
+                token2 = util.getPreviousNonWsToken(
+                  context.tokens,
+                  walker.index
+                );
+                if (
+                  !token2 ||
+                  token2.name !== "keyword" ||
+                  token2.value !== "As"
+                )
                   return false;
 
                 return true;
@@ -426,14 +431,14 @@ export const namedIdentRules = {
             )
           )
             return false;
-
+        }
         return false;
       })();
 
       if (!isValid) return false;
 
       // "}" before )
-      const walker = new TokenWalker(context);
+      const walker = context.getTokenWalker();
       while (walker.hasNext()) {
         const token = walker.next();
         if (token.name === "punctuation")

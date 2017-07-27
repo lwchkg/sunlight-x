@@ -9,7 +9,7 @@ export class Analyzer {
     this.handlers = {};
   }
 
-  static defaultHandleToken(suffix: string): * {
+  static defaultHandleToken(suffix: string): AnalyzerContext => true {
     return function(context: AnalyzerContext): true {
       const element: Element = document.createElement("span");
       element.className = context.options.classPrefix + suffix;

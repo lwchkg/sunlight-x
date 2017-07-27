@@ -1,4 +1,5 @@
 // @flow
+import { ArrayWalker } from "./array-walker.js";
 import { EOL } from "./constants.js";
 import { document } from "./jsdom.js";
 
@@ -65,6 +66,11 @@ export class AnalyzerContext {
         value.substring(tabIndex + 1);
     }
     return value;
+  }
+
+  // Create a token walker that is positioned at the this.index.
+  getTokenWalker(): ArrayWalker<Token> {
+    return new ArrayWalker(this.tokens, this.index);
   }
 
   addNode(node: Element | Text) {

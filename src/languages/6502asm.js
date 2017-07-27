@@ -246,8 +246,8 @@ export function numberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
   const line = context.reader.getLine();
   const column = context.reader.getColumn();
-  let number, peek;
 
+  let number;
   // is first char a digit?
   if (!/\d/.test(current)) {
     // does it start with "$" (hex) or "%" (binary)?
@@ -263,8 +263,8 @@ export function numberParser(context: ParserContext): ?Token {
 
   // easy way out: read until it's not a number or letter a-f
   // this will work for hex ($FF), octal (012), decimal and binary
-  while ((peek = context.reader.peek()) !== context.reader.EOF) {
-    if (!/[A-Fa-f0-9]/.test(peek)) break;
+  while (!context.reader.isPeekEOF()) {
+    if (!/[A-Fa-f0-9]/.test(context.reader.peek())) break;
 
     number += context.reader.read();
   }

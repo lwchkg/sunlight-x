@@ -3322,9 +3322,9 @@ export const namedIdentRules = {
         return false;
 
       // should be preceded by idents and backslashes and commas, and then "use "
-      let index = context.index;
-      let token;
-      while ((token = context.tokens[--index]))
+      const walker = context.getTokenWalker();
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (
           token.name !== "ident" &&
           token.name !== "default" &&
@@ -3333,7 +3333,7 @@ export const namedIdentRules = {
         )
           // should be the "use" keyword
           return token.name === "keyword" && token.value === "use";
-
+      }
       return false;
     },
 
@@ -3348,14 +3348,14 @@ export const namedIdentRules = {
       )
         return false;
 
-      // go backward and make sure that there are only idents and dots before the new keyword
-      // "previous" is used to make sure that method declarations like "public new Object Value()..." are treated correctly
-      let previous = context.tokens[context.index];
-      for (
-        let index = context.index - 1, token;
-        (token = context.tokens[index]) !== undefined;
-        --index
-      ) {
+      // go backward and make sure that there are only idents and dots before
+      // the new keyword "previous" is used to make sure that method
+      // declarations like "public new Object Value()..." are treated correctly
+      const walker = context.getTokenWalker();
+      let previous = walker.current();
+      while (walker.hasPrev()) {
+        const token = walker.prev();
+
         if (
           token.name === "keyword" &&
           (token.value === "new" || token.value === "instanceof")
