@@ -206,12 +206,10 @@ export const customParseRules = [
       // look backward for "echo" or "title" or "set" or "|" or beginning of line
       // if we find "echo" or "set" or "title" or "=" before "|" or sol then it's a fail
 
-      if (!context.reader.isPrecededByWhitespaceOnly())
-        for (
-          let index = context.count() - 1, prevToken;
-          (prevToken = context.token(index));
-          --index
-        ) {
+      if (!context.reader.isPrecededByWhitespaceOnly()) {
+        const walker = context.getTokenWalker();
+        while (walker.hasPrev()) {
+          const prevToken = walker.prev();
           if (
             prevToken.name === "keyword" &&
             util.contains(["echo", "title", "set"], prevToken.value)
@@ -231,6 +229,7 @@ export const customParseRules = [
           )
             break;
         }
+      }
 
       context.reader.read(token.value.length - 1);
       return token;

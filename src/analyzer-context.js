@@ -68,6 +68,7 @@ export class AnalyzerContext {
     return value;
   }
 
+  // Create a token walker that is positioned at the this.index.
   getTokenWalker(): ArrayWalker<Token> {
     return new ArrayWalker(this.tokens, this.index);
   }

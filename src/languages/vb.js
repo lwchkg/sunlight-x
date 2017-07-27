@@ -399,11 +399,10 @@ export const namedIdentRules = {
     function(context: AnalyzerContext): boolean {
       // look backward for "As {"
       const isValid = (function(): boolean {
-        for (
-          let index = context.index - 1, token;
-          (token = context.tokens[index]);
-          --index
-        )
+        const walker = context.getTokenWalker();
+        while (walker.hasPrev()) {
+          const token = walker.prev();
+          let token2;
           if (token.name === "punctuation")
             switch (token.value) {
               case "(":
@@ -411,8 +410,15 @@ export const namedIdentRules = {
                 return false;
               case "{":
                 // previous non-ws token should be keyword "As"
-                token = util.getPreviousNonWsToken(context.tokens, index);
-                if (!token || token.name !== "keyword" || token.value !== "As")
+                token2 = util.getPreviousNonWsToken(
+                  context.tokens,
+                  walker.index
+                );
+                if (
+                  !token2 ||
+                  token2.name !== "keyword" ||
+                  token2.value !== "As"
+                )
                   return false;
 
                 return true;
@@ -425,7 +431,7 @@ export const namedIdentRules = {
             )
           )
             return false;
-
+        }
         return false;
       })();
 

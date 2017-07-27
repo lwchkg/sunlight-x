@@ -11,12 +11,12 @@ import type { ParserContext, Token } from "../util.js";
 function peekSelectorToken(context: ParserContext): string | null {
   // make sure it's not part of a property value
   // basically if we run into "{" before "}" it's bad
-  let token;
-  let index = context.count();
-
-  while ((token = context.token(--index)) !== undefined)
+  const walker = context.getTokenWalker();
+  while (walker.hasPrev()) {
+    const token = walker.prev();
     if (token.name === "punctuation" && token.value === "}") break;
     else if (token.name === "punctuation" && token.value === "{") return null;
+  }
 
   // now check to make sure we run into a { before a ;
 

@@ -4,6 +4,7 @@
 // be found in the LICENSE file.
 
 // @flow
+import { ArrayWalker } from "./array-walker.js";
 import { CodeReader } from "./code-reader.js";
 import { BeforeTokenizeEvent, AfterTokenizeEvent } from "./events.js";
 import { Token } from "./token.js";
@@ -125,6 +126,12 @@ export class ParserContext {
 
   count(): number {
     return this.tokens.length;
+  }
+
+  // Create a token walker that is positioned at the end of the tokens. Use
+  // walker.prev() to receive the last token.
+  getTokenWalker(): ArrayWalker<Token> {
+    return new ArrayWalker(this.tokens, this.tokens.length);
   }
 
   createToken(

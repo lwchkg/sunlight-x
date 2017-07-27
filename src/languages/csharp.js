@@ -237,9 +237,11 @@ export const customParseRules = [
 
     // now go backward until we run into a "set" keyword, keeping track of all brackets along the way
     const bracketCount = [0, 0]; // open, close
-    let index = context.count() - 1;
+    const walker = context.getTokenWalker();
     let token;
-    tokenLoop: while ((token = context.token(index--)) !== undefined)
+    tokenLoop: for (;;) {
+      if (!walker.hasPrev()) return null;
+      token = walker.prev();
       if (token.name === "punctuation") {
         if (token.value === "{") bracketCount[0]++;
         else if (token.value === "}") bracketCount[1]++;
@@ -257,10 +259,7 @@ export const customParseRules = [
             return null;
         }
       }
-
-    if (token === undefined)
-      // EOF FTL
-      return null;
+    }
 
     // examine the bracket count and make sure we're in the correct scope
     if (bracketCount[1] >= bracketCount[0])
