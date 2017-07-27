@@ -723,8 +723,6 @@ export const customParseRules = [
 
     if (context.reader.current() !== "#") return null;
 
-    // must be between ":" and ";"
-    // basically if we run into a "{" before a "} it's bad
     let count = 1;
     let value = "#";
     let validHex = true;
@@ -733,6 +731,8 @@ export const customParseRules = [
       const letter = peek.charAt(peek.length - 1);
       if (letter === "}" || letter === ";") break;
 
+      // must be between ":" and ";" basically if we run into a "{" before a "}
+      // it's an id selector instead.
       if (letter === "{") return null;
 
       if (validHex && /[A-Fa-f0-9]/.test(letter)) value += letter;
@@ -746,49 +746,21 @@ export const customParseRules = [
   }
 ];
 
-/**
- * Same as default parser, but allows %
- * @param {Object} context
- * @returns {Object}
- */
-export function numberParser(context: ParserContext): ?Token {
-  const current = context.reader.current();
-  const line = context.reader.getLine();
-  const column = context.reader.getColumn();
+// The number parser interprets numbers with their units (including %). Since
+// new units may emerge, we accept any word or the % sign.
+const numberLiteral: string = ((): string => {
+  const sign = "[+-]?";
+  const int = "[0-9]+";
+  const value = sign + util.nonCapturingGroup(["[0-9]*\\." + int, int]);
+  const exponent = "E[+-]?" + int;
+  const unit = "(?:[a-z]+|%)?";
+  return value + util.nonCapturingGroup(exponent, "?") + unit;
+})();
 
-  let number;
-  let allowDecimal = true;
-  if (!/\d/.test(current)) {
-    // is it a decimal followed by a number?
-    if (current !== "." || !/\d/.test(context.reader.peek())) return null;
-
-    // decimal without leading zero
-    number = current + context.reader.read();
-    allowDecimal = false;
-  } else {
-    number = current;
-    if (current === "0" && context.reader.peek() !== ".")
-      // hex or octal
-      allowDecimal = false;
-  }
-
-  let peek;
-  while ((peek = context.reader.peek()) !== context.reader.EOF) {
-    if (!/[A-Za-z0-9%]/.test(peek)) {
-      if (peek === "." && allowDecimal && /\d$/.test(context.reader.peek(2))) {
-        number += context.reader.read();
-        allowDecimal = false;
-        continue;
-      }
-
-      break;
-    }
-
-    number += context.reader.read();
-  }
-
-  return context.createToken("number", number, line, column);
-}
+export const numberParser = util.getRegexpParser(
+  "number",
+  new RegExp("^" + numberLiteral, "i")
+);
 
 export const customTokens = {
   rule: {
@@ -833,7 +805,7 @@ export const scopes = {
     ["'", "'", ["\\'", "\\\\"], false]
   ],
   comment: [["/*", "*/", [], false]],
-  id: [["#", { length: 1, regex: /[^-\w]/ }, [], true]]
+  id: [["#", { length: 1, regex: /[^\w-]/ }, [], true]]
 };
 
 export const identFirstLetter = /[A-Za-z-]/;

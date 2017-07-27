@@ -159,9 +159,11 @@ export const customParseRules = [
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
 
-    // quick and dirty: everything between "#" (inclusive) and whitespace (exclusive) is a constant
-    // too dirty.  Need to account for parens and square brackets, whitespace can appear inside them.
-    // New routine: once inside () or [], anything goes, but once outside, terminate with whitespace
+    // Quick and dirty: everything between "#" (inclusive) and whitespace
+    // (exclusive) is a constant too dirty.  Need to account for parens and
+    // square brackets, whitespace can appear inside them. New routine: once
+    // inside () or [], anything goes, but once outside, terminate with
+    // whitespace
     let parenCount = 0;
     let bracketCount = 0;
     let peek = context.reader.peek();
@@ -208,17 +210,18 @@ export const customParseRules = [
         context.getAllTokens(),
         context.count()
       );
-      if (
-        !prevToken ||
-        prevToken.name !== "keyword" ||
-        !util.contains(validLabelOps, prevToken.value, true)
-      )
-        if (context.count() > 0 && !/\n$/.test(context.defaultData.text)) {
-          // just a regular ident
-          return null;
-        }
 
-      // read until the end of the ident
+      // Check if it is just a regular ident.
+      if (
+        (!prevToken ||
+          prevToken.name !== "keyword" ||
+          !util.contains(validLabelOps, prevToken.value, true)) &&
+        context.count() > 0 &&
+        !/\n$/.test(context.defaultData.text)
+      )
+        return null;
+
+      // Read until the end of the ident.
       label = context.reader.current();
       while ((peek = context.reader.peek()) !== context.reader.EOF) {
         if (!/\w/.test(peek)) break;
@@ -235,6 +238,7 @@ export const caseInsensitive = true;
 
 /**
  * Number parser of 6502asm.
+ * TODO: parsing appears to be incorrect. But needs specs before fixing.
  * @param {ParserContext} context
  * @returns {Token?}
  */

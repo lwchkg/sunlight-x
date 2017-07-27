@@ -74,15 +74,27 @@ describe("CSS tests", function() {
   it("number with px suffix", function() {
     testSupport.AssertContentExists("number", "2px");
   });
+  it("number with deg suffix", function() {
+    testSupport.AssertContentExists("number", "5deg");
+  });
 
   it("decimal number", function() {
     testSupport.AssertContentExists("number", "0.0");
   });
-  it("hex color", function() {
+  it("hex color #12345678", function() {
+    testSupport.AssertContentExists("hexColor", "#12345678");
+  });
+  it("hex color #FF0000", function() {
     testSupport.AssertContentExists("hexColor", "#FF0000");
   });
-  it("id selector", function() {
+  it("hex color #def", function() {
+    testSupport.AssertContentExists("hexColor", "#def");
+  });
+  it("id selector #wrapper", function() {
     testSupport.AssertContentExists("id", "#wrapper");
+  });
+  it("id selector #abc", function() {
+    testSupport.AssertContentExists("id", "#abc");
   });
 
   it("attribute operator", function() {

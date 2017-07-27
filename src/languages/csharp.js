@@ -4,6 +4,7 @@
 // be found in the LICENSE file.
 
 // @flow
+import { TokenWalker } from "../util.js";
 import * as util from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
 
@@ -293,10 +294,10 @@ export const namedIdentRules = {
       // between ":" and "{" but not case statements
 
       // look backward for a ":" not preceded by a "case"
-      let index = context.index;
-      let token;
+      const walker = new TokenWalker(context);
       let foundColon = false;
-      while ((token = context.tokens[--index]) !== undefined) {
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (token.name === "punctuation" && token.value === "{") return false;
 
         if (token.name === "keyword" && token.value === "case") return false;
@@ -310,10 +311,14 @@ export const namedIdentRules = {
 
           // if "class" is used as a type constraint, then ignore it
           const nextToken =
-            context.tokens[index + 1].name === "default"
-              ? context.tokens[index + 2]
-              : context.tokens[index + 1];
-          if (nextToken.name === "punctuation" && nextToken.value === ",")
+            walker.peek(1).name === "default"
+              ? walker.peekUnsafe(2)
+              : walker.peek(1);
+          if (
+            nextToken &&
+            nextToken.name === "punctuation" &&
+            nextToken.value === ","
+          )
             continue;
 
           break;
@@ -332,14 +337,14 @@ export const namedIdentRules = {
     // generic definitions/params between "<" and ">"
     createNamedIdentFunction((context: AnalyzerContext): boolean => {
       // between < and > and preceded by an ident and not preceded by "class"
-      let index = context.index,
-        token,
-        foundIdent = false;
 
       // look for "<" preceded by an ident but not "class"
       // if we run into ">" before "," or "<" then it's a big fail
+      let foundIdent = false;
       const bracketCountLeft = [0, 0];
-      while ((token = context.tokens[--index]) !== undefined) {
+      let walker = new TokenWalker(context);
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (token.name === "keyword" && token.value === "class")
           // this must be a generic class type definition, e.g. Foo<T>, and we don't want to color the "T"
           return false;
@@ -384,8 +389,9 @@ export const namedIdentRules = {
 
       // now look forward to make sure the generic definition is closed
       // this avoids false positives like "foo < bar"
-      index = context.index;
-      while ((token = context.tokens[++index]) !== undefined) {
+      walker = new TokenWalker(context);
+      while (walker.hasNext()) {
+        const token = walker.next();
         if (
           token.name === "operator" &&
           (token.value === ">" || token.value === ">>")
@@ -438,9 +444,9 @@ export const namedIdentRules = {
       }
 
       const bracketCount = [0, 0]; // open (<), close (>)
-      let index = context.index;
-      let token;
-      while ((token = context.tokens[++index]) !== undefined) {
+      const walker = new TokenWalker(context);
+      while (walker.hasNext()) {
+        const token = walker.next();
         if (token.name === "operator") {
           switch (token.value) {
             case "<":
@@ -483,16 +489,13 @@ export const namedIdentRules = {
         return false;
 
       // next token should be optional whitespace followed by an ident
-      token = context.tokens[++index];
-      if (!token || (token.name !== "default" && token.name !== "ident"))
-        return false;
-
+      if (!walker.hasNext()) return false;
+      let token = walker.next();
       if (token.name === "default") {
-        token = context.tokens[++index];
-        if (!token || token.name !== "ident") return false;
+        if (!walker.hasNext()) return false;
+        token = walker.next();
       }
-
-      return true;
+      return token.name === "ident";
     }),
 
     // using aliases, e.g. "Foo" in "using Foo = System.Linq.Enumerable;"
@@ -541,24 +544,25 @@ export const namedIdentRules = {
 
       // first, verify that we're inside an opening bracket
       const bracketCount: [number, number] = [0, 0];
-      let index = context.index;
-      let token;
-      while ((token = context.tokens[--index]))
-        if (token.name === "punctuation") {
-          if (token.value === "[") {
-            bracketCount[0]++;
-            continue;
-          }
+      let walker = new TokenWalker(context);
+      while (walker.hasPrev()) {
+        const token = walker.prev();
+        if (token.name !== "punctuation") continue;
 
-          if (token.value === "]") {
-            bracketCount[1]++;
-            continue;
-          }
-
-          // Start of named ident token
-          if (token.value === "{" || token.value === "}" || token.value === ";")
-            break;
+        if (token.value === "[") {
+          bracketCount[0]++;
+          continue;
         }
+
+        if (token.value === "]") {
+          bracketCount[1]++;
+          continue;
+        }
+
+        // Start of named ident token
+        if (token.value === "{" || token.value === "}" || token.value === ";")
+          break;
+      }
 
       // if no brackets were found OR...
       // all the found brackets are closed, so this ident is actually outside of
@@ -567,16 +571,17 @@ export const namedIdentRules = {
         return false;
 
       // next, verify we're inside a closing bracket
-      index = context.index;
+      walker = new TokenWalker(context);
       let indexOfLastBracket = -1;
-      while ((token = context.tokens[++index]))
+      while (walker.hasNext()) {
+        const token = walker.next();
         if (token.name === "punctuation") {
           if (token.value === "[") {
             bracketCount[0]++;
             continue;
           }
           if (token.value === "]") {
-            indexOfLastBracket = index;
+            indexOfLastBracket = walker.index;
             bracketCount[1]++;
             continue;
           }
@@ -585,12 +590,13 @@ export const namedIdentRules = {
           if (token.value === "{" || token.value === "}" || token.value === ";")
             break;
         }
+      }
 
       if (indexOfLastBracket < 0 || bracketCount[0] !== bracketCount[1])
         return false;
 
       // next token after the last closing bracket should be either a keyword or an ident
-      token = util.getNextNonWsToken(context.tokens, indexOfLastBracket);
+      const token = util.getNextNonWsToken(context.tokens, indexOfLastBracket);
       if (token && (token.name === "keyword" || token.name === "ident"))
         return true;
 
@@ -607,10 +613,10 @@ export const namedIdentRules = {
 
       // go backward and make sure that there are only idents and dots before the new keyword
       // "previous" is used to make sure that method declarations like "public new Object Value()..." are treated correctly
-      let index = context.index;
-      let previous = context.tokens[index];
-      let token;
-      while ((token = context.tokens[--index]) !== undefined) {
+      const walker = new TokenWalker(context);
+      let previous = walker.current();
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (
           token.name === "keyword" &&
           (token.value === "new" || token.value === "is")
@@ -658,14 +664,11 @@ export const namedIdentRules = {
 
       return createNamedIdentFunction((context: AnalyzerContext): boolean => {
         const precedesIsSatisfied = (function(tokens: Token[]): boolean {
-          for (let i = 0; i < precedes.length; i++)
+          for (const precede of precedes)
             if (
-              util.createProceduralRule(
-                context.index + 1,
-                1,
-                precedes[i],
-                false
-              )(tokens)
+              util.createProceduralRule(context.index + 1, 1, precede, false)(
+                tokens
+              )
             )
               return true;
 
@@ -677,15 +680,17 @@ export const namedIdentRules = {
         // make sure the previous tokens are "(" and then not a keyword
         // this'll make sure that things like "if (foo) doSomething();" won't color "foo"
 
-        let index = context.index;
-        let token;
-        while ((token = context.tokens[--index]))
+        const walker = new TokenWalker(context);
+        while (walker.hasPrev()) {
+          const token = walker.prev();
           if (token.name === "punctuation" && token.value === "(") {
-            const prevToken = util.getPreviousNonWsToken(context.tokens, index);
-            if (prevToken && prevToken.name === "keyword") return false;
-
-            return true;
+            const prevToken = util.getPreviousNonWsToken(
+              context.tokens,
+              walker.index
+            );
+            return !prevToken || prevToken.name !== "keyword";
           }
+        }
 
         return false;
       });
@@ -702,24 +707,26 @@ export const namedIdentRules = {
         return false;
 
       // should be preceded by idents and dots, and then "using ="
-      let index = context.index;
-      let token;
-      while ((token = context.tokens[--index]))
+      const walker = new TokenWalker(context);
+      while (walker.hasPrev()) {
+        const token = walker.prev();
         if (
-          token.name !== "ident" &&
-          token.name !== "default" &&
-          (token.name !== "operator" || token.value !== ".")
-        ) {
-          // should be an equals sign, and then an ident and then "using"
-          if (token.name !== "operator" || token.value !== "=") return false;
+          token.name === "ident" ||
+          token.name === "default" ||
+          (token.name === "operator" && token.value === ".")
+        )
+          continue;
 
-          return util.createProceduralRule(index - 1, -1, [
-            { token: "keyword", values: ["using"] },
-            { token: "default" },
-            { token: "ident" },
-            util.whitespace
-          ])(context.tokens);
-        }
+        // should be an equals sign, and then an ident and then "using"
+        if (token.name !== "operator" || token.value !== "=") return false;
+
+        return util.createProceduralRule(walker.index - 1, -1, [
+          { token: "keyword", values: ["using"] },
+          { token: "default" },
+          { token: "ident" },
+          util.whitespace
+        ])(context.tokens);
+      }
 
       return false;
     },

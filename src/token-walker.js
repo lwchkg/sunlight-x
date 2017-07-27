@@ -49,6 +49,24 @@ export class ArrayWalker<T> {
     this.index++;
     return this._data[this.index];
   }
+
+  hasOffset(offset: number): boolean {
+    const index = this.index + offset;
+    return index >= 0 && index < this._data.length;
+  }
+
+  peek(offset: number): T {
+    const index = this.index + offset;
+    if (index < 0 || index >= this._data.length)
+      throw new Error(
+        `Invalid index ${index}. The array has ${this._data.length} elements.`
+      );
+    return this._data[this.index + offset];
+  }
+
+  peekUnsafe(offset: number): ?T {
+    return this._data[this.index + offset];
+  }
 }
 
 export class TokenWalker extends ArrayWalker<Token> {
