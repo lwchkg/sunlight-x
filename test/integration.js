@@ -38,6 +38,7 @@ function getHighlightLanguage(filename: string): string {
     ".css": "css",
     ".js": "javascript",
     ".php": "php",
+    ".sh": "bash",
     ".txt": "plaintext",
     ".vb": "vb",
     ".xml": "xml"
