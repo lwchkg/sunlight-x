@@ -31,6 +31,7 @@ function getHighlightLanguage(filename: string): string {
   const extension = path.parse(filename).ext;
   const map: { [string]: string } = {
     ".6502asm": "6502asm",
+    ".as": "actionscript",
     ".bat": "batch",
     ".bf": "brainfuck",
     ".cs": "csharp",

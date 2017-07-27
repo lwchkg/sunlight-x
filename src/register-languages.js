@@ -1,6 +1,12 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
 import { registerLanguage } from "./languages.js";
 
+import * as actionscript from "./languages/actionscript.js";
 import * as asm6502 from "./languages/6502asm.js";
 import * as batch from "./languages/batch.js";
 import * as brainfuck from "./languages/brainfuck.js";
@@ -13,6 +19,7 @@ import * as vb from "./languages/vb.js";
 import * as xml from "./languages/xml.js";
 
 const languages = [
+  actionscript,
   asm6502,
   batch,
   brainfuck,
