@@ -1,6 +1,10 @@
 // @flow
 import { Analyzer } from "./analyzer.js";
-import * as util from "./util.js";
+import {
+  IsBetweenRuleSatisfied,
+  IsFollowsRuleSatisfied,
+  IsPrecedesRuleSatisfied
+} from "./rules-processor.js";
 
 import type { AnalyzerContext } from "./analyzer-context.js";
 import type {
@@ -28,55 +32,30 @@ export class defaultAnalyzer extends Analyzer {
 
   // this handles the named ident mayhem
   handleIdent(context: AnalyzerContext): true {
-    const _evaluateCustomRule = (rules: CustomIdentRule[]): boolean => {
-      rules = rules || [];
-      for (let i = 0; i < rules.length; i++)
-        if (rules[i](context))
-          return Analyzer.defaultHandleToken("named-ident")(context);
+    const rules = context.language.namedIdentRules;
+    const caseInsensitive = context.language.caseInsensitive;
 
-      return false;
-    };
-
-    const _evaluate = <T: FollowsOrPrecedesIdentRule | BetweenIdentRule>(
-      rules: T[],
-      createRule: T => (Token[]) => boolean
-    ): boolean => {
-      rules = rules || [];
-      for (let i = 0; i < rules.length; i++)
-        if (createRule && createRule(rules[i])(context.tokens))
-          return Analyzer.defaultHandleToken("named-ident")(context);
-
-      return false;
-    };
-
-    return (
-      _evaluateCustomRule(context.language.namedIdentRules.custom) ||
-      _evaluate(context.language.namedIdentRules.follows, (ruleData: *): * =>
-        util.createProceduralRule(
-          context.index - 1,
-          -1,
-          ruleData,
-          context.language.caseInsensitive
-        )
+    const isNamedIdent =
+      rules.custom.some((rule: CustomIdentRule): boolean => rule(context)) ||
+      rules.precedes.some((rule: FollowsOrPrecedesIdentRule): boolean =>
+        IsPrecedesRuleSatisfied(context.getTokenWalker(), rule, caseInsensitive)
       ) ||
-      _evaluate(context.language.namedIdentRules.precedes, (ruleData: *): * =>
-        util.createProceduralRule(
-          context.index + 1,
-          1,
-          ruleData,
-          context.language.caseInsensitive
-        )
+      rules.follows.some((rule: FollowsOrPrecedesIdentRule): boolean =>
+        IsFollowsRuleSatisfied(context.getTokenWalker(), rule, caseInsensitive)
       ) ||
-      _evaluate(context.language.namedIdentRules.between, (ruleData: *): * =>
-        util.createBetweenRule(
-          context.index,
-          ruleData.opener,
-          ruleData.closer,
-          context.language.caseInsensitive
+      rules.between.some((rule: BetweenIdentRule): boolean =>
+        IsBetweenRuleSatisfied(
+          context.getTokenWalker(),
+          rule.opener,
+          rule.closer,
+          caseInsensitive
         )
-      ) ||
-      Analyzer.defaultHandleToken("ident")(context)
-    );
+      );
+
+    if (isNamedIdent) Analyzer.defaultHandleToken("named-ident")(context);
+    else Analyzer.defaultHandleToken("ident")(context);
+
+    return true;
   }
 }
 

@@ -255,7 +255,6 @@ export function createProceduralRule(
   caseInsensitive: boolean = false
 ): (Token[]) => boolean {
   tokenRequirements = tokenRequirements.slice(0); // clone array
-  // TODO: verify. Probably were buggy.
   if (direction === 1) tokenRequirements.reverse();
 
   return function(tokens: Token[]): boolean {

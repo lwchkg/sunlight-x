@@ -11,6 +11,13 @@ export class ArrayWalker<T> {
     this._data = arr;
     this.index = index;
   }
+
+  // Duplicate the array walker with the current state.
+  duplicate(): ArrayWalker<T> {
+    return new ArrayWalker(this._data, this.index);
+  }
+
+  // Gets the current item, with bounds checking.
   current(): T {
     if (this.index < 0 || this.index >= this._data.length)
       throw new Error(
@@ -29,6 +36,7 @@ export class ArrayWalker<T> {
     return this.index < this._data.length - 1;
   }
 
+  // Increase or decrease index, and load the value with bounds check.
   prev(): T {
     this.index--;
     return this.current();
@@ -38,6 +46,7 @@ export class ArrayWalker<T> {
     return this.current();
   }
 
+  // Increase or decrease index, and load the value without bounds check.
   prevUnsafe(): ?T {
     this.index--;
     return this._data[this.index];
@@ -47,6 +56,15 @@ export class ArrayWalker<T> {
     return this._data[this.index];
   }
 
+  // Increase or decrease index.
+  increaseIndex() {
+    this.index++;
+  }
+  decreaseIndex() {
+    this.index--;
+  }
+
+  // Random access relative to the current index.
   hasOffset(offset: number): boolean {
     const index = this.index + offset;
     return index >= 0 && index < this._data.length;
