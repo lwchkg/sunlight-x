@@ -14,6 +14,7 @@ import * as brainfuck from "./languages/brainfuck.js";
 import * as cpp from "./languages/cpp.js";
 import * as csharp from "./languages/csharp.js";
 import * as css from "./languages/css.js";
+import * as diff from "./languages/diff.js";
 import * as javascript from "./languages/javascript.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
@@ -29,6 +30,7 @@ const languages = [
   cpp,
   csharp,
   css,
+  diff,
   javascript,
   php,
   plaintext,

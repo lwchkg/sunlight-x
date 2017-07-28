@@ -37,6 +37,7 @@ function getHighlightLanguage(filename: string): string {
     ".cpp": "cpp",
     ".cs": "csharp",
     ".css": "css",
+    ".diff": "diff",
     ".js": "javascript",
     ".php": "php",
     ".sh": "bash",
