@@ -16,7 +16,7 @@ export class Token {
     column: number,
     language: string
   ) {
-    // TODO: Update after Flow issue #4479 is fixed.
+    // TODO: Update after Flow issue #2646 is fixed.
     // $FlowFixMe
     this.name = name;
     // $FlowFixMe

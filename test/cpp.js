@@ -6,7 +6,7 @@
 // @flow
 import { TestSupport } from "./fixtures/testsupport.js";
 
-describe("ActionScript tests", function() {
+describe("C++ tests", function() {
   let testSupport: TestSupport;
   before(function() {
     testSupport = new TestSupport("cpp.cpp", "cpp");
