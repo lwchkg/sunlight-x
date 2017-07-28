@@ -403,5 +403,5 @@ export {
 } from "./rules-processor.js";
 
 // Export types for language support
-export type { HashMapType, ParserContext };
+export type { FollowsOrPrecedesIdentRule, HashMapType, ParserContext };
 export type { AnalyzerContext } from "./analyzer-context.js";

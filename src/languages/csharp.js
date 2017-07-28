@@ -7,7 +7,12 @@
 import * as util from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
 
-import type { AnalyzerContext, ParserContext, Token } from "../util.js";
+import type {
+  AnalyzerContext,
+  FollowsOrPrecedesIdentRule,
+  ParserContext,
+  Token
+} from "../util.js";
 
 /* eslint no-magic-numbers: 1 */
 const primitives = [
@@ -29,6 +34,7 @@ const primitives = [
 // things that are allowed inside a generic type definition
 const acceptableKeywords = primitives.concat(["in", "out", "string", "object"]);
 
+const typeDefinitionRegex = /^T([A-Z0-9]\w*)?$/;
 /**
  * TODO: description
  * @param {function} func
@@ -37,7 +43,6 @@ const acceptableKeywords = primitives.concat(["in", "out", "string", "object"]);
 function createNamedIdentFunction(
   func: AnalyzerContext => boolean
 ): AnalyzerContext => boolean {
-  const typeDefinitionRegex = /^T([A-Z0-9]\w*)?$/;
   return function(context: AnalyzerContext): boolean {
     return (
       !typeDefinitionRegex.test(context.tokens[context.index].value) &&
@@ -167,17 +172,18 @@ export const customParseRules = [
 
     if (!/^(get|set)\b/.test(context.reader.currentAndPeek(4))) return null;
 
-    const rule = util.createProceduralRule(context.count() - 1, -1, [
-      { token: "punctuation", values: ["}", "{", ";"] },
-      util.whitespace,
-      {
-        token: "keyword",
-        values: ["public", "private", "protected", "internal"],
-        optional: true
-      }
-    ]);
-
-    if (!rule(context.getAllTokens())) return null;
+    if (
+      !util.IsFollowsRuleSatisfied(context.getTokenWalker(), [
+        { token: "punctuation", values: ["}", "{", ";"] },
+        util.whitespace,
+        {
+          token: "keyword",
+          values: ["public", "private", "protected", "internal"],
+          optional: true
+        }
+      ])
+    )
+      return null;
 
     // now we need to look ahead and verify that the next non-sunlight.util.whitespace token is "{" or ";"
     let count = "get".length;
@@ -661,23 +667,19 @@ export const namedIdentRules = {
       ];
 
       return createNamedIdentFunction((context: AnalyzerContext): boolean => {
-        const precedesIsSatisfied = (function(tokens: Token[]): boolean {
-          for (const precede of precedes)
-            if (
-              util.createProceduralRule(context.index + 1, 1, precede, false)(
-                tokens
-              )
+        if (
+          !precedes.some((precede: FollowsOrPrecedesIdentRule): boolean =>
+            util.IsPrecedesRuleSatisfied(
+              context.getTokenWalker(),
+              precede,
+              false
             )
-              return true;
-
+          )
+        )
           return false;
-        })(context.tokens);
-
-        if (!precedesIsSatisfied) return false;
 
         // make sure the previous tokens are "(" and then not a keyword
         // this'll make sure that things like "if (foo) doSomething();" won't color "foo"
-
         const walker = context.getTokenWalker();
         while (walker.hasPrev()) {
           const token = walker.prev();
@@ -718,18 +720,19 @@ export const namedIdentRules = {
         // should be an equals sign, and then an ident and then "using"
         if (token.name !== "operator" || token.value !== "=") return false;
 
-        return util.createProceduralRule(walker.index - 1, -1, [
+        return util.IsFollowsRuleSatisfied(walker, [
           { token: "keyword", values: ["using"] },
           { token: "default" },
           { token: "ident" },
           util.whitespace
-        ])(context.tokens);
+        ]);
       }
 
       return false;
     },
 
-    // can't use the follows/precedes utilities since we need to verify that it doesn't match the type definition naming convention
+    // can't use the follows/precedes utilities since we need to verify that it
+    // doesn't match the type definition naming convention
     createNamedIdentFunction((context: AnalyzerContext): boolean => {
       const follows = [
         // method/property return values
@@ -785,23 +788,14 @@ export const namedIdentRules = {
         [{ token: "default" }, { token: "ident" }]
       ];
 
-      for (let i = 0; i < follows.length; i++)
-        if (
-          util.createProceduralRule(context.index - 1, -1, follows[i], false)(
-            context.tokens
-          )
+      return (
+        precedes.some((rule: FollowsOrPrecedesIdentRule): boolean =>
+          util.IsPrecedesRuleSatisfied(context.getTokenWalker(), rule, false)
+        ) ||
+        follows.some((rule: FollowsOrPrecedesIdentRule): boolean =>
+          util.IsFollowsRuleSatisfied(context.getTokenWalker(), rule, false)
         )
-          return true;
-
-      for (let i = 0; i < precedes.length; i++)
-        if (
-          util.createProceduralRule(context.index + 1, 1, precedes[i], false)(
-            context.tokens
-          )
-        )
-          return true;
-
-      return false;
+      );
     })
   ]
 };

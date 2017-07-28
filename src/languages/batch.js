@@ -54,20 +54,20 @@ export const customParseRules = [
 
   // Label after goto statements
   function(context: ParserContext): ?Token {
-    const matches = util.createProceduralRule(
-      context.count() - 1,
-      -1,
-      [
-        { token: "keyword", values: ["goto"] },
-        { token: "operator", values: [":"], optional: true }
-      ],
-      true
-    );
+    if (
+      !util.IsFollowsRuleSatisfied(
+        context.getTokenWalker(),
+        [
+          { token: "keyword", values: ["goto"] },
+          { token: "operator", values: [":"], optional: true }
+        ],
+        true
+      )
+    )
+      return null;
 
     const line = context.reader.getLine();
     const column = context.reader.getColumn();
-
-    if (!matches(context.getAllTokens())) return null;
 
     let value = context.reader.current();
     while (!context.reader.isPeekEOF() && !/[\W]/.test(context.reader.peek()))

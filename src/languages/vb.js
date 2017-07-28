@@ -339,10 +339,10 @@ export const namedIdentRules = {
 
       // verify that this ident is the second argument to the function call
       if (
-        !util.createProceduralRule(context.index - 1, -1, [
+        !util.IsFollowsRuleSatisfied(context.getTokenWalker(), [
           { token: "punctuation", values: [","] },
           util.whitespace
-        ])(context.tokens)
+        ])
       )
         return false;
 

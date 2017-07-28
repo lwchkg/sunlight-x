@@ -6,7 +6,11 @@
 // @flow
 import * as util from "../util.js";
 
-import type { AnalyzerContext, Token } from "../util.js";
+import type {
+  AnalyzerContext,
+  FollowsOrPrecedesIdentRule,
+  Token
+} from "../util.js";
 
 export const primitives = [
   "int",
@@ -192,19 +196,16 @@ export const namedIdentRules = {
       return function(context: AnalyzerContext): boolean {
         // basically, can't be on the right hand side of an equals sign
         // so we traverse the tokens backward, and if we run into a "=" before a ";" or a "{", it's no good
-        const precedesIsSatisfied = (function(tokens: Token[]): boolean {
-          for (const precede of precedes)
-            if (
-              util.createProceduralRule(context.index + 1, 1, precede, false)(
-                tokens
-              )
+        if (
+          !precedes.some((precede: FollowsOrPrecedesIdentRule): boolean =>
+            util.IsPrecedesRuleSatisfied(
+              context.getTokenWalker(),
+              precede,
+              false
             )
-              return true;
-
+          )
+        )
           return false;
-        })(context.tokens);
-
-        if (!precedesIsSatisfied) return false;
 
         // make sure we're not on the left side of the equals sign
         const walker = context.getTokenWalker();
@@ -243,19 +244,16 @@ export const namedIdentRules = {
       ];
 
       return function(context: AnalyzerContext): boolean {
-        const precedesIsSatisfied = (function(tokens: Token[]): boolean {
-          for (const precede of precedes)
-            if (
-              util.createProceduralRule(context.index + 1, 1, precede, false)(
-                tokens
-              )
+        if (
+          !precedes.some((precede: FollowsOrPrecedesIdentRule): boolean =>
+            util.IsPrecedesRuleSatisfied(
+              context.getTokenWalker(),
+              precede,
+              false
             )
-              return true;
-
+          )
+        )
           return false;
-        })(context.tokens);
-
-        if (!precedesIsSatisfied) return false;
 
         // make sure the previous tokens are "(" and then not a keyword
         // this'll make sure that things like "if (foo) doSomething();" won't color "foo"

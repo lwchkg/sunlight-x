@@ -129,5 +129,11 @@ describe("Batch file (DOS) tests", function() {
     it("label label1", function() {
       testSupport.AssertContentExists("label", "label1");
     });
+    it("label prefixed with :", function() {
+      testSupport.AssertContentExists("label", "label3");
+    });
+    it("label after goto", function() {
+      testSupport.AssertContentExists("label", "label2");
+    });
   });
 });
