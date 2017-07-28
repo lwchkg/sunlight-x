@@ -6,11 +6,7 @@
 // @flow
 import * as util from "../util.js";
 
-import type {
-  AnalyzerContext,
-  FollowsOrPrecedesIdentRule,
-  Token
-} from "../util.js";
+import type { AnalyzerContext, FollowsOrPrecedesIdentRule } from "../util.js";
 
 export const primitives = [
   "int",
