@@ -395,7 +395,13 @@ export function getComputedStyle(element: Element, style: string): string {
   return func(element)[style];
 }
 
-// Export types for language support
 export { Token } from "./token.js";
+export {
+  IsPrecedesRuleSatisfied,
+  IsFollowsRuleSatisfied,
+  IsBetweenRuleSatisfied
+} from "./rules-processor.js";
+
+// Export types for language support
 export type { HashMapType, ParserContext };
 export type { AnalyzerContext } from "./analyzer-context.js";
