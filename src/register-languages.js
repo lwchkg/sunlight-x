@@ -11,6 +11,7 @@ import * as asm6502 from "./languages/6502asm.js";
 import * as bash from "./languages/bash.js";
 import * as batch from "./languages/batch.js";
 import * as brainfuck from "./languages/brainfuck.js";
+import * as cpp from "./languages/cpp.js";
 import * as csharp from "./languages/csharp.js";
 import * as css from "./languages/css.js";
 import * as javascript from "./languages/javascript.js";
@@ -25,6 +26,7 @@ const languages = [
   bash,
   batch,
   brainfuck,
+  cpp,
   csharp,
   css,
   javascript,

@@ -34,6 +34,7 @@ function getHighlightLanguage(filename: string): string {
     ".as": "actionscript",
     ".bat": "batch",
     ".bf": "brainfuck",
+    ".cpp": "cpp",
     ".cs": "csharp",
     ".css": "css",
     ".js": "javascript",
