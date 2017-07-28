@@ -3,11 +3,11 @@
 import { isIe } from "./constants.js";
 
 export class Token {
-  name: string;
-  value: string;
-  line: number;
-  column: number;
-  language: string;
+  +name: string;
+  +value: string;
+  +line: number;
+  +column: number;
+  +language: string;
 
   constructor(
     name: string,
@@ -16,10 +16,16 @@ export class Token {
     column: number,
     language: string
   ) {
+    // TODO: Update after Flow issue #4479 is fixed.
+    // $FlowFixMe
     this.name = name;
+    // $FlowFixMe
     this.value = isIe ? value.replace(/\n/g, "\r") : value;
+    // $FlowFixMe
     this.line = line;
+    // $FlowFixMe
     this.column = column;
+    // $FlowFixMe
     this.language = language;
   }
 }

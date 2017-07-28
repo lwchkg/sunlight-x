@@ -4,10 +4,11 @@
 // be found in the LICENSE file.
 
 // @flow
+import { Token } from "../util.js";
 import * as util from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
 
-import type { AnalyzerContext, ParserContext, Token } from "../util.js";
+import type { AnalyzerContext, ParserContext } from "../util.js";
 
 /* eslint no-magic-numbers: 1 */
 export const name = "vb";
@@ -239,7 +240,13 @@ export const customParseRules = [
         ((prevToken.name === "operator" && prevToken.value === ".") ||
           (prevToken.name === "keyword" && prevToken.value === "Sub"))
       )
-        token.name = "ident";
+        return new Token(
+          "ident",
+          token.value,
+          token.line,
+          token.column,
+          token.language
+        );
 
       return token;
     };

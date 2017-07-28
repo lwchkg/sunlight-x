@@ -397,5 +397,6 @@ export function getComputedStyle(element: Element, style: string): string {
 }
 
 // Export types for language support
-export type { HashMapType, ParserContext, Token };
+export { Token } from "./token.js";
+export type { HashMapType, ParserContext };
 export type { AnalyzerContext } from "./analyzer-context.js";
