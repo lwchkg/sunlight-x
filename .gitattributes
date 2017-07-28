@@ -1,0 +1,5 @@
+# Test expectations. Needs diff, but no language statistics.
+test/output/* linguist-documentation
+
+# Test code snippets. Needs diff, but no language statistics.
+test/code-snippets/* linguist-documentation
