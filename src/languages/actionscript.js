@@ -4,9 +4,10 @@
 // be found in the LICENSE file.
 
 // @flow
+import { Token } from "../util.js";
 import * as util from "../util.js";
 
-import type { AnalyzerContext, ParserContext, Token } from "../util.js";
+import type { AnalyzerContext, ParserContext } from "../util.js";
 
 /* eslint no-magic-numbers: 1 */
 export const name = "actionscript";
@@ -184,10 +185,16 @@ export const customParseRules = [
       while ((peek = context.reader.peek(count)) && peek.length === count)
         if (!/\s$/.test(peek)) {
           if (peek.charAt(count - 1) === "(") {
-            token.line = context.reader.getLine();
-            token.column = context.reader.getColumn();
+            const line = context.reader.getLine();
+            const column = context.reader.getColumn();
             context.reader.read(token.value.length - 1);
-            return token;
+            return new Token(
+              token.name,
+              token.value,
+              line,
+              column,
+              token.language
+            );
           }
           break;
         }
