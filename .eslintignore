@@ -1,0 +1,5 @@
+babel-out/*
+node_modules/*
+flow-typed/*
+
+test/code-snippets/*
