@@ -7,6 +7,16 @@ Sunlight highlighter modernized for node.js.
 While the highlighter can be run, it is still a WIP.
 
 
+# Features
+
+- Relatively accurate highlighting for some languages.
+  This is mainly done with a context-aware highlighting facility (at the expense of more complex language modules).
+  In particular, "named identifiers" are supported in addition to normal identifiers.
+- Use multiple themes at the same time.
+- Line numbering.
+- Line highlighting.
+
+
 # Usage
 
 The API of the highlighter is still evolving.
@@ -28,12 +38,25 @@ If you want badly to generate HTML snippets, see `test/integration.js` for examp
 
 - Add all languages and plugins
 - Reorganize API
-- Add API for theme selection
-- Add more tests
+  - Sunlight.\*
+  - Sunlight.Highlighter.\*
+  - Add API for theme selection
+  - Add API for getting the path and/or content of CSS files (and LESS files?).
+- Add more tests.
 - Webpack for browsers
 - Clarify owners of code snippets (some unknown code are used now).
-  - Brainfuck: http://bf.doleczek.pl (license unknown) - any known free alternatives?
-  - Others: no other owners found yet
+  - Others are listed in the code snippets folder.
+- Refactors.
+- Modernize the languages being highlighted.
+- Rewrite number parsers.
+
+
+# How to contribute
+
+- Start an issue, and write down your ideas there.
+- Give ideas on the API.
+- Add tests, contribute test snippets.
+
 
 # Copyright
 
@@ -43,5 +66,5 @@ Use of the software by a Apache License Version 2.0, that can be found in the LI
 
 # Credits
 
-This software is forked from [Sunlight](http://sunlightjs.com/), by Tommy Montgomery.
+This software is forked from [Sunlight](http://sunlightjs.com/), authored by Tommy Montgomery.
 The original Sunlight is licensed by the [WTFPL](http://www.wtfpl.net/about/) (warning: foul language inside).
