@@ -9,7 +9,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 let testSupport: TestSupport;
 describe("CSharp tests", function() {
   describe("file #1", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("csharp1.cs", "csharp");
     });
     it("using keyword", function() {
@@ -356,7 +356,7 @@ describe("CSharp tests", function() {
   });
 
   describe("file #2", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("csharp2.cs", "csharp");
     });
     // undefined token when ident is the first token
@@ -369,7 +369,7 @@ describe("CSharp tests", function() {
   });
 
   describe("file #3", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("csharp3.cs", "csharp");
     });
     // when attribute is first token

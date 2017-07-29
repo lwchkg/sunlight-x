@@ -10,11 +10,8 @@
     ]
   ],
   "env": {
-    "development": {
-      "presets": [
-        "babel-preset-power-assert",
-        "jsdoc-to-assert"
-      ],
+    "test": {
+      "presets": [],
     }
   }
 }

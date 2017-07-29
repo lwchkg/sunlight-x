@@ -8,7 +8,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 
 describe("XML cross-language tests", function() {
   let testSupport: TestSupport;
-  before(function() {
+  beforeAll(function() {
     testSupport = new TestSupport("xml-multilang.xml", "xml");
   });
   it("doctype", function() {

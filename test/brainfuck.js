@@ -8,7 +8,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 
 describe("Brainfuck tests", function() {
   let testSupport: TestSupport;
-  before(function() {
+  beforeAll(function() {
     testSupport = new TestSupport("brainfuck.bf", "brainfuck");
   });
 

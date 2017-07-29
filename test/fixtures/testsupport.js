@@ -4,7 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-import * as assert from "assert";
 import * as fs from "fs";
 import { jsdom } from "jsdom";
 import * as path from "path";
@@ -109,9 +108,6 @@ export class TestSupport {
 
     content = content.replace(/ /g, nbsp).replace(/\t/g, nbsp.repeat(4));
 
-    assert(
-      nodeValues.indexOf(content) >= 0,
-      `Cannot find \`${content}\` in \`${className}\`.`
-    );
+    expect(nodeValues).toContain(content);
   }
 }

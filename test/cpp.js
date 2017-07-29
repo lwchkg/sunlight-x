@@ -8,7 +8,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 
 describe("C++ tests", function() {
   let testSupport: TestSupport;
-  before(function() {
+  beforeAll(function() {
     testSupport = new TestSupport("cpp.cpp", "cpp");
   });
   it("preprocessor", function() {

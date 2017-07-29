@@ -8,7 +8,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 
 describe("Diff tests", function() {
   let testSupport: TestSupport;
-  before(function() {
+  beforeAll(function() {
     testSupport = new TestSupport("diff.diff", "diff");
   });
   it("Index: merge header", function() {

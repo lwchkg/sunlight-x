@@ -9,7 +9,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 let testSupport: TestSupport;
 describe("VB tests", function() {
   describe("File #1", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("vb1.vb", "vb");
     });
     it("'comment", function() {
@@ -214,7 +214,7 @@ describe("VB tests", function() {
   });
 
   describe("File #2 (VB2017 number literals)", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("vb2.vb", "vb");
     });
     it("number 12_34_5%", function() {
