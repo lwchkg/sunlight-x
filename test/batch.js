@@ -7,7 +7,7 @@
 import { TestSupport } from "./fixtures/testsupport.js";
 
 describe("Batch file (DOS) tests", function() {
-  describe("File #1", function() {
+  describe("file #1", function() {
     let testSupport: TestSupport;
     before(function() {
       testSupport = new TestSupport("batch1.bat", "batch");
@@ -121,7 +121,7 @@ describe("Batch file (DOS) tests", function() {
       );
     });
   });
-  describe("File #2", function() {
+  describe("file #2", function() {
     let testSupport: TestSupport;
     before(function() {
       testSupport = new TestSupport("batch2.bat", "batch");

@@ -15,6 +15,7 @@ import * as cpp from "./languages/cpp.js";
 import * as csharp from "./languages/csharp.js";
 import * as css from "./languages/css.js";
 import * as diff from "./languages/diff.js";
+import * as erlang from "./languages/erlang.js";
 import * as javascript from "./languages/javascript.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
@@ -31,6 +32,7 @@ const languages = [
   csharp,
   css,
   diff,
+  erlang,
   javascript,
   php,
   plaintext,

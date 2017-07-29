@@ -20,7 +20,7 @@ export type ScopeType = [
   string[],
   boolean
 ];
-export type ContextItemsType = { [string]: mixed };
+export type ContextItemsType = { [string]: mixed | mixed[] };
 
 export type EmbeddedLanguageDefinitionPrecompiled = {|
   switchTo: ParserContext => boolean,
