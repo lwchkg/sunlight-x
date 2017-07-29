@@ -9,7 +9,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 describe("Batch file (DOS) tests", function() {
   describe("file #1", function() {
     let testSupport: TestSupport;
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("batch1.bat", "batch");
     });
     it("echo keyword", function() {
@@ -123,7 +123,7 @@ describe("Batch file (DOS) tests", function() {
   });
   describe("file #2", function() {
     let testSupport: TestSupport;
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("batch2.bat", "batch");
     });
     it("label label1", function() {

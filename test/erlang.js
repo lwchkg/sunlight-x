@@ -9,7 +9,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 describe("Erlang tests", function() {
   let testSupport: TestSupport;
   describe("file #1", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("erlang1.erl", "erlang");
     });
     it("-module module attribute", function() {
@@ -115,7 +115,7 @@ describe("Erlang tests", function() {
   });
 
   describe("file #2", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("erlang2.erl", "erlang");
     });
   });

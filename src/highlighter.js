@@ -279,4 +279,9 @@ export class Highlighter {
       });
     }
   }
+
+  // Reset HIGHLIGHTED_NODE_COUNT to zero. Run this before a layout test.
+  static resetNodeCount() {
+    HIGHLIGHTED_NODE_COUNT = 0;
+  }
 }

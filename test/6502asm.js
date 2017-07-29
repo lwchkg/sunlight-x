@@ -8,7 +8,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 
 describe("6502 ASM tests", function() {
   let testSupport: TestSupport;
-  before(function() {
+  beforeAll(function() {
     testSupport = new TestSupport("6502asm.6502asm", "6502asm");
   });
   it("label at beginning of line", function() {

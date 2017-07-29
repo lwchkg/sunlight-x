@@ -8,7 +8,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 
 let testSupport: TestSupport;
 describe("Javascript tests", function() {
-  before(function() {
+  beforeAll(function() {
     testSupport = new TestSupport("javascript.js", "javascript");
   });
   it("function keyword", function() {

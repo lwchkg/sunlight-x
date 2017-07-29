@@ -10,9 +10,6 @@
     "babel-eslint": "^7.2.3",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
-    "babel-preset-jsdoc-to-assert": "^4.0.0",
-    "babel-preset-power-assert": "^1.0.0",
-    "babel-register": "^6.24.1",
     "cross-env": "^5.0.1",
     "eslint": "^4.2.0",
     "eslint-config-prettier": "^2.3.0",
@@ -22,13 +19,21 @@
     "flow-typed": "^2.1.5",
     "jest": "^20.0.4",
     "less": "^2.7.2",
-    "mocha": "^3.4.2",
-    "power-assert": "^1.4.4",
     "prettier": "^1.5.3"
   },
   "dependencies": {
     "jsdom": "^9.12.0",
     "winston": "^2.3.1"
+  },
+  "jest": {
+    "testMatch": [
+      "**/test/**/*.js?(x)"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/fixtures/",
+      "/code-snippets/"
+    ]
   },
   "scripts": {
     "babel": "babel",
@@ -43,11 +48,11 @@
     "flow": "flow",
     "flow-typed": "flow-typed",
     "flow-typed-install": "flow-typed install",
+    "jest": "jest",
     "lessc": "lessc",
     "lint": "yarn run flow-typed-install && yarn run eslint-run",
-    "mocha": "mocha",
     "prepare": "yarn run compile",
     "test": "yarn run lint && yarn run testOnly",
-    "testOnly": "yarn run mocha"
+    "testOnly": "yarn run jest"
   }
 }

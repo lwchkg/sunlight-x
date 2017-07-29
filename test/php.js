@@ -9,7 +9,7 @@ import { TestSupport } from "./fixtures/testsupport.js";
 describe("PHP tests", function() {
   let testSupport: TestSupport;
   describe("file #1", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("php1.php", "php");
     });
     it("open tag", function() {
@@ -218,7 +218,7 @@ describe("PHP tests", function() {
   });
 
   describe("file #2", function() {
-    before(function() {
+    beforeAll(function() {
       testSupport = new TestSupport("php2.php", "php");
     });
     it("unclosed heredoc", function() {
