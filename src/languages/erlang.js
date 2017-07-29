@@ -90,22 +90,22 @@ export const customParseRules = [
         // the next thing is a bunch of whitespace followed by ->, or fail
         while ((peek = context.reader.peek(++count)) && peek.length === count)
           if (!/\s$/.test(peek)) {
-            if (/->$/.test(context.reader.peek(count + 1)))
-              if (!Array.isArray(context.items.userDefinedFunctions)) {
+            if (/->$/.test(context.reader.peek(count + 1))) {
+              // function declaration
+              if (!Array.isArray(context.items.userDefinedFunctions))
                 logger.errorInvalidValue(
                   `userDefinedFunctions is not an array.`,
-                  context.items.scalaBracketNestingLevel
+                  context.items.userDefinedFunctions
                 );
-              } else {
-                // function declaration
-                context.items.userDefinedFunctions.push(ident);
-                return context.createToken(
-                  "userDefinedFunction",
-                  ident,
-                  line,
-                  column
-                );
-              }
+              else context.items.userDefinedFunctions.push(ident);
+
+              return context.createToken(
+                "userDefinedFunction",
+                ident,
+                line,
+                column
+              );
+            }
 
             break;
           }
@@ -165,7 +165,7 @@ export const namedIdentRules = {
       if (!Array.isArray(context.items.userDefinedFunctions)) {
         logger.errorInvalidValue(
           `userDefinedFunctions is not an array.`,
-          context.items.scalaBracketNestingLevel
+          context.items.userDefinedFunctions
         );
         return false;
       }
