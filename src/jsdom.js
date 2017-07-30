@@ -6,7 +6,7 @@
 // @flow
 import { jsdom } from "jsdom";
 export { jsdom };
-export const document: Document = jsdom("", {});
+export const document = jsdom("", {});
 
 const defaultView = document.defaultView;
 
