@@ -46,7 +46,7 @@ class EventClass<T> {
   }
 }
 
-// TODO: reformat after prettify recognize flow
+// TODO: reformat after prettier recognize flow
 type BeforeHighlightNodeEventType = EventClass<BeforeHighlightNodeEventArgs>;
 export const BeforeHighlightNodeEvent: BeforeHighlightNodeEventType = new EventClass();
 
