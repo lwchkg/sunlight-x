@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("6502 ASM tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("6502asm.6502asm", "6502asm");
+    testSupport = new TestSupportForFile("6502asm.6502asm", "6502asm");
   });
   it("label at beginning of line", function() {
     testSupport.AssertContentExists("label", "MainKernel");

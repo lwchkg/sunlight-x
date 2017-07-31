@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("Bash tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("bash.sh", "bash");
+    testSupport = new TestSupportForFile("bash.sh", "bash");
   });
   it("hashbang", function() {
     testSupport.AssertContentExists("hashBang", "#!/bin/bash");

@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("Diff tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("diff.diff", "diff");
+    testSupport = new TestSupportForFile("diff.diff", "diff");
   });
   it("Index: merge header", function() {
     testSupport.AssertContentExists("mergeHeader", "Index: path/to/file.cpp");

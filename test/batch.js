@@ -4,13 +4,13 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("Batch file (DOS) tests", function() {
   describe("file #1", function() {
-    let testSupport: TestSupport;
+    let testSupport: TestSupportForFile;
     beforeAll(function() {
-      testSupport = new TestSupport("batch1.bat", "batch");
+      testSupport = new TestSupportForFile("batch1.bat", "batch");
     });
     it("echo keyword", function() {
       testSupport.AssertContentExists("keyword", "echo");
@@ -122,9 +122,9 @@ describe("Batch file (DOS) tests", function() {
     });
   });
   describe("file #2", function() {
-    let testSupport: TestSupport;
+    let testSupport: TestSupportForFile;
     beforeAll(function() {
-      testSupport = new TestSupport("batch2.bat", "batch");
+      testSupport = new TestSupportForFile("batch2.bat", "batch");
     });
     it("label label1", function() {
       testSupport.AssertContentExists("label", "label1");

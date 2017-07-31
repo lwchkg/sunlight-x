@@ -20,9 +20,9 @@ const defaultOptions = {
 
 export const nbsp = "\u00a0";
 
-export class TestSupport {
+export class TestSupportForCode {
   /**
-   * @param {string} filename Name of the file that contains the code to be highlighted.
+   * @param {string} code
    * @param {string} language
    * @param {Object|undefined} options
    */
@@ -31,17 +31,12 @@ export class TestSupport {
   codeElement: Element;
 
   constructor(
-    filename: string,
+    code: string,
     language: string,
     options?: SunlightPartialOptionsType
   ) {
     this.options = Object.assign({}, defaultOptions, options);
     this.classPrefix = this.options.classPrefix || "sunlight-";
-
-    const code = fs.readFileSync(
-      path.join(__dirname, "..", "code-snippets", filename),
-      "utf8"
-    );
 
     const document: Document = jsdom("", {});
     const preElement = document.createElement("pre");
@@ -109,5 +104,25 @@ export class TestSupport {
     content = content.replace(/ /g, nbsp).replace(/\t/g, nbsp.repeat(4));
 
     expect(nodeValues).toContain(content);
+  }
+}
+
+export class TestSupportForFile extends TestSupportForCode {
+  /**
+   * @param {string} filename Name of the file that contains the code to be highlighted.
+   * @param {string} language
+   * @param {Object|undefined} options
+   */
+  constructor(
+    filename: string,
+    language: string,
+    options?: SunlightPartialOptionsType
+  ) {
+    const code = fs.readFileSync(
+      path.join(__dirname, "..", "code-snippets", filename),
+      "utf8"
+    );
+
+    super(code, language, options);
   }
 }

@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
-let testSupport: TestSupport;
+let testSupport: TestSupportForFile;
 describe("Javascript tests", function() {
   beforeAll(function() {
-    testSupport = new TestSupport("javascript.js", "javascript");
+    testSupport = new TestSupportForFile("javascript.js", "javascript");
   });
   it("function keyword", function() {
     testSupport.AssertContentExists("keyword", "function");

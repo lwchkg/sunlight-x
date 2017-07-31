@@ -4,13 +4,13 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
-let testSupport: TestSupport;
+let testSupport: TestSupportForFile;
 describe("VB tests", function() {
   describe("File #1", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("vb1.vb", "vb");
+      testSupport = new TestSupportForFile("vb1.vb", "vb");
     });
     it("'comment", function() {
       testSupport.AssertContentExists("comment", "'comment");
@@ -215,7 +215,7 @@ describe("VB tests", function() {
 
   describe("File #2 (VB2017 number literals)", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("vb2.vb", "vb");
+      testSupport = new TestSupportForFile("vb2.vb", "vb");
     });
     it("number 12_34_5%", function() {
       testSupport.AssertContentExists("number", "12_34_5%");

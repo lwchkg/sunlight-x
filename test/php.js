@@ -4,13 +4,13 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("PHP tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   describe("file #1", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("php1.php", "php");
+      testSupport = new TestSupportForFile("php1.php", "php");
     });
     it("open tag", function() {
       testSupport.AssertContentExists("openTag", "<?php");
@@ -219,7 +219,7 @@ describe("PHP tests", function() {
 
   describe("file #2", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("php2.php", "php");
+      testSupport = new TestSupportForFile("php2.php", "php");
     });
     it("unclosed heredoc", function() {
       testSupport.AssertContentExists(

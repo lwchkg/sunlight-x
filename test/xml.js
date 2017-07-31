@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("XML tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("xml.xml", "xml");
+    testSupport = new TestSupportForFile("xml.xml", "xml");
   });
   it("xml open tag", function() {
     testSupport.AssertContentExists("xmlOpenTag", "<?xml");

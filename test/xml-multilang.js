@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("XML cross-language tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("xml-multilang.xml", "xml");
+    testSupport = new TestSupportForFile("xml-multilang.xml", "xml");
   });
   it("doctype", function() {
     testSupport.AssertContentExists("doctype", "<!doctype html>");

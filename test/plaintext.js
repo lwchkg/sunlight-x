@@ -8,7 +8,7 @@ import assert from "assert";
 const fs = require("fs");
 const path = require("path");
 import { TEXT_NODE } from "../src/constants.js";
-import { nbsp, TestSupport } from "./fixtures/testsupport.js";
+import { nbsp, TestSupportForFile } from "./fixtures/testsupport.js";
 
 describe("Plaintext tests", function() {
   const tests = [
@@ -25,7 +25,7 @@ describe("Plaintext tests", function() {
   tests.forEach(function(test: { name: string, language: string }) {
     it(test.name, function() {
       const snippetFileName = "plaintext.txt";
-      const testSupport = new TestSupport(snippetFileName, test.language);
+      const testSupport = new TestSupportForFile(snippetFileName, test.language);
 
       const expected = fs
         .readFileSync(
