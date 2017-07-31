@@ -25,7 +25,10 @@ describe("Plaintext tests", function() {
   tests.forEach(function(test: { name: string, language: string }) {
     it(test.name, function() {
       const snippetFileName = "plaintext.txt";
-      const testSupport = new TestSupportForFile(snippetFileName, test.language);
+      const testSupport = new TestSupportForFile(
+        snippetFileName,
+        test.language
+      );
 
       const expected = fs
         .readFileSync(

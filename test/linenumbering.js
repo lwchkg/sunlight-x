@@ -30,7 +30,11 @@ function checkLineNumbers(
 describe("Line numbering plugin", function() {
   it("adds line numbering which starts from 1 as default", function() {
     const options = { lineNumbers: true };
-    const testSupport = new TestSupportForFile("javascript.js", "javascript", options);
+    const testSupport = new TestSupportForFile(
+      "javascript.js",
+      "javascript",
+      options
+    );
     assert.strictEqual(
       true,
       testSupport.DoesElementsWithClassNameExist("line-number-margin")
@@ -41,7 +45,11 @@ describe("Line numbering plugin", function() {
 
   it("does not add line numbering if lineNumbers is set to false", function() {
     const options = { lineNumbers: false };
-    const testSupport = new TestSupportForFile("javascript.js", "javascript", options);
+    const testSupport = new TestSupportForFile(
+      "javascript.js",
+      "javascript",
+      options
+    );
     assert.strictEqual(
       false,
       testSupport.DoesElementsWithClassNameExist("line-number-margin")
@@ -51,7 +59,11 @@ describe("Line numbering plugin", function() {
   it("adds line numbering which starts the specified line number", function() {
     const lineNumberStart = 100;
     const options = { lineNumbers: true, lineNumberStart: lineNumberStart };
-    const testSupport = new TestSupportForFile("javascript.js", "javascript", options);
+    const testSupport = new TestSupportForFile(
+      "javascript.js",
+      "javascript",
+      options
+    );
     assert.strictEqual(
       true,
       testSupport.DoesElementsWithClassNameExist("line-number-margin")

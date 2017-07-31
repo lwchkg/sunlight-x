@@ -117,7 +117,11 @@ describe("HTML files generation test", function() {
       const language = getHighlightLanguage(snippetFilename);
       if (language === "") continue;
 
-      const testSupport = new TestSupportForFile(snippetFilename, language, options);
+      const testSupport = new TestSupportForFile(
+        snippetFilename,
+        language,
+        options
+      );
       allResults.push({
         filename: snippetFilename,
         highlightedCode: testSupport.codeElement.innerHTML
