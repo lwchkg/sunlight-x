@@ -4,13 +4,13 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "../fixtures/testsupport.js";
 
-let testSupport: TestSupport;
+let testSupport: TestSupportForFile;
 describe("CSharp tests", function() {
   describe("file #1", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("csharp1.cs", "csharp");
+      testSupport = new TestSupportForFile("csharp1.cs", "csharp");
     });
     it("using keyword", function() {
       testSupport.AssertContentExists("keyword", "using");
@@ -357,7 +357,7 @@ describe("CSharp tests", function() {
 
   describe("file #2", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("csharp2.cs", "csharp");
+      testSupport = new TestSupportForFile("csharp2.cs", "csharp");
     });
     // undefined token when ident is the first token
     it("undefined token fix", function() {
@@ -370,7 +370,7 @@ describe("CSharp tests", function() {
 
   describe("file #3", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("csharp3.cs", "csharp");
+      testSupport = new TestSupportForFile("csharp3.cs", "csharp");
     });
     // when attribute is first token
     it("attribute as first token", function() {

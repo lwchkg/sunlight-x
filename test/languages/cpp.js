@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "../fixtures/testsupport.js";
 
 describe("C++ tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("cpp.cpp", "cpp");
+    testSupport = new TestSupportForFile("cpp.cpp", "cpp");
   });
   it("preprocessor", function() {
     testSupport.AssertContentExists(

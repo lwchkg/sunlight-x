@@ -4,13 +4,13 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "../fixtures/testsupport.js";
 
 describe("Erlang tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   describe("file #1", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("erlang1.erl", "erlang");
+      testSupport = new TestSupportForFile("erlang1.erl", "erlang");
     });
     it("-module module attribute", function() {
       testSupport.AssertContentExists("moduleAttribute", "-module");
@@ -116,7 +116,7 @@ describe("Erlang tests", function() {
 
   describe("file #2", function() {
     beforeAll(function() {
-      testSupport = new TestSupport("erlang2.erl", "erlang");
+      testSupport = new TestSupportForFile("erlang2.erl", "erlang");
     });
   });
 });

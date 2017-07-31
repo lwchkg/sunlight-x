@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "../fixtures/testsupport.js";
 
 describe("CSS tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("css.css", "css");
+    testSupport = new TestSupportForFile("css.css", "css");
   });
   it("css rule declaration", function() {
     testSupport.AssertContentExists("rule", "@import");

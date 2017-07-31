@@ -4,12 +4,12 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupport } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "../fixtures/testsupport.js";
 
 describe("Brainfuck tests", function() {
-  let testSupport: TestSupport;
+  let testSupport: TestSupportForFile;
   beforeAll(function() {
-    testSupport = new TestSupport("brainfuck.bf", "brainfuck");
+    testSupport = new TestSupportForFile("brainfuck.bf", "brainfuck");
   });
 
   it("increment", function() {
