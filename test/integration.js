@@ -42,6 +42,7 @@ function getHighlightLanguage(filename: string): string {
     ".erl": "erlang",
     ".hs": "haskell",
     ".httpdconf": "http",
+    ".java": "java",
     ".js": "javascript",
     ".php": "php",
     ".sh": "bash",

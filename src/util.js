@@ -405,3 +405,4 @@ export {
 // Export types for language support
 export type { FollowsOrPrecedesIdentRule, HashMapType, ParserContext };
 export type { AnalyzerContext } from "./analyzer-context.js";
+export type { BetweenIdentRule } from "./languages.js";
