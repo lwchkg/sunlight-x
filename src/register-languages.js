@@ -18,6 +18,7 @@ import * as diff from "./languages/diff.js";
 import * as erlang from "./languages/erlang.js";
 import * as haskell from "./languages/haskell.js";
 import * as httpd from "./languages/httpd.js";
+import * as java from "./languages/java.js";
 import * as javascript from "./languages/javascript.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
@@ -37,6 +38,7 @@ const languages = [
   erlang,
   haskell,
   httpd,
+  java,
   javascript,
   php,
   plaintext,
