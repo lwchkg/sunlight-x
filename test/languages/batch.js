@@ -4,7 +4,7 @@
 // be found in the LICENSE file.
 
 // @flow
-import { TestSupportForFile } from "./fixtures/testsupport.js";
+import { TestSupportForFile } from "../fixtures/testsupport.js";
 
 describe("Batch file (DOS) tests", function() {
   describe("file #1", function() {

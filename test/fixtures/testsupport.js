@@ -107,6 +107,18 @@ export class TestSupportForCode {
   }
 }
 
+/**
+ * Returns the content of the file in "code-snippets" directory.
+ * @param {string} filename
+ * @returns {string}
+ */
+export function GetContentOfSnippet(filename: string): string {
+  return fs.readFileSync(
+    path.join(__dirname, "..", "code-snippets", filename),
+    "utf8"
+  );
+}
+
 export class TestSupportForFile extends TestSupportForCode {
   /**
    * @param {string} filename Name of the file that contains the code to be highlighted.
@@ -118,11 +130,6 @@ export class TestSupportForFile extends TestSupportForCode {
     language: string,
     options?: SunlightPartialOptionsType
   ) {
-    const code = fs.readFileSync(
-      path.join(__dirname, "..", "code-snippets", filename),
-      "utf8"
-    );
-
-    super(code, language, options);
+    super(GetContentOfSnippet(filename), language, options);
   }
 }

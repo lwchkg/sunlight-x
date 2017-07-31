@@ -5,10 +5,12 @@
 
 // @flow
 import assert from "assert";
-const fs = require("fs");
-const path = require("path");
-import { TEXT_NODE } from "../src/constants.js";
-import { nbsp, TestSupportForFile } from "./fixtures/testsupport.js";
+import { TEXT_NODE } from "../../src/constants.js";
+import {
+  nbsp,
+  GetContentOfSnippet,
+  TestSupportForFile
+} from "../fixtures/testsupport.js";
 
 describe("Plaintext tests", function() {
   const tests = [
@@ -30,11 +32,7 @@ describe("Plaintext tests", function() {
         test.language
       );
 
-      const expected = fs
-        .readFileSync(
-          path.join(__dirname, "code-snippets", snippetFileName),
-          "utf8"
-        )
+      const expected = GetContentOfSnippet(snippetFileName)
         .replace(/ /g, nbsp)
         .replace(/\t/g, nbsp.repeat(4));
 
