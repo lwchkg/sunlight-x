@@ -44,6 +44,7 @@ function getHighlightLanguage(filename: string): string {
     ".httpdconf": "http",
     ".java": "java",
     ".js": "javascript",
+    ".lisp": "lisp",
     ".php": "php",
     ".sh": "bash",
     ".txt": "plaintext",

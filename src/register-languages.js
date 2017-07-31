@@ -20,6 +20,7 @@ import * as haskell from "./languages/haskell.js";
 import * as httpd from "./languages/httpd.js";
 import * as java from "./languages/java.js";
 import * as javascript from "./languages/javascript.js";
+import * as lisp from "./languages/lisp.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
 import * as vb from "./languages/vb.js";
@@ -40,6 +41,7 @@ const languages = [
   httpd,
   java,
   javascript,
+  lisp,
   php,
   plaintext,
   vb,
