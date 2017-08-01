@@ -22,6 +22,7 @@ import * as java from "./languages/java.js";
 import * as javascript from "./languages/javascript.js";
 import * as lisp from "./languages/lisp.js";
 import * as lua from "./languages/lua.js";
+import * as mysql from "./languages/mysql.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
 import * as vb from "./languages/vb.js";
@@ -44,6 +45,7 @@ const languages = [
   javascript,
   lisp,
   lua,
+  mysql,
   php,
   plaintext,
   vb,

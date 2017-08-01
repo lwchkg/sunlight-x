@@ -48,6 +48,7 @@ function getHighlightLanguage(filename: string): string {
     ".lua": "lua",
     ".php": "php",
     ".sh": "bash",
+    ".sql": "mysql",
     ".txt": "plaintext",
     ".vb": "vb",
     ".xml": "xml"
