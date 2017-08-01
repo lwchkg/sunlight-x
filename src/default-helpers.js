@@ -53,7 +53,7 @@ export class defaultAnalyzer extends Analyzer {
       );
 
     if (isNamedIdent) Analyzer.defaultHandleToken("named-ident")(context);
-    else Analyzer.defaultHandleToken("ident")(context);
+    else super.handleToken(context);
 
     return true;
   }

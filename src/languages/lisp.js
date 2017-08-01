@@ -1247,24 +1247,11 @@ export const namedIdentRules = {
           prevToken.name === "macro" &&
           util.contains(defMacros, prevToken.value)
         ) {
-          if (!Array.isArray(context.items.userDefinedFunctions))
-            logger.errorInvalidValue(
-              `userDefinedFunctions is not an array.`,
-              context.items.userDefinedFunctions
-            );
-          else context.items.userDefinedFunctions.push(identValue);
-
+          context.userDefinedNameStore.addName(identValue, name);
           return true;
         }
 
-        if (!Array.isArray(context.items.userDefinedFunctions)) {
-          logger.errorInvalidValue(
-            `userDefinedFunctions is not an array.`,
-            context.items.userDefinedFunctions
-          );
-          return false;
-        }
-        return util.contains(context.items.userDefinedFunctions, identValue);
+        return context.userDefinedNameStore.hasName(identValue, name);
       };
     })()
   ]

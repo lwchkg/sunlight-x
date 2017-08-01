@@ -14,6 +14,7 @@ import { languages } from "./languages.js";
 import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
 import { errorInvalidValue } from "./logger.js";
+import { UserDefinedNameStore } from "./user-defined-name-store.js";
 
 import { document, window } from "./jsdom.js";
 
@@ -139,11 +140,14 @@ export class Highlighter {
     AfterAnalyzeEvent.raise(this, { analyzerContext: analyzerContext });
   }
 
-  // partialContext allows us to perform a partial parse, and then pick up where we left off at a later time
-  // this functionality enables nested highlights (language within a language, e.g. PHP within HTML followed by more PHP)
-  highlightText(
+  // partialContext allows us to perform a partial parse, and then pick up where
+  // we left off at a later time this functionality enables nested highlights
+  // (language within a language, e.g. PHP within HTML followed by more PHP)
+  // TODO: evaluate the need for partialContext to exist.
+  _highlightText(
     unhighlightedCode: string,
     languageId: string,
+    userDefinedNameStore: UserDefinedNameStore,
     partialContext: ?AnalyzerContext
   ): AnalyzerContext {
     let language = languages[languageId];
@@ -159,7 +163,15 @@ export class Highlighter {
     });
 
     const analyzerContext = new AnalyzerContext(
-      Tokenize(this, unhighlightedCode, language, partialContext, this.options),
+      Tokenize(
+        this,
+        unhighlightedCode,
+        language,
+        userDefinedNameStore,
+        partialContext,
+        this.options
+      ),
+      userDefinedNameStore,
       partialContext,
       this.options
     );
@@ -197,7 +209,12 @@ export class Highlighter {
 
   // highlights a block of text
   highlight(code: string, languageId: string): AnalyzerContext {
-    return this.highlightText(code, languageId);
+    return this._highlightText(
+      code,
+      languageId,
+      new UserDefinedNameStore(),
+      undefined
+    );
   }
 
   // recursively highlights a DOM node
@@ -210,13 +227,15 @@ export class Highlighter {
     BeforeHighlightNodeEvent.raise(this, { node: node });
 
     let currentNodeCount = 0;
+    const userDefinedNameStore = new UserDefinedNameStore();
     let partialContext: ?AnalyzerContext = undefined;
     for (const childNode of node.childNodes)
       if (childNode.nodeType === TEXT_NODE) {
         // text nodes
-        partialContext = this.highlightText(
+        partialContext = this._highlightText(
           childNode.nodeValue,
           languageId,
+          userDefinedNameStore,
           partialContext
         );
         HIGHLIGHTED_NODE_COUNT++;

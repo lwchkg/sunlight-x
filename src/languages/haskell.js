@@ -4,7 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-import * as logger from "../logger.js";
 import * as util from "../util.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
@@ -99,12 +98,7 @@ export const customParseRules = [
       prevToken.name === "keyword" &&
       util.contains(["class", "newtype", "data", "type"], prevToken.value)
     ) {
-      if (!Array.isArray(context.items.userDefinedFunctions))
-        logger.errorInvalidValue(
-          `userDefinedFunctions is not an array.`,
-          context.items.scalaBracketNestingLevel
-        );
-      else context.items.userDefinedFunctions.push(ident);
+      context.userDefinedNameStore.addName(ident, name);
 
       context.reader.read(ident.length - 1); // already read the first character
       return context.createToken("ident", ident, line, column);
@@ -118,12 +112,7 @@ export const customParseRules = [
           if (!/::$/.test(context.reader.peek(++count))) return null;
 
           // yay it's a function!
-          if (!Array.isArray(context.items.userDefinedFunctions))
-            logger.errorInvalidValue(
-              `userDefinedFunctions is not an array.`,
-              context.items.userDefinedFunctions
-            );
-          else context.items.userDefinedFunctions.push(ident);
+          context.userDefinedNameStore.addName(ident, name);
 
           context.reader.read(ident.length - 1); // already read the first character
           return context.createToken("ident", ident, line, column);
@@ -377,23 +366,12 @@ export const identAfterFirstLetter = /[\w']/;
 export const namedIdentRules = {
   custom: [
     function(context: AnalyzerContext): boolean {
-      if (!Array.isArray(context.items.userDefinedFunctions)) {
-        logger.errorInvalidValue(
-          `userDefinedFunctions is not an array.`,
-          context.items.userDefinedFunctions
-        );
-        return false;
-      }
-      return util.contains(
-        context.items.userDefinedFunctions,
-        context.tokens[context.index].value
+      return context.userDefinedNameStore.hasName(
+        context.tokens[context.index].value,
+        name
       );
     }
   ]
-};
-
-export const contextItems = {
-  userDefinedFunctions: []
 };
 
 export const operators = [

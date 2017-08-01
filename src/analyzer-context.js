@@ -2,6 +2,7 @@
 import { ArrayWalker } from "./array-walker.js";
 import { EOL } from "./constants.js";
 import { document } from "./jsdom.js";
+import { UserDefinedNameStore } from "./user-defined-name-store.js";
 
 import type { Analyzer } from "./analyzer.js";
 import type { Continuation } from "./continuation.js";
@@ -16,6 +17,7 @@ export class AnalyzerContext {
   tokens: Token[];
   language: Language; // Uninitizlized by constructor. Initialize before using!
   analyzerOverrides: Analyzer[];
+  userDefinedNameStore: UserDefinedNameStore;
   continuation: ?Continuation;
   items: ContextItemsType;
   index: number; // TODO: initialize. But what to initialize with?
@@ -25,10 +27,12 @@ export class AnalyzerContext {
 
   constructor(
     parserContext: ParserContext,
+    userDefinedNameStore: UserDefinedNameStore,
     partialContext: ?AnalyzerContext,
     options: SunlightOptionsType
   ) {
     this.nodes = [];
+    this.userDefinedNameStore = userDefinedNameStore;
     this.options = options;
 
     if (options.showWhitespace) {

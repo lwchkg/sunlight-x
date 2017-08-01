@@ -395,6 +395,7 @@ export function getComputedStyle(element: Element, style: string): string {
   return func(element)[style];
 }
 
+export { defaultAnalyzer } from "./default-helpers.js";
 export { Token } from "./token.js";
 export {
   IsPrecedesRuleSatisfied,

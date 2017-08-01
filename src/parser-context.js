@@ -9,6 +9,7 @@ import { CodeReader } from "./code-reader.js";
 import { BeforeTokenizeEvent, AfterTokenizeEvent } from "./events.js";
 import { Token } from "./token.js";
 import { parseNextToken } from "./parse-next-token.js";
+import { UserDefinedNameStore } from "./user-defined-name-store.js";
 import * as util from "./util.js";
 
 import type { AnalyzerContext } from "./analyzer-context.js";
@@ -28,6 +29,7 @@ export class ParserContext {
   reader: CodeReader;
   language: Language;
   items: ContextItemsType;
+  userDefinedNameStore: UserDefinedNameStore;
   embeddedLanguageStack: EmbeddedLanguageDefinition[];
   defaultData: { text: string, line: number, column: number };
   continuation: ?Continuation;
@@ -36,10 +38,12 @@ export class ParserContext {
     highlighter: Highlighter,
     unhighlightedCode: string,
     language: Language,
+    userDefinedNameStore: UserDefinedNameStore,
     partialContext: ?AnalyzerContext,
     options: SunlightOptionsType
   ) {
     this.highlighter = highlighter;
+    this.userDefinedNameStore = userDefinedNameStore;
     this.options = options;
     this.tokens = [];
 
@@ -149,6 +153,7 @@ export class ParserContext {
  * @param {Highlighter} highlighter
  * @param {string} unhighlightedCode
  * @param {Language} language
+ * @param {UserDefinedNameStore} userDefinedNameStore
  * @param {AnalyzerContext} partialContext
  * @param {SunlightOptionsType} options
  * @returns {ParserContext}
@@ -157,6 +162,7 @@ export function Tokenize(
   highlighter: Highlighter,
   unhighlightedCode: string,
   language: Language,
+  userDefinedNameStore: UserDefinedNameStore,
   partialContext: ?AnalyzerContext,
   options: SunlightOptionsType
 ): ParserContext {
@@ -164,6 +170,7 @@ export function Tokenize(
     highlighter,
     unhighlightedCode,
     language,
+    userDefinedNameStore,
     partialContext,
     options
   );
