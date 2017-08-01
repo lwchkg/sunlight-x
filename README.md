@@ -3,6 +3,9 @@
 [![Build Status](https://travis-ci.org/lwchkg/sunlight-x.svg?branch=master)](https://travis-ci.org/lwchkg/sunlight-x)
 [![Build status](https://ci.appveyor.com/api/projects/status/ilr6lbjngs8x5abg?svg=true)](https://ci.appveyor.com/project/lwchkg/sunlight-x)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d34cdc3875a94bafb62c822ba120b4cd)](https://www.codacy.com/app/lwchkg/sunlight-x?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lwchkg/sunlight-x&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d34cdc3875a94bafb62c822ba120b4cd)](https://www.codacy.com/app/lwchkg/sunlight-x?utm_source=github.com&utm_medium=referral&utm_content=lwchkg/sunlight-x&utm_campaign=Badge_Coverage)
+
 Sunlight highlighter modernized for node.js.
 While the highlighter can be run, it is still a WIP.
 
