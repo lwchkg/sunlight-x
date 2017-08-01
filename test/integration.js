@@ -46,6 +46,7 @@ function getHighlightLanguage(filename: string): string {
     ".js": "javascript",
     ".lisp": "lisp",
     ".lua": "lua",
+    ".nginxconf": "nginx",
     ".php": "php",
     ".sh": "bash",
     ".sql": "mysql",

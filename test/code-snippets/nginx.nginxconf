@@ -1,0 +1,119 @@
+#nginx test
+http {
+    error_page 502 503 504 /50x.html;
+    gzip on;
+    gzip_static on;
+    gzip_disable "MSIE [1-6]\.";
+    expires 24h;
+    index index.html;
+    
+    <!--# echo var="name" default="no" -->
+    
+    geo $geo  { # the variable created is $geo
+        default          0;
+        127.0.0.1/32     2;
+        192.168.1.0/24   1;
+        10.1.0.0/16      1;
+    }
+    
+    map $uri $new {
+        default        http://www.domain.com/home/;
+
+        /aa            http://aa.domain.com/;
+        /bb            http://bb.domain.com/;
+        /john          http://my.domain.com/users/john/;
+    }
+    
+    split-clients '${remote-addr}AAA' $variant {
+        0.5% .one;
+        2.0% .two;
+        - "";
+    }
+    
+    upstream backend {
+        server backend1.example.com weight=5;
+        server backend2.example.com:8080;
+        server unix:/tmp/backend3;
+    }
+    
+    location / {
+        error_page 404 = @fallback;
+        proxy_set_header X-Real-IP $remote_addr;
+        rewrite ^ /prefix/$secure_link break;
+    }
+     
+    location @fallback {
+        proxy_pass http://backend;
+        proxy_cache_path /data/nginx/cache/three levels=1:1:2 keys_zone=three:1000m;
+    }
+    
+    server {
+        listen [fe80::1];
+        listen  127.0.0.1 default accept_filter=dataready backlog=1024;
+        server_name example.com *.example.com www.example.*;
+        root /var/www;
+    }
+
+    server {
+        listen *:8000;
+        listen localhost:8000;
+        listen               443;
+        ssl                  on;
+        ssl_certificate      /usr/local/nginx/conf/cert.pem;
+        ssl_certificate_key  /usr/local/nginx/conf/cert.key;
+
+        server_name server_name www.example.com ~^(www\.)?(?P<domain>.+)$;
+        root  /sites/$domain;
+        
+        if ($slow) {
+            set $limit_rate 4k;
+        }
+        
+        location ^~ /images/ {
+            # matches any query beginning with /images/ and halts searching,
+            # so regular expressions will not be checked.
+        }
+        
+        location = / {
+            # matches the query / only.
+        }
+
+        location ~* \.(gif|jpg|jpeg)$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME /home/www/scripts/php$fastcgi_script_name;
+        }
+        
+        location /video {
+            aio on; 
+            directio 512; 
+            output_buffers 1 128k;
+            types {
+                text/html    html;
+                image/gif    gif;
+                image/jpeg   jpg;
+            }
+
+            default_type text/html;
+            echo "foo";
+            echo_after_body "after the body";
+        }
+        
+        location ~ ^/download/(.*)$ {
+            alias /home/website/files/$1;
+            internal;
+            limit_except GET {
+                allow  192.168.1.0/32;
+                deny   all;
+            }
+        }
+    }
+}
+
+mail {
+    imap_capabilities NAMESPACE SORT QUOTA;
+    listen 127.0.0.1:8000;
+    server {
+        server_name example.com www.example.com;
+    }
+}
+
