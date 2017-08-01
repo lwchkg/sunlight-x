@@ -166,10 +166,6 @@ export const namedIdentRules = {
   precedes: [[{ token: "operator", values: [":"] }]]
 };
 
-export const contextItems = {
-  userDefinedFunctions: []
-};
-
 export const operators = [
   "<-",
   "<",

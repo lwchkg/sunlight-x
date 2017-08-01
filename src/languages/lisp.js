@@ -4,7 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-import * as logger from "../logger.js";
 import * as util from "../util.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
@@ -1255,10 +1254,6 @@ export const namedIdentRules = {
       };
     })()
   ]
-};
-
-export const contextItems = {
-  userDefinedFunctions: []
 };
 
 export const operators = [
