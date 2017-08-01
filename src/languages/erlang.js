@@ -4,7 +4,6 @@
 // be found in the LICENSE file.
 
 // @flow
-import * as logger from "../logger.js";
 import * as util from "../util.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
@@ -92,12 +91,7 @@ export const customParseRules = [
           if (!/\s$/.test(peek)) {
             if (/->$/.test(context.reader.peek(count + 1))) {
               // function declaration
-              if (!Array.isArray(context.items.userDefinedFunctions))
-                logger.errorInvalidValue(
-                  `userDefinedFunctions is not an array.`,
-                  context.items.userDefinedFunctions
-                );
-              else context.items.userDefinedFunctions.push(ident);
+              context.userDefinedNameStore.addName(ident, name);
 
               return context.createToken(
                 "userDefinedFunction",
@@ -162,25 +156,14 @@ export const identAfterFirstLetter = /[\w@]/;
 export const namedIdentRules = {
   custom: [
     function(context: AnalyzerContext): boolean {
-      if (!Array.isArray(context.items.userDefinedFunctions)) {
-        logger.errorInvalidValue(
-          `userDefinedFunctions is not an array.`,
-          context.items.userDefinedFunctions
-        );
-        return false;
-      }
-      return util.contains(
-        context.items.userDefinedFunctions,
-        context.tokens[context.index].value
+      return context.userDefinedNameStore.hasName(
+        context.tokens[context.index].value,
+        name
       );
     }
   ],
 
   precedes: [[{ token: "operator", values: [":"] }]]
-};
-
-export const contextItems = {
-  userDefinedFunctions: []
 };
 
 export const operators = [
