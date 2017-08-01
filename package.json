@@ -55,7 +55,7 @@
     "flow-typed": "flow-typed",
     "flow-typed-install": "flow-typed install",
     "jest": "jest",
-    "jest-coverage": "jest --coverage",
+    "jest-coverage": "jest --coverage --maxWorkers=4",
     "lessc": "lessc",
     "lint": "yarn run flow-typed-install && yarn run eslint-run",
     "prepare": "yarn run compile",
