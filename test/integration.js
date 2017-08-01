@@ -45,6 +45,7 @@ function getHighlightLanguage(filename: string): string {
     ".java": "java",
     ".js": "javascript",
     ".lisp": "lisp",
+    ".lua": "lua",
     ".php": "php",
     ".sh": "bash",
     ".txt": "plaintext",
