@@ -426,25 +426,17 @@ export const namedIdentRules = {
         return false;
       }
 
-      // verify bracket count
-      if (bracketCount[0] !== bracketCount[1])
-        // mismatched generics, could be something scary
-        return false;
+      // verify bracket count, if mismatched, could be something scary
+      if (bracketCount[0] !== bracketCount[1]) return false;
 
       // next token should be optional whitespace followed by an ident
-      if (walker.hasNext()) {
-        token = walker.next();
-        if (!token || (token.name !== "default" && token.name !== "ident"))
-          return false;
-      }
-
+      if (!walker.hasNext()) return false;
+      token = walker.next();
       if (token.name === "default") {
         if (!walker.hasNext()) return false;
         token = walker.next();
-        if (token.name !== "ident") return false;
       }
-
-      return true;
+      return token.name === "ident";
     },
 
     // after class keyword but inside <>

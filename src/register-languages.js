@@ -24,6 +24,7 @@ import * as lisp from "./languages/lisp.js";
 import * as lua from "./languages/lua.js";
 import * as mysql from "./languages/mysql.js";
 import * as nginx from "./languages/nginx.js";
+import * as objectivec from "./languages/objective-c.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
 import * as vb from "./languages/vb.js";
@@ -48,6 +49,7 @@ const languages = [
   lua,
   mysql,
   nginx,
+  objectivec,
   php,
   plaintext,
   vb,
