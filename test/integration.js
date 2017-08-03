@@ -48,6 +48,7 @@ function getHighlightLanguage(filename: string): string {
     ".lua": "lua",
     ".mm": "objective-c",
     ".nginxconf": "nginx",
+    ".pl": "perl",
     ".php": "php",
     ".sh": "bash",
     ".sql": "mysql",
