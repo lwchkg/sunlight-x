@@ -25,6 +25,7 @@ import * as lua from "./languages/lua.js";
 import * as mysql from "./languages/mysql.js";
 import * as nginx from "./languages/nginx.js";
 import * as objectivec from "./languages/objective-c.js";
+import * as perl from "./languages/perl.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
 import * as vb from "./languages/vb.js";
@@ -50,6 +51,7 @@ const languages = [
   mysql,
   nginx,
   objectivec,
+  perl,
   php,
   plaintext,
   vb,
