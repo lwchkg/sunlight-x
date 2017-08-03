@@ -6820,7 +6820,7 @@ be&nbsp;parsed&nbsp;as&nbsp;anything&nbsp;or&nbsp;else&nbsp;this&nbsp;is&nbsp;no
 <span class="sunlight-variable">$readStream</span><span class="sunlight-operator">.</span><span class="sunlight-ident">Close</span><span class="sunlight-punctuation">(</span><span class="sunlight-punctuation">)</span>
 <span class="sunlight-variable">$response</span><span class="sunlight-operator">.</span><span class="sunlight-ident">Close</span><span class="sunlight-punctuation">(</span><span class="sunlight-punctuation">)</span>
 </span></pre></div></div>
-<h2>vb1.vb</h2>
+<h2>python.py</h2>
 <div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-31-line-1" href="#sunlight-31-line-1">1</a>
 <a name="sunlight-31-line-2" href="#sunlight-31-line-2">2</a>
 <a name="sunlight-31-line-3" href="#sunlight-31-line-3">3</a>
@@ -6946,27 +6946,279 @@ be&nbsp;parsed&nbsp;as&nbsp;anything&nbsp;or&nbsp;else&nbsp;this&nbsp;is&nbsp;no
 <a name="sunlight-31-line-123" href="#sunlight-31-line-123">123</a>
 <a name="sunlight-31-line-124" href="#sunlight-31-line-124">124</a>
 <a name="sunlight-31-line-125" href="#sunlight-31-line-125">125</a>
-<a name="sunlight-31-line-126" href="#sunlight-31-line-126">126</a>
-<a name="sunlight-31-line-127" href="#sunlight-31-line-127">127</a>
-<a name="sunlight-31-line-128" href="#sunlight-31-line-128">128</a>
-<a name="sunlight-31-line-129" href="#sunlight-31-line-129">129</a>
-<a name="sunlight-31-line-130" href="#sunlight-31-line-130">130</a>
-<a name="sunlight-31-line-131" href="#sunlight-31-line-131">131</a>
-<a name="sunlight-31-line-132" href="#sunlight-31-line-132">132</a>
-<a name="sunlight-31-line-133" href="#sunlight-31-line-133">133</a>
-<a name="sunlight-31-line-134" href="#sunlight-31-line-134">134</a>
-<a name="sunlight-31-line-135" href="#sunlight-31-line-135">135</a>
-<a name="sunlight-31-line-136" href="#sunlight-31-line-136">136</a>
-<a name="sunlight-31-line-137" href="#sunlight-31-line-137">137</a>
-<a name="sunlight-31-line-138" href="#sunlight-31-line-138">138</a>
-<a name="sunlight-31-line-139" href="#sunlight-31-line-139">139</a>
-<a name="sunlight-31-line-140" href="#sunlight-31-line-140">140</a>
-<a name="sunlight-31-line-141" href="#sunlight-31-line-141">141</a>
-<a name="sunlight-31-line-142" href="#sunlight-31-line-142">142</a>
-<a name="sunlight-31-line-143" href="#sunlight-31-line-143">143</a>
-<a name="sunlight-31-line-144" href="#sunlight-31-line-144">144</a>
-<a name="sunlight-31-line-145" href="#sunlight-31-line-145">145</a>
-<a name="sunlight-31-line-146" href="#sunlight-31-line-146">146</a>
+</div><pre class="sunlight-highlight-python sunlight-highlighted"><span class="sunlight-python"><span class="sunlight-comment">#normal&nbsp;strings</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-string">'Hello,&nbsp;world!'</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-string">"Hello,&nbsp;world!"</span>
+
+<span class="sunlight-comment">#looooooooooooooong&nbsp;strings</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-longString">"""Hello,&nbsp;world!"""</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-longString">'''Hello,&nbsp;world!'''</span>
+
+<span class="sunlight-comment">#raw&nbsp;strings</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawString">r"hello"</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawString">r'hello'</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawString">R"hello"</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawString">R'hello'</span>
+
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawLongString">r'''hello'''</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawLongString">R'''hello'''</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawLongString">r"""hello"""</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-rawLongString">R"""hello"""</span>
+
+<span class="sunlight-comment">#binary&nbsp;strings</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">br"hello"</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">br'hello'</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">bR"hello"</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">bR'hello'</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">Br"hello"</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">Br'hello'</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">BR"hello"</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryString">BR'hello'</span>
+
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">br"""hello"""</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">br'''hello'''</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">bR"""hello"""</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">bR'''hello'''</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">Br"""hello"""</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">Br'''hello'''</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">BR"""hello"""</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-binaryLongString">BR'''hello'''</span>
+
+<span class="sunlight-comment">#fibonacci&nbsp;tuple&nbsp;assignment</span>
+<span class="sunlight-ident">parents</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">babies</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-delimiter">(</span><span class="sunlight-number">1</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">1</span><span class="sunlight-delimiter">)</span>
+<span class="sunlight-keyword">while</span>&nbsp;<span class="sunlight-ident">babies</span>&nbsp;<span class="sunlight-operator">&lt;</span>&nbsp;<span class="sunlight-number">100</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-string">'This&nbsp;generation&nbsp;has&nbsp;%d&nbsp;babies'</span>&nbsp;<span class="sunlight-operator">%</span>&nbsp;<span class="sunlight-ident">babies</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">parents</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">babies</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-delimiter">(</span><span class="sunlight-ident">babies</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">parents</span>&nbsp;<span class="sunlight-operator">+</span>&nbsp;<span class="sunlight-ident">babies</span><span class="sunlight-delimiter">)</span>
+
+<span class="sunlight-comment">#import,&nbsp;regex</span>
+<span class="sunlight-keyword">import</span>&nbsp;<span class="sunlight-ident">re</span>
+<span class="sunlight-keyword">for</span>&nbsp;<span class="sunlight-ident">test_string</span>&nbsp;<span class="sunlight-keyword">in</span>&nbsp;<span class="sunlight-delimiter">[</span><span class="sunlight-string">'555-1212'</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-string">'ILL-EGAL'</span><span class="sunlight-delimiter">]</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">if</span>&nbsp;<span class="sunlight-ident">re</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">match</span><span class="sunlight-delimiter">(</span><span class="sunlight-rawString">r'^\d{3}-\d{4}$'</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">test_string</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-ident">test_string</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-string">'is&nbsp;a&nbsp;valid&nbsp;US&nbsp;local&nbsp;phone&nbsp;number'</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">else</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-ident">test_string</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-string">'rejected'</span>
+
+<span class="sunlight-comment">#!/usr/bin/env&nbsp;python</span>
+<span class="sunlight-comment">#&nbsp;This&nbsp;program&nbsp;adds&nbsp;up&nbsp;integers&nbsp;in&nbsp;the&nbsp;command&nbsp;line</span>
+<span class="sunlight-keyword">import</span>&nbsp;<span class="sunlight-ident">sys</span>
+<span class="sunlight-keyword">try</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">total</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-function">sum</span><span class="sunlight-delimiter">(</span><span class="sunlight-function">int</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">arg</span><span class="sunlight-delimiter">)</span>&nbsp;<span class="sunlight-keyword">for</span>&nbsp;<span class="sunlight-ident">arg</span>&nbsp;<span class="sunlight-keyword">in</span>&nbsp;<span class="sunlight-ident">sys</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">argv</span><span class="sunlight-delimiter">[</span><span class="sunlight-number">1</span><span class="sunlight-delimiter">:</span><span class="sunlight-delimiter">]</span><span class="sunlight-delimiter">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-string">'sum&nbsp;='</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">total</span>
+<span class="sunlight-keyword">except</span>&nbsp;<span class="sunlight-named-ident">ValueError</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-string">'Please&nbsp;supply&nbsp;integer&nbsp;arguments'</span>
+
+<span class="sunlight-keyword">class</span>&nbsp;<span class="sunlight-named-ident">BankAccount</span><span class="sunlight-delimiter">(</span><span class="sunlight-function">object</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-specialMethod">__init__</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">self</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">initial_balance</span><span class="sunlight-delimiter">=</span><span class="sunlight-number">0</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">self</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">balance</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">initial_balance</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">deposit</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">self</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">amount</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">self</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">balance</span>&nbsp;<span class="sunlight-delimiter">+=</span>&nbsp;<span class="sunlight-ident">amount</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">withdraw</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">self</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">amount</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">self</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">balance</span>&nbsp;<span class="sunlight-delimiter">-=</span>&nbsp;<span class="sunlight-ident">amount</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">overdrawn</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">self</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">return</span>&nbsp;<span class="sunlight-ident">self</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">balance</span>&nbsp;<span class="sunlight-operator">&lt;</span>&nbsp;<span class="sunlight-number">0</span>
+<span class="sunlight-ident">my_account</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">BankAccount</span><span class="sunlight-delimiter">(</span><span class="sunlight-number">15</span><span class="sunlight-delimiter">)</span>
+<span class="sunlight-ident">my_account</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">withdraw</span><span class="sunlight-delimiter">(</span><span class="sunlight-number">5</span><span class="sunlight-delimiter">)</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-ident">my_account</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">balance</span>
+
+
+<span class="sunlight-comment">#8-Queens</span>
+<span class="sunlight-ident">BOARD_SIZE</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-number">8</span>
+
+<span class="sunlight-keyword">class</span>&nbsp;<span class="sunlight-named-ident">BailOut</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">Exception</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">pass</span>
+
+<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">validate</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">queens</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">left</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">right</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">col</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">queens</span><span class="sunlight-delimiter">[</span><span class="sunlight-operator">-</span><span class="sunlight-number">1</span><span class="sunlight-delimiter">]</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">for</span>&nbsp;<span class="sunlight-ident">r</span>&nbsp;<span class="sunlight-keyword">in</span>&nbsp;<span class="sunlight-function">reversed</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">queens</span><span class="sunlight-delimiter">[</span><span class="sunlight-delimiter">:</span><span class="sunlight-operator">-</span><span class="sunlight-number">1</span><span class="sunlight-delimiter">]</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">left</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">right</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">left</span><span class="sunlight-operator">-</span><span class="sunlight-number">1</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">right</span><span class="sunlight-operator">+</span><span class="sunlight-number">1</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">if</span>&nbsp;<span class="sunlight-ident">r</span>&nbsp;<span class="sunlight-keyword">in</span>&nbsp;<span class="sunlight-delimiter">(</span><span class="sunlight-ident">left</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">col</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-ident">right</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">raise</span>&nbsp;<span class="sunlight-named-ident">BailOut</span>
+
+<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">add_queen</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">queens</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">for</span>&nbsp;<span class="sunlight-ident">i</span>&nbsp;<span class="sunlight-keyword">in</span>&nbsp;<span class="sunlight-function">range</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">BOARD_SIZE</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">test_queens</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">queens</span>&nbsp;<span class="sunlight-operator">+</span>&nbsp;<span class="sunlight-delimiter">[</span><span class="sunlight-ident">i</span><span class="sunlight-delimiter">]</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">try</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">validate</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">test_queens</span><span class="sunlight-delimiter">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">if</span>&nbsp;<span class="sunlight-function">len</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">test_queens</span><span class="sunlight-delimiter">)</span>&nbsp;<span class="sunlight-delimiter">=</span><span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">BOARD_SIZE</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">return</span>&nbsp;<span class="sunlight-ident">test_queens</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">else</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">return</span>&nbsp;<span class="sunlight-ident">add_queen</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">test_queens</span><span class="sunlight-delimiter">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">except</span>&nbsp;<span class="sunlight-named-ident">BailOut</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">pass</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">raise</span>&nbsp;<span class="sunlight-named-ident">BailOut</span>
+
+<span class="sunlight-ident">queens</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ident">add_queen</span><span class="sunlight-delimiter">(</span><span class="sunlight-delimiter">[</span><span class="sunlight-delimiter">]</span><span class="sunlight-delimiter">)</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-ident">queens</span>
+<span class="sunlight-function">print</span>&nbsp;<span class="sunlight-string">"\n"</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">join</span><span class="sunlight-delimiter">(</span><span class="sunlight-string">".&nbsp;"</span><span class="sunlight-operator">*</span><span class="sunlight-ident">q</span>&nbsp;<span class="sunlight-operator">+</span>&nbsp;<span class="sunlight-string">"Q&nbsp;"</span>&nbsp;<span class="sunlight-operator">+</span>&nbsp;<span class="sunlight-string">".&nbsp;"</span><span class="sunlight-operator">*</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">BOARD_SIZE</span><span class="sunlight-operator">-</span><span class="sunlight-ident">q</span><span class="sunlight-operator">-</span><span class="sunlight-number">1</span><span class="sunlight-delimiter">)</span>&nbsp;<span class="sunlight-keyword">for</span>&nbsp;<span class="sunlight-ident">q</span>&nbsp;<span class="sunlight-keyword">in</span>&nbsp;<span class="sunlight-ident">queens</span><span class="sunlight-delimiter">)</span>
+
+<span class="sunlight-ident">variableName</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-number">4</span><span class="sunlight-operator">**</span><span class="sunlight-number">5</span>
+<span class="sunlight-ident">complexNumber</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-number">4j</span>&nbsp;<span class="sunlight-delimiter">+=</span>&nbsp;<span class="sunlight-number">1</span>
+
+<span class="sunlight-ident">constants</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-delimiter">(</span><span class="sunlight-constant">None</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-constant">True</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-constant">False</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-constant">NotImplemented</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-constant">__debug__</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-constant">Ellipsis</span><span class="sunlight-delimiter">)</span>
+<span class="sunlight-ident">ellipsis</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-ellipsis">...</span>
+
+<span class="sunlight-keyword">import</span>&nbsp;<span class="sunlight-ident">unittest</span>
+<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">median</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">pool</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">copy</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-function">sorted</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">pool</span><span class="sunlight-delimiter">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">size</span>&nbsp;<span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-function">len</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">copy</span><span class="sunlight-delimiter">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">if</span>&nbsp;<span class="sunlight-ident">size</span>&nbsp;<span class="sunlight-operator">%</span>&nbsp;<span class="sunlight-number">2</span>&nbsp;<span class="sunlight-delimiter">=</span><span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-number">1</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">return</span>&nbsp;<span class="sunlight-ident">copy</span><span class="sunlight-delimiter">[</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">size</span>&nbsp;<span class="sunlight-operator">-</span>&nbsp;<span class="sunlight-number">1</span><span class="sunlight-delimiter">)</span>&nbsp;<span class="sunlight-operator">/</span>&nbsp;<span class="sunlight-number">2</span><span class="sunlight-delimiter">]</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">else</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">return</span>&nbsp;<span class="sunlight-delimiter">(</span><span class="sunlight-ident">copy</span><span class="sunlight-delimiter">[</span><span class="sunlight-ident">size</span><span class="sunlight-operator">/</span><span class="sunlight-number">2</span>&nbsp;<span class="sunlight-operator">-</span>&nbsp;<span class="sunlight-number">1</span><span class="sunlight-delimiter">]</span>&nbsp;<span class="sunlight-operator">+</span>&nbsp;<span class="sunlight-ident">copy</span><span class="sunlight-delimiter">[</span><span class="sunlight-ident">size</span><span class="sunlight-operator">/</span><span class="sunlight-number">2</span><span class="sunlight-delimiter">]</span><span class="sunlight-delimiter">)</span>&nbsp;<span class="sunlight-operator">/</span>&nbsp;<span class="sunlight-number">2</span>
+<span class="sunlight-keyword">class</span>&nbsp;<span class="sunlight-named-ident">TestMedian</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">unittest</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">TestCase</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">def</span>&nbsp;<span class="sunlight-named-ident">testMedian</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">self</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">self</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">failUnlessEqual</span><span class="sunlight-delimiter">(</span><span class="sunlight-ident">median</span><span class="sunlight-delimiter">(</span><span class="sunlight-delimiter">[</span><span class="sunlight-number">2</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">9</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">9</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">7</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">9</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">2</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">4</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">5</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">8</span><span class="sunlight-delimiter">]</span><span class="sunlight-delimiter">)</span><span class="sunlight-delimiter">,</span>&nbsp;<span class="sunlight-number">7</span><span class="sunlight-delimiter">)</span>
+<span class="sunlight-keyword">if</span>&nbsp;<span class="sunlight-attribute">__name__</span>&nbsp;<span class="sunlight-delimiter">=</span><span class="sunlight-delimiter">=</span>&nbsp;<span class="sunlight-string">'__main__'</span><span class="sunlight-delimiter">:</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-ident">unittest</span><span class="sunlight-delimiter">.</span><span class="sunlight-ident">main</span><span class="sunlight-delimiter">(</span><span class="sunlight-delimiter">)</span>
+
+</span></pre></div></div>
+<h2>vb1.vb</h2>
+<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-32-line-1" href="#sunlight-32-line-1">1</a>
+<a name="sunlight-32-line-2" href="#sunlight-32-line-2">2</a>
+<a name="sunlight-32-line-3" href="#sunlight-32-line-3">3</a>
+<a name="sunlight-32-line-4" href="#sunlight-32-line-4">4</a>
+<a name="sunlight-32-line-5" href="#sunlight-32-line-5">5</a>
+<a name="sunlight-32-line-6" href="#sunlight-32-line-6">6</a>
+<a name="sunlight-32-line-7" href="#sunlight-32-line-7">7</a>
+<a name="sunlight-32-line-8" href="#sunlight-32-line-8">8</a>
+<a name="sunlight-32-line-9" href="#sunlight-32-line-9">9</a>
+<a name="sunlight-32-line-10" href="#sunlight-32-line-10">10</a>
+<a name="sunlight-32-line-11" href="#sunlight-32-line-11">11</a>
+<a name="sunlight-32-line-12" href="#sunlight-32-line-12">12</a>
+<a name="sunlight-32-line-13" href="#sunlight-32-line-13">13</a>
+<a name="sunlight-32-line-14" href="#sunlight-32-line-14">14</a>
+<a name="sunlight-32-line-15" href="#sunlight-32-line-15">15</a>
+<a name="sunlight-32-line-16" href="#sunlight-32-line-16">16</a>
+<a name="sunlight-32-line-17" href="#sunlight-32-line-17">17</a>
+<a name="sunlight-32-line-18" href="#sunlight-32-line-18">18</a>
+<a name="sunlight-32-line-19" href="#sunlight-32-line-19">19</a>
+<a name="sunlight-32-line-20" href="#sunlight-32-line-20">20</a>
+<a name="sunlight-32-line-21" href="#sunlight-32-line-21">21</a>
+<a name="sunlight-32-line-22" href="#sunlight-32-line-22">22</a>
+<a name="sunlight-32-line-23" href="#sunlight-32-line-23">23</a>
+<a name="sunlight-32-line-24" href="#sunlight-32-line-24">24</a>
+<a name="sunlight-32-line-25" href="#sunlight-32-line-25">25</a>
+<a name="sunlight-32-line-26" href="#sunlight-32-line-26">26</a>
+<a name="sunlight-32-line-27" href="#sunlight-32-line-27">27</a>
+<a name="sunlight-32-line-28" href="#sunlight-32-line-28">28</a>
+<a name="sunlight-32-line-29" href="#sunlight-32-line-29">29</a>
+<a name="sunlight-32-line-30" href="#sunlight-32-line-30">30</a>
+<a name="sunlight-32-line-31" href="#sunlight-32-line-31">31</a>
+<a name="sunlight-32-line-32" href="#sunlight-32-line-32">32</a>
+<a name="sunlight-32-line-33" href="#sunlight-32-line-33">33</a>
+<a name="sunlight-32-line-34" href="#sunlight-32-line-34">34</a>
+<a name="sunlight-32-line-35" href="#sunlight-32-line-35">35</a>
+<a name="sunlight-32-line-36" href="#sunlight-32-line-36">36</a>
+<a name="sunlight-32-line-37" href="#sunlight-32-line-37">37</a>
+<a name="sunlight-32-line-38" href="#sunlight-32-line-38">38</a>
+<a name="sunlight-32-line-39" href="#sunlight-32-line-39">39</a>
+<a name="sunlight-32-line-40" href="#sunlight-32-line-40">40</a>
+<a name="sunlight-32-line-41" href="#sunlight-32-line-41">41</a>
+<a name="sunlight-32-line-42" href="#sunlight-32-line-42">42</a>
+<a name="sunlight-32-line-43" href="#sunlight-32-line-43">43</a>
+<a name="sunlight-32-line-44" href="#sunlight-32-line-44">44</a>
+<a name="sunlight-32-line-45" href="#sunlight-32-line-45">45</a>
+<a name="sunlight-32-line-46" href="#sunlight-32-line-46">46</a>
+<a name="sunlight-32-line-47" href="#sunlight-32-line-47">47</a>
+<a name="sunlight-32-line-48" href="#sunlight-32-line-48">48</a>
+<a name="sunlight-32-line-49" href="#sunlight-32-line-49">49</a>
+<a name="sunlight-32-line-50" href="#sunlight-32-line-50">50</a>
+<a name="sunlight-32-line-51" href="#sunlight-32-line-51">51</a>
+<a name="sunlight-32-line-52" href="#sunlight-32-line-52">52</a>
+<a name="sunlight-32-line-53" href="#sunlight-32-line-53">53</a>
+<a name="sunlight-32-line-54" href="#sunlight-32-line-54">54</a>
+<a name="sunlight-32-line-55" href="#sunlight-32-line-55">55</a>
+<a name="sunlight-32-line-56" href="#sunlight-32-line-56">56</a>
+<a name="sunlight-32-line-57" href="#sunlight-32-line-57">57</a>
+<a name="sunlight-32-line-58" href="#sunlight-32-line-58">58</a>
+<a name="sunlight-32-line-59" href="#sunlight-32-line-59">59</a>
+<a name="sunlight-32-line-60" href="#sunlight-32-line-60">60</a>
+<a name="sunlight-32-line-61" href="#sunlight-32-line-61">61</a>
+<a name="sunlight-32-line-62" href="#sunlight-32-line-62">62</a>
+<a name="sunlight-32-line-63" href="#sunlight-32-line-63">63</a>
+<a name="sunlight-32-line-64" href="#sunlight-32-line-64">64</a>
+<a name="sunlight-32-line-65" href="#sunlight-32-line-65">65</a>
+<a name="sunlight-32-line-66" href="#sunlight-32-line-66">66</a>
+<a name="sunlight-32-line-67" href="#sunlight-32-line-67">67</a>
+<a name="sunlight-32-line-68" href="#sunlight-32-line-68">68</a>
+<a name="sunlight-32-line-69" href="#sunlight-32-line-69">69</a>
+<a name="sunlight-32-line-70" href="#sunlight-32-line-70">70</a>
+<a name="sunlight-32-line-71" href="#sunlight-32-line-71">71</a>
+<a name="sunlight-32-line-72" href="#sunlight-32-line-72">72</a>
+<a name="sunlight-32-line-73" href="#sunlight-32-line-73">73</a>
+<a name="sunlight-32-line-74" href="#sunlight-32-line-74">74</a>
+<a name="sunlight-32-line-75" href="#sunlight-32-line-75">75</a>
+<a name="sunlight-32-line-76" href="#sunlight-32-line-76">76</a>
+<a name="sunlight-32-line-77" href="#sunlight-32-line-77">77</a>
+<a name="sunlight-32-line-78" href="#sunlight-32-line-78">78</a>
+<a name="sunlight-32-line-79" href="#sunlight-32-line-79">79</a>
+<a name="sunlight-32-line-80" href="#sunlight-32-line-80">80</a>
+<a name="sunlight-32-line-81" href="#sunlight-32-line-81">81</a>
+<a name="sunlight-32-line-82" href="#sunlight-32-line-82">82</a>
+<a name="sunlight-32-line-83" href="#sunlight-32-line-83">83</a>
+<a name="sunlight-32-line-84" href="#sunlight-32-line-84">84</a>
+<a name="sunlight-32-line-85" href="#sunlight-32-line-85">85</a>
+<a name="sunlight-32-line-86" href="#sunlight-32-line-86">86</a>
+<a name="sunlight-32-line-87" href="#sunlight-32-line-87">87</a>
+<a name="sunlight-32-line-88" href="#sunlight-32-line-88">88</a>
+<a name="sunlight-32-line-89" href="#sunlight-32-line-89">89</a>
+<a name="sunlight-32-line-90" href="#sunlight-32-line-90">90</a>
+<a name="sunlight-32-line-91" href="#sunlight-32-line-91">91</a>
+<a name="sunlight-32-line-92" href="#sunlight-32-line-92">92</a>
+<a name="sunlight-32-line-93" href="#sunlight-32-line-93">93</a>
+<a name="sunlight-32-line-94" href="#sunlight-32-line-94">94</a>
+<a name="sunlight-32-line-95" href="#sunlight-32-line-95">95</a>
+<a name="sunlight-32-line-96" href="#sunlight-32-line-96">96</a>
+<a name="sunlight-32-line-97" href="#sunlight-32-line-97">97</a>
+<a name="sunlight-32-line-98" href="#sunlight-32-line-98">98</a>
+<a name="sunlight-32-line-99" href="#sunlight-32-line-99">99</a>
+<a name="sunlight-32-line-100" href="#sunlight-32-line-100">100</a>
+<a name="sunlight-32-line-101" href="#sunlight-32-line-101">101</a>
+<a name="sunlight-32-line-102" href="#sunlight-32-line-102">102</a>
+<a name="sunlight-32-line-103" href="#sunlight-32-line-103">103</a>
+<a name="sunlight-32-line-104" href="#sunlight-32-line-104">104</a>
+<a name="sunlight-32-line-105" href="#sunlight-32-line-105">105</a>
+<a name="sunlight-32-line-106" href="#sunlight-32-line-106">106</a>
+<a name="sunlight-32-line-107" href="#sunlight-32-line-107">107</a>
+<a name="sunlight-32-line-108" href="#sunlight-32-line-108">108</a>
+<a name="sunlight-32-line-109" href="#sunlight-32-line-109">109</a>
+<a name="sunlight-32-line-110" href="#sunlight-32-line-110">110</a>
+<a name="sunlight-32-line-111" href="#sunlight-32-line-111">111</a>
+<a name="sunlight-32-line-112" href="#sunlight-32-line-112">112</a>
+<a name="sunlight-32-line-113" href="#sunlight-32-line-113">113</a>
+<a name="sunlight-32-line-114" href="#sunlight-32-line-114">114</a>
+<a name="sunlight-32-line-115" href="#sunlight-32-line-115">115</a>
+<a name="sunlight-32-line-116" href="#sunlight-32-line-116">116</a>
+<a name="sunlight-32-line-117" href="#sunlight-32-line-117">117</a>
+<a name="sunlight-32-line-118" href="#sunlight-32-line-118">118</a>
+<a name="sunlight-32-line-119" href="#sunlight-32-line-119">119</a>
+<a name="sunlight-32-line-120" href="#sunlight-32-line-120">120</a>
+<a name="sunlight-32-line-121" href="#sunlight-32-line-121">121</a>
+<a name="sunlight-32-line-122" href="#sunlight-32-line-122">122</a>
+<a name="sunlight-32-line-123" href="#sunlight-32-line-123">123</a>
+<a name="sunlight-32-line-124" href="#sunlight-32-line-124">124</a>
+<a name="sunlight-32-line-125" href="#sunlight-32-line-125">125</a>
+<a name="sunlight-32-line-126" href="#sunlight-32-line-126">126</a>
+<a name="sunlight-32-line-127" href="#sunlight-32-line-127">127</a>
+<a name="sunlight-32-line-128" href="#sunlight-32-line-128">128</a>
+<a name="sunlight-32-line-129" href="#sunlight-32-line-129">129</a>
+<a name="sunlight-32-line-130" href="#sunlight-32-line-130">130</a>
+<a name="sunlight-32-line-131" href="#sunlight-32-line-131">131</a>
+<a name="sunlight-32-line-132" href="#sunlight-32-line-132">132</a>
+<a name="sunlight-32-line-133" href="#sunlight-32-line-133">133</a>
+<a name="sunlight-32-line-134" href="#sunlight-32-line-134">134</a>
+<a name="sunlight-32-line-135" href="#sunlight-32-line-135">135</a>
+<a name="sunlight-32-line-136" href="#sunlight-32-line-136">136</a>
+<a name="sunlight-32-line-137" href="#sunlight-32-line-137">137</a>
+<a name="sunlight-32-line-138" href="#sunlight-32-line-138">138</a>
+<a name="sunlight-32-line-139" href="#sunlight-32-line-139">139</a>
+<a name="sunlight-32-line-140" href="#sunlight-32-line-140">140</a>
+<a name="sunlight-32-line-141" href="#sunlight-32-line-141">141</a>
+<a name="sunlight-32-line-142" href="#sunlight-32-line-142">142</a>
+<a name="sunlight-32-line-143" href="#sunlight-32-line-143">143</a>
+<a name="sunlight-32-line-144" href="#sunlight-32-line-144">144</a>
+<a name="sunlight-32-line-145" href="#sunlight-32-line-145">145</a>
+<a name="sunlight-32-line-146" href="#sunlight-32-line-146">146</a>
 </div><pre class="sunlight-highlight-vb sunlight-highlighted"><span class="sunlight-vb"><span class="sunlight-keyword">Imports</span>&nbsp;<span class="sunlight-ident">System</span><span class="sunlight-operator">.</span><span class="sunlight-ident">Runtime</span><span class="sunlight-operator">.</span><span class="sunlight-ident">InteropServices</span>
 
 <span class="sunlight-comment">'comment</span>
@@ -7115,28 +7367,28 @@ be&nbsp;parsed&nbsp;as&nbsp;anything&nbsp;or&nbsp;else&nbsp;this&nbsp;is&nbsp;no
 <span class="sunlight-keyword">End</span>&nbsp;<span class="sunlight-keyword">Enum</span>
 </span></pre></div></div>
 <h2>vb2.vb</h2>
-<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-32-line-1" href="#sunlight-32-line-1">1</a>
-<a name="sunlight-32-line-2" href="#sunlight-32-line-2">2</a>
-<a name="sunlight-32-line-3" href="#sunlight-32-line-3">3</a>
-<a name="sunlight-32-line-4" href="#sunlight-32-line-4">4</a>
-<a name="sunlight-32-line-5" href="#sunlight-32-line-5">5</a>
-<a name="sunlight-32-line-6" href="#sunlight-32-line-6">6</a>
-<a name="sunlight-32-line-7" href="#sunlight-32-line-7">7</a>
-<a name="sunlight-32-line-8" href="#sunlight-32-line-8">8</a>
-<a name="sunlight-32-line-9" href="#sunlight-32-line-9">9</a>
-<a name="sunlight-32-line-10" href="#sunlight-32-line-10">10</a>
-<a name="sunlight-32-line-11" href="#sunlight-32-line-11">11</a>
-<a name="sunlight-32-line-12" href="#sunlight-32-line-12">12</a>
-<a name="sunlight-32-line-13" href="#sunlight-32-line-13">13</a>
-<a name="sunlight-32-line-14" href="#sunlight-32-line-14">14</a>
-<a name="sunlight-32-line-15" href="#sunlight-32-line-15">15</a>
-<a name="sunlight-32-line-16" href="#sunlight-32-line-16">16</a>
-<a name="sunlight-32-line-17" href="#sunlight-32-line-17">17</a>
-<a name="sunlight-32-line-18" href="#sunlight-32-line-18">18</a>
-<a name="sunlight-32-line-19" href="#sunlight-32-line-19">19</a>
-<a name="sunlight-32-line-20" href="#sunlight-32-line-20">20</a>
-<a name="sunlight-32-line-21" href="#sunlight-32-line-21">21</a>
-<a name="sunlight-32-line-22" href="#sunlight-32-line-22">22</a>
+<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-33-line-1" href="#sunlight-33-line-1">1</a>
+<a name="sunlight-33-line-2" href="#sunlight-33-line-2">2</a>
+<a name="sunlight-33-line-3" href="#sunlight-33-line-3">3</a>
+<a name="sunlight-33-line-4" href="#sunlight-33-line-4">4</a>
+<a name="sunlight-33-line-5" href="#sunlight-33-line-5">5</a>
+<a name="sunlight-33-line-6" href="#sunlight-33-line-6">6</a>
+<a name="sunlight-33-line-7" href="#sunlight-33-line-7">7</a>
+<a name="sunlight-33-line-8" href="#sunlight-33-line-8">8</a>
+<a name="sunlight-33-line-9" href="#sunlight-33-line-9">9</a>
+<a name="sunlight-33-line-10" href="#sunlight-33-line-10">10</a>
+<a name="sunlight-33-line-11" href="#sunlight-33-line-11">11</a>
+<a name="sunlight-33-line-12" href="#sunlight-33-line-12">12</a>
+<a name="sunlight-33-line-13" href="#sunlight-33-line-13">13</a>
+<a name="sunlight-33-line-14" href="#sunlight-33-line-14">14</a>
+<a name="sunlight-33-line-15" href="#sunlight-33-line-15">15</a>
+<a name="sunlight-33-line-16" href="#sunlight-33-line-16">16</a>
+<a name="sunlight-33-line-17" href="#sunlight-33-line-17">17</a>
+<a name="sunlight-33-line-18" href="#sunlight-33-line-18">18</a>
+<a name="sunlight-33-line-19" href="#sunlight-33-line-19">19</a>
+<a name="sunlight-33-line-20" href="#sunlight-33-line-20">20</a>
+<a name="sunlight-33-line-21" href="#sunlight-33-line-21">21</a>
+<a name="sunlight-33-line-22" href="#sunlight-33-line-22">22</a>
 </div><pre class="sunlight-highlight-vb sunlight-highlighted"><span class="sunlight-vb"><span class="sunlight-keyword">Public</span>&nbsp;<span class="sunlight-keyword">Module</span>&nbsp;<span class="sunlight-named-ident">thisModule</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">Const</span>&nbsp;<span class="sunlight-ident">i1_OK</span>&nbsp;<span class="sunlight-operator">=</span>&nbsp;<span class="sunlight-number">12_34_5%</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-keyword">Const</span>&nbsp;<span class="sunlight-ident">i2_OK</span>&nbsp;<span class="sunlight-operator">=</span>&nbsp;<span class="sunlight-number">&amp;ha_BC_d23_8&amp;</span>
@@ -7161,71 +7413,71 @@ be&nbsp;parsed&nbsp;as&nbsp;anything&nbsp;or&nbsp;else&nbsp;this&nbsp;is&nbsp;no
 <span class="sunlight-keyword">End</span>&nbsp;<span class="sunlight-keyword">Module</span>
 </span></pre></div></div>
 <h2>xml-multilang.xml</h2>
-<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-33-line-1" href="#sunlight-33-line-1">1</a>
-<a name="sunlight-33-line-2" href="#sunlight-33-line-2">2</a>
-<a name="sunlight-33-line-3" href="#sunlight-33-line-3">3</a>
-<a name="sunlight-33-line-4" href="#sunlight-33-line-4">4</a>
-<a name="sunlight-33-line-5" href="#sunlight-33-line-5">5</a>
-<a name="sunlight-33-line-6" href="#sunlight-33-line-6">6</a>
-<a name="sunlight-33-line-7" href="#sunlight-33-line-7">7</a>
-<a name="sunlight-33-line-8" href="#sunlight-33-line-8">8</a>
-<a name="sunlight-33-line-9" href="#sunlight-33-line-9">9</a>
-<a name="sunlight-33-line-10" href="#sunlight-33-line-10">10</a>
-<a name="sunlight-33-line-11" href="#sunlight-33-line-11">11</a>
-<a name="sunlight-33-line-12" href="#sunlight-33-line-12">12</a>
-<a name="sunlight-33-line-13" href="#sunlight-33-line-13">13</a>
-<a name="sunlight-33-line-14" href="#sunlight-33-line-14">14</a>
-<a name="sunlight-33-line-15" href="#sunlight-33-line-15">15</a>
-<a name="sunlight-33-line-16" href="#sunlight-33-line-16">16</a>
-<a name="sunlight-33-line-17" href="#sunlight-33-line-17">17</a>
-<a name="sunlight-33-line-18" href="#sunlight-33-line-18">18</a>
-<a name="sunlight-33-line-19" href="#sunlight-33-line-19">19</a>
-<a name="sunlight-33-line-20" href="#sunlight-33-line-20">20</a>
-<a name="sunlight-33-line-21" href="#sunlight-33-line-21">21</a>
-<a name="sunlight-33-line-22" href="#sunlight-33-line-22">22</a>
-<a name="sunlight-33-line-23" href="#sunlight-33-line-23">23</a>
-<a name="sunlight-33-line-24" href="#sunlight-33-line-24">24</a>
-<a name="sunlight-33-line-25" href="#sunlight-33-line-25">25</a>
-<a name="sunlight-33-line-26" href="#sunlight-33-line-26">26</a>
-<a name="sunlight-33-line-27" href="#sunlight-33-line-27">27</a>
-<a name="sunlight-33-line-28" href="#sunlight-33-line-28">28</a>
-<a name="sunlight-33-line-29" href="#sunlight-33-line-29">29</a>
-<a name="sunlight-33-line-30" href="#sunlight-33-line-30">30</a>
-<a name="sunlight-33-line-31" href="#sunlight-33-line-31">31</a>
-<a name="sunlight-33-line-32" href="#sunlight-33-line-32">32</a>
-<a name="sunlight-33-line-33" href="#sunlight-33-line-33">33</a>
-<a name="sunlight-33-line-34" href="#sunlight-33-line-34">34</a>
-<a name="sunlight-33-line-35" href="#sunlight-33-line-35">35</a>
-<a name="sunlight-33-line-36" href="#sunlight-33-line-36">36</a>
-<a name="sunlight-33-line-37" href="#sunlight-33-line-37">37</a>
-<a name="sunlight-33-line-38" href="#sunlight-33-line-38">38</a>
-<a name="sunlight-33-line-39" href="#sunlight-33-line-39">39</a>
-<a name="sunlight-33-line-40" href="#sunlight-33-line-40">40</a>
-<a name="sunlight-33-line-41" href="#sunlight-33-line-41">41</a>
-<a name="sunlight-33-line-42" href="#sunlight-33-line-42">42</a>
-<a name="sunlight-33-line-43" href="#sunlight-33-line-43">43</a>
-<a name="sunlight-33-line-44" href="#sunlight-33-line-44">44</a>
-<a name="sunlight-33-line-45" href="#sunlight-33-line-45">45</a>
-<a name="sunlight-33-line-46" href="#sunlight-33-line-46">46</a>
-<a name="sunlight-33-line-47" href="#sunlight-33-line-47">47</a>
-<a name="sunlight-33-line-48" href="#sunlight-33-line-48">48</a>
-<a name="sunlight-33-line-49" href="#sunlight-33-line-49">49</a>
-<a name="sunlight-33-line-50" href="#sunlight-33-line-50">50</a>
-<a name="sunlight-33-line-51" href="#sunlight-33-line-51">51</a>
-<a name="sunlight-33-line-52" href="#sunlight-33-line-52">52</a>
-<a name="sunlight-33-line-53" href="#sunlight-33-line-53">53</a>
-<a name="sunlight-33-line-54" href="#sunlight-33-line-54">54</a>
-<a name="sunlight-33-line-55" href="#sunlight-33-line-55">55</a>
-<a name="sunlight-33-line-56" href="#sunlight-33-line-56">56</a>
-<a name="sunlight-33-line-57" href="#sunlight-33-line-57">57</a>
-<a name="sunlight-33-line-58" href="#sunlight-33-line-58">58</a>
-<a name="sunlight-33-line-59" href="#sunlight-33-line-59">59</a>
-<a name="sunlight-33-line-60" href="#sunlight-33-line-60">60</a>
-<a name="sunlight-33-line-61" href="#sunlight-33-line-61">61</a>
-<a name="sunlight-33-line-62" href="#sunlight-33-line-62">62</a>
-<a name="sunlight-33-line-63" href="#sunlight-33-line-63">63</a>
-<a name="sunlight-33-line-64" href="#sunlight-33-line-64">64</a>
-<a name="sunlight-33-line-65" href="#sunlight-33-line-65">65</a>
+<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-34-line-1" href="#sunlight-34-line-1">1</a>
+<a name="sunlight-34-line-2" href="#sunlight-34-line-2">2</a>
+<a name="sunlight-34-line-3" href="#sunlight-34-line-3">3</a>
+<a name="sunlight-34-line-4" href="#sunlight-34-line-4">4</a>
+<a name="sunlight-34-line-5" href="#sunlight-34-line-5">5</a>
+<a name="sunlight-34-line-6" href="#sunlight-34-line-6">6</a>
+<a name="sunlight-34-line-7" href="#sunlight-34-line-7">7</a>
+<a name="sunlight-34-line-8" href="#sunlight-34-line-8">8</a>
+<a name="sunlight-34-line-9" href="#sunlight-34-line-9">9</a>
+<a name="sunlight-34-line-10" href="#sunlight-34-line-10">10</a>
+<a name="sunlight-34-line-11" href="#sunlight-34-line-11">11</a>
+<a name="sunlight-34-line-12" href="#sunlight-34-line-12">12</a>
+<a name="sunlight-34-line-13" href="#sunlight-34-line-13">13</a>
+<a name="sunlight-34-line-14" href="#sunlight-34-line-14">14</a>
+<a name="sunlight-34-line-15" href="#sunlight-34-line-15">15</a>
+<a name="sunlight-34-line-16" href="#sunlight-34-line-16">16</a>
+<a name="sunlight-34-line-17" href="#sunlight-34-line-17">17</a>
+<a name="sunlight-34-line-18" href="#sunlight-34-line-18">18</a>
+<a name="sunlight-34-line-19" href="#sunlight-34-line-19">19</a>
+<a name="sunlight-34-line-20" href="#sunlight-34-line-20">20</a>
+<a name="sunlight-34-line-21" href="#sunlight-34-line-21">21</a>
+<a name="sunlight-34-line-22" href="#sunlight-34-line-22">22</a>
+<a name="sunlight-34-line-23" href="#sunlight-34-line-23">23</a>
+<a name="sunlight-34-line-24" href="#sunlight-34-line-24">24</a>
+<a name="sunlight-34-line-25" href="#sunlight-34-line-25">25</a>
+<a name="sunlight-34-line-26" href="#sunlight-34-line-26">26</a>
+<a name="sunlight-34-line-27" href="#sunlight-34-line-27">27</a>
+<a name="sunlight-34-line-28" href="#sunlight-34-line-28">28</a>
+<a name="sunlight-34-line-29" href="#sunlight-34-line-29">29</a>
+<a name="sunlight-34-line-30" href="#sunlight-34-line-30">30</a>
+<a name="sunlight-34-line-31" href="#sunlight-34-line-31">31</a>
+<a name="sunlight-34-line-32" href="#sunlight-34-line-32">32</a>
+<a name="sunlight-34-line-33" href="#sunlight-34-line-33">33</a>
+<a name="sunlight-34-line-34" href="#sunlight-34-line-34">34</a>
+<a name="sunlight-34-line-35" href="#sunlight-34-line-35">35</a>
+<a name="sunlight-34-line-36" href="#sunlight-34-line-36">36</a>
+<a name="sunlight-34-line-37" href="#sunlight-34-line-37">37</a>
+<a name="sunlight-34-line-38" href="#sunlight-34-line-38">38</a>
+<a name="sunlight-34-line-39" href="#sunlight-34-line-39">39</a>
+<a name="sunlight-34-line-40" href="#sunlight-34-line-40">40</a>
+<a name="sunlight-34-line-41" href="#sunlight-34-line-41">41</a>
+<a name="sunlight-34-line-42" href="#sunlight-34-line-42">42</a>
+<a name="sunlight-34-line-43" href="#sunlight-34-line-43">43</a>
+<a name="sunlight-34-line-44" href="#sunlight-34-line-44">44</a>
+<a name="sunlight-34-line-45" href="#sunlight-34-line-45">45</a>
+<a name="sunlight-34-line-46" href="#sunlight-34-line-46">46</a>
+<a name="sunlight-34-line-47" href="#sunlight-34-line-47">47</a>
+<a name="sunlight-34-line-48" href="#sunlight-34-line-48">48</a>
+<a name="sunlight-34-line-49" href="#sunlight-34-line-49">49</a>
+<a name="sunlight-34-line-50" href="#sunlight-34-line-50">50</a>
+<a name="sunlight-34-line-51" href="#sunlight-34-line-51">51</a>
+<a name="sunlight-34-line-52" href="#sunlight-34-line-52">52</a>
+<a name="sunlight-34-line-53" href="#sunlight-34-line-53">53</a>
+<a name="sunlight-34-line-54" href="#sunlight-34-line-54">54</a>
+<a name="sunlight-34-line-55" href="#sunlight-34-line-55">55</a>
+<a name="sunlight-34-line-56" href="#sunlight-34-line-56">56</a>
+<a name="sunlight-34-line-57" href="#sunlight-34-line-57">57</a>
+<a name="sunlight-34-line-58" href="#sunlight-34-line-58">58</a>
+<a name="sunlight-34-line-59" href="#sunlight-34-line-59">59</a>
+<a name="sunlight-34-line-60" href="#sunlight-34-line-60">60</a>
+<a name="sunlight-34-line-61" href="#sunlight-34-line-61">61</a>
+<a name="sunlight-34-line-62" href="#sunlight-34-line-62">62</a>
+<a name="sunlight-34-line-63" href="#sunlight-34-line-63">63</a>
+<a name="sunlight-34-line-64" href="#sunlight-34-line-64">64</a>
+<a name="sunlight-34-line-65" href="#sunlight-34-line-65">65</a>
 </div><pre class="sunlight-highlight-xml sunlight-highlighted"><span class="sunlight-xml"><span class="sunlight-doctype">&lt;!doctype&nbsp;html&gt;</span>
 <span class="sunlight-operator">&lt;</span><span class="sunlight-tagName">html</span><span class="sunlight-operator">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-operator">&lt;</span><span class="sunlight-tagName">head</span><span class="sunlight-operator">&gt;</span>
@@ -7293,29 +7545,29 @@ be&nbsp;parsed&nbsp;as&nbsp;anything&nbsp;or&nbsp;else&nbsp;this&nbsp;is&nbsp;no
 <span class="sunlight-operator">&lt;/</span><span class="sunlight-tagName">html</span><span class="sunlight-operator">&gt;</span>
 </span></pre></div></div>
 <h2>xml.xml</h2>
-<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-34-line-1" href="#sunlight-34-line-1">1</a>
-<a name="sunlight-34-line-2" href="#sunlight-34-line-2">2</a>
-<a name="sunlight-34-line-3" href="#sunlight-34-line-3">3</a>
-<a name="sunlight-34-line-4" href="#sunlight-34-line-4">4</a>
-<a name="sunlight-34-line-5" href="#sunlight-34-line-5">5</a>
-<a name="sunlight-34-line-6" href="#sunlight-34-line-6">6</a>
-<a name="sunlight-34-line-7" href="#sunlight-34-line-7">7</a>
-<a name="sunlight-34-line-8" href="#sunlight-34-line-8">8</a>
-<a name="sunlight-34-line-9" href="#sunlight-34-line-9">9</a>
-<a name="sunlight-34-line-10" href="#sunlight-34-line-10">10</a>
-<a name="sunlight-34-line-11" href="#sunlight-34-line-11">11</a>
-<a name="sunlight-34-line-12" href="#sunlight-34-line-12">12</a>
-<a name="sunlight-34-line-13" href="#sunlight-34-line-13">13</a>
-<a name="sunlight-34-line-14" href="#sunlight-34-line-14">14</a>
-<a name="sunlight-34-line-15" href="#sunlight-34-line-15">15</a>
-<a name="sunlight-34-line-16" href="#sunlight-34-line-16">16</a>
-<a name="sunlight-34-line-17" href="#sunlight-34-line-17">17</a>
-<a name="sunlight-34-line-18" href="#sunlight-34-line-18">18</a>
-<a name="sunlight-34-line-19" href="#sunlight-34-line-19">19</a>
-<a name="sunlight-34-line-20" href="#sunlight-34-line-20">20</a>
-<a name="sunlight-34-line-21" href="#sunlight-34-line-21">21</a>
-<a name="sunlight-34-line-22" href="#sunlight-34-line-22">22</a>
-<a name="sunlight-34-line-23" href="#sunlight-34-line-23">23</a>
+<div class="sunlight-container"><div class="sunlight-code-container" style="overflow-y: auto; max-height: undefined; border-width: 1px; border-style: solid;"><div class="sunlight-line-number-margin"><a name="sunlight-35-line-1" href="#sunlight-35-line-1">1</a>
+<a name="sunlight-35-line-2" href="#sunlight-35-line-2">2</a>
+<a name="sunlight-35-line-3" href="#sunlight-35-line-3">3</a>
+<a name="sunlight-35-line-4" href="#sunlight-35-line-4">4</a>
+<a name="sunlight-35-line-5" href="#sunlight-35-line-5">5</a>
+<a name="sunlight-35-line-6" href="#sunlight-35-line-6">6</a>
+<a name="sunlight-35-line-7" href="#sunlight-35-line-7">7</a>
+<a name="sunlight-35-line-8" href="#sunlight-35-line-8">8</a>
+<a name="sunlight-35-line-9" href="#sunlight-35-line-9">9</a>
+<a name="sunlight-35-line-10" href="#sunlight-35-line-10">10</a>
+<a name="sunlight-35-line-11" href="#sunlight-35-line-11">11</a>
+<a name="sunlight-35-line-12" href="#sunlight-35-line-12">12</a>
+<a name="sunlight-35-line-13" href="#sunlight-35-line-13">13</a>
+<a name="sunlight-35-line-14" href="#sunlight-35-line-14">14</a>
+<a name="sunlight-35-line-15" href="#sunlight-35-line-15">15</a>
+<a name="sunlight-35-line-16" href="#sunlight-35-line-16">16</a>
+<a name="sunlight-35-line-17" href="#sunlight-35-line-17">17</a>
+<a name="sunlight-35-line-18" href="#sunlight-35-line-18">18</a>
+<a name="sunlight-35-line-19" href="#sunlight-35-line-19">19</a>
+<a name="sunlight-35-line-20" href="#sunlight-35-line-20">20</a>
+<a name="sunlight-35-line-21" href="#sunlight-35-line-21">21</a>
+<a name="sunlight-35-line-22" href="#sunlight-35-line-22">22</a>
+<a name="sunlight-35-line-23" href="#sunlight-35-line-23">23</a>
 </div><pre class="sunlight-highlight-xml sunlight-highlighted"><span class="sunlight-xml"><span class="sunlight-xmlOpenTag">&lt;?xml</span>&nbsp;<span class="sunlight-attribute">version</span><span class="sunlight-operator">=</span><span class="sunlight-string">"1.0"</span>&nbsp;<span class="sunlight-xmlCloseTag">?&gt;</span>
 <span class="sunlight-operator">&lt;</span><span class="sunlight-tagName">config</span>&nbsp;<span class="sunlight-attribute">xmlns</span><span class="sunlight-operator">:</span><span class="sunlight-attribute">foo</span><span class="sunlight-operator">=</span><span class="sunlight-string">"http://example.com"</span><span class="sunlight-operator">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="sunlight-comment">&lt;!--&nbsp;sections&nbsp;--&gt;</span>

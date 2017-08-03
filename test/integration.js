@@ -51,6 +51,7 @@ function getHighlightLanguage(filename: string): string {
     ".pl": "perl",
     ".php": "php",
     ".ps1": "powershell",
+    ".py": "python",
     ".sh": "bash",
     ".sql": "mysql",
     ".txt": "plaintext",
