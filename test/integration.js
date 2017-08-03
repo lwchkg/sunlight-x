@@ -50,6 +50,7 @@ function getHighlightLanguage(filename: string): string {
     ".nginxconf": "nginx",
     ".pl": "perl",
     ".php": "php",
+    ".ps1": "powershell",
     ".sh": "bash",
     ".sql": "mysql",
     ".txt": "plaintext",

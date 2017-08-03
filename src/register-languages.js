@@ -28,6 +28,7 @@ import * as objectivec from "./languages/objective-c.js";
 import * as perl from "./languages/perl.js";
 import * as php from "./languages/php.js";
 import * as plaintext from "./languages/plaintext.js";
+import * as powershell from "./languages/powershell.js";
 import * as vb from "./languages/vb.js";
 import * as xml from "./languages/xml.js";
 
@@ -54,6 +55,7 @@ const languages = [
   perl,
   php,
   plaintext,
+  powershell,
   vb,
   xml
 ];
