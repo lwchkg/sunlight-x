@@ -727,6 +727,9 @@ export const customParseRules = [
       value = "";
     }
 
+    // Reset queue. This is needed if the reader reach EOF.
+    context.items.heredocQueue = [];
+
     return tokens.length > 0 ? tokens : null;
   },
 
