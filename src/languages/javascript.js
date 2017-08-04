@@ -186,11 +186,11 @@ export const customParseRules = [
     // Read the regex modifiers. Only "g", "i" and "m", "u" and "y" are allowed,
     // but in the future extra letters may be allowed, so we allow any
     // alphabetical character here.
-    while (context.reader.peek() !== context.reader.EOF) {
-      if (!/[A-Za-z]/.test(context.reader.peek())) break;
-
+    while (
+      !context.reader.isPeekEOF() &&
+      /[A-Za-z]/.test(context.reader.peek())
+    )
       regexLiteral += context.reader.read();
-    }
 
     return context.createToken("regexLiteral", regexLiteral, line, column);
   }
