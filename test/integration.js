@@ -52,6 +52,7 @@ function getHighlightLanguage(filename: string): string {
     ".php": "php",
     ".ps1": "powershell",
     ".py": "python",
+    ".rb": "ruby",
     ".sh": "bash",
     ".sql": "mysql",
     ".txt": "plaintext",
