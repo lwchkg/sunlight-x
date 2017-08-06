@@ -179,6 +179,8 @@ export const customParseRules = [
 export const embeddedLanguages = {
   css: {
     switchTo: function(context: ParserContext): boolean {
+      if (context.options.enableScalaXmlInterpolation === true) return false;
+
       if (context.reader.match("</style")) return false;
 
       const walker = context.getTokenWalker();
@@ -271,6 +273,7 @@ export const embeddedLanguages = {
 
   scala: {
     switchTo: function(context: ParserContext): boolean {
+      context.items.scalaBracketNestingLevel = 0;
       return (
         context.options.enableScalaXmlInterpolation === true &&
         context.reader.current() === "{"

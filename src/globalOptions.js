@@ -6,7 +6,8 @@ type SunlightOptionsObjectType = {
   tabWidth: number,
   classPrefix: string,
   showWhitespace: boolean,
-  maxHeight: false | string
+  maxHeight: false | string,
+  enableScalaXmlInterpolation: boolean
 };
 export type SunlightOptionsType = SunlightOptionsMapType &
   SunlightOptionsObjectType;
@@ -25,5 +26,6 @@ export const globalOptions: SunlightOptionsType = {
   tabWidth: 4,
   classPrefix: DEFAULT_CLASS_PREFIX,
   showWhitespace: false,
-  maxHeight: false
+  maxHeight: false,
+  enableScalaXmlInterpolation: false
 };
