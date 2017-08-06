@@ -55,6 +55,7 @@ function getHighlightLanguage(filename: string): string {
     ".rb": "ruby",
     ".scala": "scala",
     ".sh": "bash",
+    ".sln": "sln",
     ".sql": "mysql",
     ".txt": "plaintext",
     ".vb": "vb",

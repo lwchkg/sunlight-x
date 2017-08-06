@@ -32,6 +32,7 @@ import * as powershell from "./languages/powershell.js";
 import * as python from "./languages/python.js";
 import * as ruby from "./languages/ruby.js";
 import * as scala from "./languages/scala.js";
+import * as sln from "./languages/sln.js";
 import * as vb from "./languages/vb.js";
 import * as xml from "./languages/xml.js";
 
@@ -62,6 +63,7 @@ const languages = [
   python,
   ruby,
   scala,
+  sln,
   vb,
   xml
 ];
