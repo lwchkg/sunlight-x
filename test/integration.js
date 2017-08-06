@@ -57,6 +57,7 @@ function getHighlightLanguage(filename: string): string {
     ".sh": "bash",
     ".sln": "sln",
     ".sql": "mysql",
+    ".tsql": "tsql",
     ".txt": "plaintext",
     ".vb": "vb",
     ".xml": "xml"
