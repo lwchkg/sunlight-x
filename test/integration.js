@@ -53,6 +53,7 @@ function getHighlightLanguage(filename: string): string {
     ".ps1": "powershell",
     ".py": "python",
     ".rb": "ruby",
+    ".scala": "scala",
     ".sh": "bash",
     ".sql": "mysql",
     ".txt": "plaintext",
