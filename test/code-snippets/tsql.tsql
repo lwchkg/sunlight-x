@@ -1,0 +1,27 @@
+--comment 1
+select * from db.my_table where myTable.id > 10
+
+select @@IDENTITY
+
+/* multi
+line comment */
+
+select "escaped\\\"";
+select 'escaped\\\'';
+
+SELECT TOP 1000
+    f.foo [foo],
+    f.bar,
+    f.name [foo.name],
+    b.baz,
+    @@ROWCOUNT
+FROM foo f
+INNER JOIN bar b
+    ON b.id = f.bar_id
+LEFT OUTER JOIN baz
+    ON baz.id = f.foo
+    AND baz.id IS NOT NULL
+GROUP BY f.name
+HAVING COUNT(f.name) < 10
+WHERE LEN(f.foo) < 5
+AND LEFT(f.foo) = 'f'
