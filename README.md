@@ -37,28 +37,33 @@ If you want badly to generate HTML snippets, see `test/integration.js` for examp
 - Modified CSS (themes not supported in HTML output yet).
 
 
-# TODO
-
-- Add all languages and plugins
-- Reorganize API
-  - Sunlight.\*
-  - Sunlight.Highlighter.\*
-  - Add API for theme selection
-  - Add API for getting the path and/or content of CSS files (and LESS files?).
-- Add more tests.
-- Webpack for browsers
-- Clarify owners of code snippets (some unknown code are used now).
-  - Others are listed in the code snippets folder.
-- Refactors.
-- Modernize the languages being highlighted.
-- Rewrite number parsers.
-
-
 # How to contribute
 
 - Start an issue, and write down your ideas there.
 - Give ideas on the API.
 - Add tests, contribute test snippets.
+- Add an language. Remember to add tests with it.
+- Points out where an existing language does not work well. (Start an issue for this.)
+
+
+# TODO
+
+- Add doucmentation.
+- Add the "doclinks" plugin.
+- Reorganize API:
+  - Sunlight.\*
+  - Sunlight.Highlighter.\*
+  - Add API for theme selection
+  - Add API for getting the path and/or content of CSS files (and LESS files?).
+- Add more tests.
+- Revamp switchTo/switchBack mechanism. Currently it is broken when multiple languages are loaded.
+- Webpack for browsers.
+- Clarify owners of code snippets (some unknown code are used now).
+  - Others are listed in the code snippets folder.
+- Refactors.
+- Add support of template interpolations in Javascript, PHP and other languages.
+- Modernize the languages being highlighted.
+- Rewrite number parsers.
 
 
 # Copyright
