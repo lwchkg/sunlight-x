@@ -12,7 +12,6 @@ import {} from "./load-plugins.js";
 import type { SunlightPartialOptionsType } from "./globalOptions.js";
 
 // Exports
-export const version = "1.22.0";
 export { defaultAnalyzer } from "./default-helpers.js";
 export { globalOptions } from "./globalOptions.js";
 export { registerLanguage, isRegistered } from "./languages.js";

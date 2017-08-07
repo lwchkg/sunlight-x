@@ -20,7 +20,7 @@ describe("API tests", function() {
     );
 
     // The result of the highlighting should be the same.
-    assert.strictEqual(highlightedCode, highlightedElement.innerHTML);
+    assert.strictEqual(highlightedCode, highlightedElement.outerHTML);
   });
 
   it("highlights empty code to completion", function() {
@@ -29,5 +29,24 @@ describe("API tests", function() {
 
     // The result is useless. Anyway, it must not throw or freeze.
     for (const code of codeSnippets) highlighter.highlightCode(code, language);
+  });
+
+  it("highlights code with the given theme", function() {
+    const code = 'console.log("test")\nconsole.log("test")';
+    const language = "javascript";
+
+    const customHighlighter = new Highlighter({ theme: "abcd" });
+    const classPrefix = customHighlighter.options.classPrefix;
+    const highlightedElement = customHighlighter.highlightCodeAsElement(
+      code,
+      language
+    );
+
+    const actualThemeList = highlightedElement.className
+      .split(" ")
+      .filter((item: string): boolean =>
+        item.startsWith(classPrefix + "theme-")
+      );
+    assert.deepStrictEqual(actualThemeList, [classPrefix + "theme-abcd"]);
   });
 });

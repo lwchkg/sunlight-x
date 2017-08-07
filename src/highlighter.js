@@ -18,7 +18,7 @@ import {
 import { languages } from "./languages.js";
 import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
-import { errorInvalidValue } from "./logger.js";
+import { error as logError, errorInvalidValue } from "./logger.js";
 import { UserDefinedNameStore } from "./user-defined-name-store.js";
 
 import { document, window } from "./jsdom.js";
@@ -277,6 +277,11 @@ export class Highlighter {
       const container: HTMLElement = document.createElement("div");
       container.className = this.options.classPrefix + "container";
 
+      if (this.options.theme)
+        container.classList.add(
+          `${this.options.classPrefix}theme-${this.options.theme}`
+        );
+
       const codeContainer: HTMLElement = document.createElement("div");
       codeContainer.className = this.options.classPrefix + "code-container";
 
@@ -332,7 +337,12 @@ export class Highlighter {
 
     this.highlightNode(preElement, true);
 
-    return codeElement;
+    const ret = codeElement.childNodes[0];
+    if (!(ret instanceof window.Element)) {
+      logError("Internal error.");
+      return codeElement;
+    }
+    return ret;
   }
 
   /**
@@ -342,7 +352,7 @@ export class Highlighter {
    * @returns {Element}
    */
   highlightCode(code: string, languageId: string): string {
-    return this.highlightCodeAsElement(code, languageId).innerHTML;
+    return this.highlightCodeAsElement(code, languageId).outerHTML;
   }
 
   // Reset HIGHLIGHTED_NODE_COUNT to zero. Run this before a layout test.
