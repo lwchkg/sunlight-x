@@ -37,12 +37,12 @@ describe("Plaintext tests", function() {
         .replace(/\t/g, nbsp.repeat(4));
 
       const elements = testSupport.GetElementsWithClassName("plaintext");
-      assert.strictEqual(1, elements.length);
-      assert.strictEqual(1, elements[0].childNodes.length);
+      assert.strictEqual(elements.length, 1);
+      assert.strictEqual(elements[0].childNodes.length, 1);
 
       const textElement = elements[0].childNodes[0];
-      assert.strictEqual(TEXT_NODE, textElement.nodeType);
-      assert.strictEqual(expected, textElement.nodeValue);
+      assert.strictEqual(textElement.nodeType, TEXT_NODE);
+      assert.strictEqual(textElement.nodeValue, expected);
     });
   });
 });
