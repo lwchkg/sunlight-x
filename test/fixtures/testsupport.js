@@ -5,7 +5,6 @@
 
 // @flow
 import * as fs from "fs";
-import { jsdom } from "jsdom";
 import * as path from "path";
 
 import { Highlighter } from "../../src/sunlight.js";
@@ -13,7 +12,6 @@ import { Highlighter } from "../../src/sunlight.js";
 import type { SunlightPartialOptionsType } from "../../src/globalOptions.js";
 
 const defaultOptions = {
-  classPrefix: "sunlight-",
   enableDocLinks: true,
   maxHeight: undefined
 };
@@ -21,37 +19,24 @@ const defaultOptions = {
 export const nbsp = "\u00a0";
 
 export class TestSupportForCode {
+  classPrefix: string;
+  codeElement: Element;
+
   /**
    * @param {string} code
    * @param {string} language
    * @param {Object|undefined} options
    */
-  options: SunlightPartialOptionsType;
-  classPrefix: string;
-  codeElement: Element;
-
   constructor(
     code: string,
     language: string,
     options?: SunlightPartialOptionsType
   ) {
-    this.options = Object.assign({}, defaultOptions, options);
-    this.classPrefix = this.options.classPrefix || "sunlight-";
+    const parsedOptions = Object.assign({}, defaultOptions, options);
+    const highlighter = new Highlighter(parsedOptions);
 
-    const document: Document = jsdom("", {});
-    const preElement = document.createElement("pre");
-    // Note: setting innerText does not work in jsdom 9.4.2
-    preElement.appendChild(document.createTextNode(code));
-    preElement.setAttribute(
-      "class",
-      this.classPrefix + "highlight-" + language
-    );
-
-    this.codeElement = document.createElement("div");
-    this.codeElement.appendChild(preElement);
-
-    const highlighter = new Highlighter(this.options);
-    highlighter.highlightNode(preElement);
+    this.classPrefix = highlighter.options.classPrefix;
+    this.codeElement = highlighter.highlightCodeAsElement(code, language);
   }
 
   /**
