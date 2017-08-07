@@ -1,3 +1,8 @@
+// sunlight-x: Intelligent Syntax Highlighting, Modernized
+// Copyright 2017 Leung Wing-chung. All rights reserved.
+// Use of this source code is governed by a Apache License Version 2.0, that can
+// be found in the LICENSE file.
+
 // @flow
 import * as util from "./util.js";
 import { DEFAULT_LANGUAGE, TEXT_NODE } from "./constants.js";
@@ -13,7 +18,7 @@ import {
 import { languages } from "./languages.js";
 import { AnalyzerContext } from "./analyzer-context.js";
 import { Tokenize } from "./parser-context.js";
-import { errorInvalidValue } from "./logger.js";
+import { error as logError, errorInvalidValue } from "./logger.js";
 import { UserDefinedNameStore } from "./user-defined-name-store.js";
 
 import { document, window } from "./jsdom.js";
@@ -25,6 +30,7 @@ import type {
 import type { Analyzer } from "./analyzer.js";
 import type { ParserContext } from "./parser-context.js";
 
+// TODO: Redo count. Is there really a need to increase count for sub-nodes?
 let HIGHLIGHTED_NODE_COUNT = 0;
 
 /**
@@ -143,7 +149,6 @@ export class Highlighter {
   // partialContext allows us to perform a partial parse, and then pick up where
   // we left off at a later time this functionality enables nested highlights
   // (language within a language, e.g. PHP within HTML followed by more PHP)
-  // TODO: evaluate the need for partialContext to exist.
   _highlightText(
     unhighlightedCode: string,
     languageId: string,
@@ -207,7 +212,7 @@ export class Highlighter {
     return node.classList.contains(this.options.classPrefix + "highlighted");
   }
 
-  // highlights a block of text
+  // Highlights a block of text. DEPRECATED.
   highlight(code: string, languageId: string): AnalyzerContext {
     return this._highlightText(
       code,
@@ -217,7 +222,15 @@ export class Highlighter {
     );
   }
 
-  // recursively highlights a DOM node
+  /**
+   * Recursively highlights a DOM node. The node should have the class of
+   * "sunlight-highlight-[lang]", or "[prefix]highlight-[lang]" if you have a
+   * custom prefix.
+   * @param {Element} node The element to be highlighted.
+   * @param {boolean?} addContainer Whether to add the container. If omitted,
+   * container will be added if it is a block element. (TODO: should we make it
+   * omit == true?)
+   */
   highlightNode(node: Element, addContainer: ?boolean) {
     if (this.isAlreadyHighlighted(node)) return;
 
@@ -264,6 +277,11 @@ export class Highlighter {
       const container: HTMLElement = document.createElement("div");
       container.className = this.options.classPrefix + "container";
 
+      if (this.options.theme)
+        container.classList.add(
+          `${this.options.classPrefix}theme-${this.options.theme}`
+        );
+
       const codeContainer: HTMLElement = document.createElement("div");
       codeContainer.className = this.options.classPrefix + "code-container";
 
@@ -297,6 +315,44 @@ export class Highlighter {
         count: currentNodeCount
       });
     }
+  }
+
+  /**
+   * Highlights the given code and returns the HTML Element.
+   * @param {string} code
+   * @param {string} languageId
+   * @returns {Element}
+   */
+  highlightCodeAsElement(code: string, languageId: string): Element {
+    const preElement = document.createElement("pre");
+    // Note: setting innerText does not work in jsdom 9.4.2
+    preElement.appendChild(document.createTextNode(code));
+    preElement.setAttribute(
+      "class",
+      this.options.classPrefix + "highlight-" + languageId
+    );
+
+    const codeElement = document.createElement("div");
+    codeElement.appendChild(preElement);
+
+    this.highlightNode(preElement, true);
+
+    const ret = codeElement.childNodes[0];
+    if (!(ret instanceof window.Element)) {
+      logError("Internal error.");
+      return codeElement;
+    }
+    return ret;
+  }
+
+  /**
+   * Highlights the given code and returns the HTML as a string.
+   * @param {string} code
+   * @param {string} languageId
+   * @returns {Element}
+   */
+  highlightCode(code: string, languageId: string): string {
+    return this.highlightCodeAsElement(code, languageId).outerHTML;
   }
 
   // Reset HIGHLIGHTED_NODE_COUNT to zero. Run this before a layout test.

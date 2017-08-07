@@ -135,7 +135,7 @@ describe("HTML files generation test", function() {
       );
       allResults.push({
         filename: snippetFilename,
-        highlightedCode: testSupport.codeElement.innerHTML
+        highlightedCode: testSupport.codeElement.outerHTML
       });
     }
 
