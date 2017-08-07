@@ -5,6 +5,10 @@
   "main": "babel-out/index.js",
   "author": "WC Leung",
   "license": "Apache-2.0",
+  "files": [
+    "babel-out/",
+    "compiled-assets/"
+  ],
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-eslint": "^7.2.3",
@@ -12,12 +16,12 @@
     "babel-preset-flow": "^6.23.0",
     "cash-cat": "^0.2.0",
     "codacy-coverage": "^2.0.2",
-    "cross-env": "^5.0.1",
-    "eslint": "^4.2.0",
+    "cross-env": "^5.0.4",
+    "eslint": "^4.4.1",
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-flowtype": "^2.35.0",
     "eslint-plugin-prettier": "^2.1.2",
-    "flow-bin": "^0.51.0",
+    "flow-bin": "^0.52.0",
     "flow-typed": "^2.1.5",
     "jest": "^20.0.4",
     "less": "^2.7.2",
