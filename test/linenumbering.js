@@ -22,8 +22,8 @@ function checkLineNumbers(
     const attribute = node.getAttribute("href") || "";
     const match: ?(string[]) = attribute.match(lineNumberExtractorRegExp);
     const lineNumber: string = (match && match[1]) || "";
-    assert.notStrictEqual("", lineNumber);
-    assert.strictEqual(lineNumberStart + index, Number.parseInt(lineNumber));
+    assert.notStrictEqual(lineNumber, "");
+    assert.strictEqual(Number.parseInt(lineNumber), lineNumberStart + index);
   });
 }
 
@@ -36,8 +36,8 @@ describe("Line numbering plugin", function() {
       options
     );
     assert.strictEqual(
-      true,
-      testSupport.DoesElementsWithClassNameExist("line-number-margin")
+      testSupport.DoesElementsWithClassNameExist("line-number-margin"),
+      true
     );
 
     checkLineNumbers(testSupport, 1);
@@ -51,8 +51,8 @@ describe("Line numbering plugin", function() {
       options
     );
     assert.strictEqual(
-      false,
-      testSupport.DoesElementsWithClassNameExist("line-number-margin")
+      testSupport.DoesElementsWithClassNameExist("line-number-margin"),
+      false
     );
   });
 
@@ -65,8 +65,8 @@ describe("Line numbering plugin", function() {
       options
     );
     assert.strictEqual(
-      true,
-      testSupport.DoesElementsWithClassNameExist("line-number-margin")
+      testSupport.DoesElementsWithClassNameExist("line-number-margin"),
+      true
     );
 
     checkLineNumbers(testSupport, lineNumberStart);

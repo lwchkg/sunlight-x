@@ -64,8 +64,8 @@ function getHighlightLanguage(filename: string): string {
   };
   const language = map[extension] || "";
   assert.notStrictEqual(
-    "",
     language,
+    "",
     "Cannot find the language of extension " + extension
   );
   return language;
