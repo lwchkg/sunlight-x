@@ -138,7 +138,6 @@ var isRegistered = sunlight.isRegistered(language)
 - Add doucmentation.
 - Add the "doclinks" plugin.
 - Reorganize API:
-  - Add API for theme selection
   - Add API for getting the path and/or content of CSS files (and LESS files?).
 - Add more tests.
 - Revamp switchTo/switchBack mechanism. Currently it is broken when multiple languages are loaded.
