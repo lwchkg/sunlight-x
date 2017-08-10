@@ -4,7 +4,7 @@ import { Highlighter } from "../src/sunlight.js";
 const highlighter = new Highlighter();
 
 describe("API tests", function() {
-  it("highlights code", function() {
+  it("all highlight functions have equivalent output", function() {
     const code = 'console.log("test")\nconsole.log("test")';
     const language = "javascript";
 
@@ -31,7 +31,7 @@ describe("API tests", function() {
     for (const code of codeSnippets) highlighter.highlightCode(code, language);
   });
 
-  it("highlights code with the given theme", function() {
+  it("respects theme settings", function() {
     const code = 'console.log("test")\nconsole.log("test")';
     const language = "javascript";
 
