@@ -16,6 +16,7 @@ export { defaultAnalyzer } from "./default-helpers.js";
 export { globalOptions } from "./globalOptions.js";
 export { registerLanguage, isRegistered } from "./languages.js";
 export { Highlighter };
+export { getCSSSync } from "./styles.js";
 
 /**
  * Highlight all code matching the given or default class prefix.

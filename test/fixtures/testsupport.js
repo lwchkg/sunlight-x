@@ -92,16 +92,15 @@ export class TestSupportForCode {
   }
 }
 
+const snippetsDir = path.join(__dirname, "..", "code-snippets");
+
 /**
  * Returns the content of the file in "code-snippets" directory.
  * @param {string} filename
  * @returns {string}
  */
 export function GetContentOfSnippet(filename: string): string {
-  return fs.readFileSync(
-    path.join(__dirname, "..", "code-snippets", filename),
-    "utf8"
-  );
+  return fs.readFileSync(path.join(snippetsDir, filename), "utf8");
 }
 
 export class TestSupportForFile extends TestSupportForCode {
@@ -116,5 +115,13 @@ export class TestSupportForFile extends TestSupportForCode {
     options?: SunlightPartialOptionsType
   ) {
     super(GetContentOfSnippet(filename), language, options);
+  }
+
+  /**
+   * Returns the list of files in the snippet directory.
+   * @returns {string[]}
+   */
+  static getSnippetFileList(): string[] {
+    return fs.readdirSync(snippetsDir);
   }
 }
