@@ -16,7 +16,6 @@ import { TestSupportForFile } from "./fixtures/testsupport.js";
  * @returns {string}
  */
 function getHighlightLanguage(filename: string): string {
-  if (filename === "README.md") return "";
   const extension = path.parse(filename).ext;
   const map: { [string]: string } = {
     ".6502asm": "6502asm",
@@ -121,6 +120,8 @@ describe("HTML files generation test", function() {
 
     const allResults: { filename: string, highlightedCode: string }[] = [];
     for (const filename of snippetList) {
+      if (filename === "README.md") continue;
+
       const language = getHighlightLanguage(filename);
       const testSupport = new TestSupportForFile(filename, language, options);
       allResults.push({
