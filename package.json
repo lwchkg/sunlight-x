@@ -64,6 +64,6 @@
     "lessc": "lessc",
     "lint": "yarn run flow-typed-install && yarn run eslint-run",
     "prepare": "yarn run compile",
-    "test": "yarn run lint && yarn run jest-coverage && yarn run codacy-coverage-upload"
+    "test": "yarn run compile-css && yarn run lint && yarn run jest-coverage && yarn run codacy-coverage-upload"
   }
 }
