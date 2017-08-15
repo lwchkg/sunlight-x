@@ -30,7 +30,7 @@ main, nav, aside, header, footer { box-sizing: border-box; }
 header {
   font-weight: bold;
   padding: 2px 16px;
-  background-color: darkslategray;
+  background-color: #ee9900;
   color: white;
 }
 
@@ -47,7 +47,9 @@ main { padding: 12px 16px; }
 
 main h2 { font-size: 20px; }
 
-div + h2 { margin-top: 8px; }
+div + h2 { margin-top: 24px; }
+
+p { margin: 0 0 8px; padding: 0; }
 
 nav {
   flex: 0 0 12em;

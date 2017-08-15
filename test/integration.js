@@ -8,7 +8,10 @@ import assert from "assert";
 import fs from "fs";
 import path from "path";
 import { getCSSSync, Highlighter } from "../src/sunlight.js";
-import { TestSupportForFile } from "./fixtures/testsupport.js";
+import {
+  getOptionsFromString,
+  TestSupportForFile
+} from "./fixtures/testsupport.js";
 
 /**
  * Returns the syntax highlighting language from the file extension.
@@ -113,19 +116,26 @@ function resetHighlighterCount() {
 
 describe("HTML files generation test", function() {
   const snippetList = TestSupportForFile.getSnippetFileList();
-  const options = { lineNumbers: true };
 
   it("Renders the demo page correctly", function() {
     resetHighlighterCount();
 
-    const allResults: { filename: string, highlightedCode: string }[] = [];
+    const allResults: {
+      filename: string,
+      theme: string,
+      lineNumbers: string,
+      highlightedCode: string
+    }[] = [];
     for (const filename of snippetList) {
       if (filename === "README.md") continue;
 
       const language = getHighlightLanguage(filename);
+      const options = getOptionsFromString(filename);
       const testSupport = new TestSupportForFile(filename, language, options);
       allResults.push({
         filename: filename,
+        theme: typeof options.theme === "string" ? options.theme : "",
+        lineNumbers: options.lineNumbers ? "true" : "false",
         highlightedCode: testSupport.codeElement.outerHTML
       });
     }
@@ -138,6 +148,8 @@ describe("HTML files generation test", function() {
       nav += `<a href="#${result.filename}">${result.filename}</a>\n`;
 
       content += `<h2 id="${result.filename}">${result.filename}</h2>\n`;
+      content += `<p>Theme: <b>${result.theme}</b>, `;
+      content += `Line numbers: <b>${result.lineNumbers}</b></p>\n`;
       content += `${result.highlightedCode}\n`;
     }
 

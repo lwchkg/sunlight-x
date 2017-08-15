@@ -6,6 +6,7 @@
 // @flow
 import * as fs from "fs";
 import * as path from "path";
+import { djb2Utf8 } from "./djb2-utf8.js";
 
 import { Highlighter } from "../../src/sunlight.js";
 
@@ -17,6 +18,32 @@ const defaultOptions = {
 };
 
 export const nbsp = "\u00a0";
+
+/**
+ * Generate options according to the hash. Exported for testing only.
+ * @param {number} hash The hash, from 0 to 2 ^ 32 - 1.
+ * @returns {Object}
+ */
+export function getOptionsFromHash(hash: number): SunlightPartialOptionsType {
+  const themes = ["gitbook", "light", "dark"];
+  const ret: SunlightPartialOptionsType = {};
+
+  ret.theme = themes[hash % 3];
+  hash = Math.floor(hash / 3);
+
+  ret.lineNumbers = (hash & 1) !== 0;
+
+  return ret;
+}
+
+/**
+ * Generate options according to the hash of a string.
+ * @param {string} s
+ * @returns {Object}
+ */
+export function getOptionsFromString(s: string): SunlightPartialOptionsType {
+  return getOptionsFromHash(djb2Utf8(s));
+}
 
 export class TestSupportForCode {
   classPrefix: string;
