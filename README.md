@@ -7,7 +7,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d34cdc3875a94bafb62c822ba120b4cd)](https://www.codacy.com/app/lwchkg/sunlight-x?utm_source=github.com&utm_medium=referral&utm_content=lwchkg/sunlight-x&utm_campaign=Badge_Coverage)
 
 Sunlight highlighter modernized for node.js.
-Before the new demo is finished, you can see [the old Sunlight demo](http://sunlightjs.com/demo.html#vb) here.
+[Here](https://raw.githack.com/lwchkg/sunlight-x/master/test/output/integration-expected.html) is the demo of sunlight-x.
 
 
 # Features
@@ -139,6 +139,9 @@ var isRegistered = sunlight.isRegistered(language)
 - Add the "doclinks" plugin.
 - Reorganize API:
   - Add API for getting the path and/or content of CSS files (and LESS files?).
+  - code-reader.js (API should facilitate concise language parsers.)
+  - Remove line/column in tokens (no consumers of such code)!!!
+  - Fix bizzare statements in language files, e.g. `const value = context.reader.current() + context.reader.read(2); // we already read the first letter`. I don’t have any idea why the first byte of the token is already read, and this makes code that produce multiple tokens inconsistent (the first byte is NOT alreay read for the second token). Sadly this means redoing most of the existing language definitions in one single commit.
 - Add more tests.
 - Revamp switchTo/switchBack mechanism. Currently it is broken when multiple languages are loaded.
 - Webpack for browsers.
