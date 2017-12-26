@@ -27,8 +27,6 @@ export class Continuation {
     context: ParserContext,
     continuation: Continuation,
     buffer: string,
-    line: number,
-    column: number,
     processCurrent: boolean = false
   ): Token {
     let foundCloser = false;
@@ -83,6 +81,6 @@ export class Continuation {
     // this has significance for partial parses (e.g. for nested languages)
     if (!foundCloser) context.continuation = continuation;
 
-    return context.createToken(this.tokenName, buffer, line, column);
+    return context.createToken(this.tokenName, buffer);
   }
 }

@@ -238,9 +238,7 @@ export const customParseRules = [
                   possibleMessageArgument && exprCount > 1
                     ? "messageArgumentName"
                     : "messageDestination",
-                  ident,
-                  context.reader.getLine(),
-                  context.reader.getColumn()
+                  ident
                 );
                 context.reader.read(ident.length - 1);
                 return token2;
@@ -303,12 +301,7 @@ export const customParseRules = [
           )
             return null;
 
-          const token2 = context.createToken(
-            token.name,
-            token.value,
-            context.reader.getLine(),
-            context.reader.getColumn()
-          );
+          const token2 = context.createToken(token.name, token.value);
           context.reader.read(token2.value.length - 1);
           return token2;
         } else if (prevToken.value === ";") {

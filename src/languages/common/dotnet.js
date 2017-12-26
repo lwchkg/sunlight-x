@@ -19,40 +19,19 @@ export function XMLDocComment(
 
     const metaName = "xmlDocCommentMeta"; // tags and the "///" starting token
     const contentName = "xmlDocCommentContent"; // actual comments (words and stuff)
-    const tokens = [
-      context.createToken(
-        metaName,
-        commentStart,
-        context.reader.getLine(),
-        context.reader.getColumn()
-      )
-    ];
+    const tokens = [context.createToken(metaName, commentStart)];
     context.reader.read(commentStart.length - 1);
 
-    const current: {
-      name: string,
-      value: string,
-      line: number,
-      column: number
-    } = { line: 0, column: 0, value: "", name: "" };
+    const current: { name: string, value: string } = { name: "", value: "" };
 
     while (!context.reader.isPeekEOF()) {
       const peek = context.reader.peek();
       if (peek === "<" && current.name !== metaName) {
         // push the current token
         if (current.value !== "")
-          tokens.push(
-            context.createToken(
-              current.name,
-              current.value,
-              current.line,
-              current.column
-            )
-          );
+          tokens.push(context.createToken(current.name, current.value));
 
-        // amd create a token for the tag
-        current.line = context.reader.getLine();
-        current.column = context.reader.getColumn();
+        // and create a token for the tag
         current.name = metaName;
         current.value = context.reader.read();
         continue;
@@ -61,14 +40,7 @@ export function XMLDocComment(
       if (peek === ">" && current.name === metaName) {
         // close the tag
         current.value += context.reader.read();
-        tokens.push(
-          context.createToken(
-            current.name,
-            current.value,
-            current.line,
-            current.column
-          )
-        );
+        tokens.push(context.createToken(current.name, current.value));
         current.name = "";
         current.value = "";
         continue;
@@ -76,24 +48,13 @@ export function XMLDocComment(
 
       if (peek === "\n") break;
 
-      if (current.name === "") {
-        current.name = contentName;
-        current.line = context.reader.getLine();
-        current.column = context.reader.getColumn();
-      }
+      if (current.name === "") current.name = contentName;
 
       current.value += context.reader.read();
     }
 
     if (current.name === contentName)
-      tokens.push(
-        context.createToken(
-          current.name,
-          current.value,
-          current.line,
-          current.column
-        )
-      );
+      tokens.push(context.createToken(current.name, current.value));
 
     return tokens.length > 0 ? tokens : null;
   };

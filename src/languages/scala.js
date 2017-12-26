@@ -146,9 +146,7 @@ export const customParseRules = [
     if (!match) return null;
     context.reader.read(match[1].length);
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-    return context.createToken("symbolLiteral", "'" + match[1], line, column);
+    return context.createToken("symbolLiteral", "'" + match[1]);
   },
 
   // case classes: can't distinguish between a case class and a function call so
@@ -157,9 +155,6 @@ export const customParseRules = [
     if (context.defaultData.text === "") return null;
 
     if (!/[A-Za-z]/.test(context.reader.current())) return null;
-
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     const prevToken = context.token(context.count() - 1);
     if (
@@ -175,7 +170,7 @@ export const customParseRules = [
       ident += context.reader.read();
 
     context.userDefinedNameStore.addName(ident, name);
-    return context.createToken("ident", ident, line, column);
+    return context.createToken("ident", ident);
   }
 ];
 

@@ -86,9 +86,6 @@ export const customParseRules = [
     ];
 
     return function(context: ParserContext): ?Token {
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
-
       if (
         !/[A-Za-z_-]/.test(context.reader.current()) ||
         !/[\w-]/.test(context.reader.peek())
@@ -105,7 +102,7 @@ export const customParseRules = [
           ? "keyword"
           : ident.charAt(0) === "-" ? "switch" : "ident";
 
-      return context.createToken(tokenType, ident, line, column);
+      return context.createToken(tokenType, ident);
     };
   })(),
 
@@ -156,9 +153,6 @@ export const customParseRules = [
     const invalidVariableCharRegex = /[!@#%&,.\s]/;
 
     return function(context: ParserContext): ?Token {
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
-
       // illegal characters in a variable: ! @ # % & , . whitespace
       if (
         context.reader.current() !== "$" ||
@@ -177,9 +171,7 @@ export const customParseRules = [
         util.contains(specialVariables, value.toUpperCase())
           ? "specialVariable"
           : "variable",
-        value,
-        line,
-        column
+        value
       );
     };
   })()

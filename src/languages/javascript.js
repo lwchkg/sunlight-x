@@ -138,12 +138,7 @@ export const customParseRules = [
     const previousNonWsToken = context.token(context.count() - 1);
     let previousToken = null;
     if (context.defaultData.text !== "")
-      previousToken = context.createToken(
-        "default",
-        context.defaultData.text,
-        context.defaultData.line,
-        context.defaultData.column
-      );
+      previousToken = context.createToken("default", context.defaultData.text);
 
     if (!previousToken) previousToken = previousNonWsToken;
 
@@ -167,9 +162,6 @@ export const customParseRules = [
         return null;
     }
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     // read the regex literal
     let regexLiteral = "/";
     let charClass = false;
@@ -192,7 +184,7 @@ export const customParseRules = [
     )
       regexLiteral += context.reader.read();
 
-    return context.createToken("regexLiteral", regexLiteral, line, column);
+    return context.createToken("regexLiteral", regexLiteral);
   }
 ];
 

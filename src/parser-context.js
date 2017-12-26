@@ -65,16 +65,7 @@ export class ParserContext {
       partialContext.continuation = null;
       // The following statement can write to this.continuation
       // TODO: clean up
-      this.tokens.push(
-        continuation.process(
-          this,
-          continuation,
-          "",
-          this.reader.getLine(),
-          this.reader.getColumn(),
-          true
-        )
-      );
+      this.tokens.push(continuation.process(this, continuation, "", true));
     }
 
     while (!this.reader.isEOF()) {
@@ -84,14 +75,7 @@ export class ParserContext {
       // flush default data if needed (in pretty much all languages this is just whitespace)
       if (token !== null && token !== undefined) {
         if (this.defaultData.text !== "") {
-          this.tokens.push(
-            this.createToken(
-              "default",
-              this.defaultData.text,
-              this.defaultData.line,
-              this.defaultData.column
-            )
-          );
+          this.tokens.push(this.createToken("default", this.defaultData.text));
           this.defaultData.text = "";
         }
 
@@ -105,14 +89,7 @@ export class ParserContext {
 
     // append the last default token, if necessary
     if (this.defaultData.text !== "")
-      this.tokens.push(
-        this.createToken(
-          "default",
-          this.defaultData.text,
-          this.defaultData.line,
-          this.defaultData.column
-        )
-      );
+      this.tokens.push(this.createToken("default", this.defaultData.text));
 
     AfterTokenizeEvent.raise(this.highlighter, {
       code: unhighlightedCode,
@@ -138,13 +115,8 @@ export class ParserContext {
     return new ArrayWalker(this.tokens, this.tokens.length);
   }
 
-  createToken(
-    name: string,
-    value: string,
-    line: number,
-    column: number
-  ): Token {
-    return new Token(name, value, line, column, this.language.name);
+  createToken(name: string, value: string): Token {
+    return new Token(name, value, this.language.name);
   }
 }
 

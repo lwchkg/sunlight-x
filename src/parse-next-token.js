@@ -36,20 +36,12 @@ function parseOperator(context: ParserContext): ?Token {
 function parsePunctuation(context: ParserContext): ?Token {
   const current = context.reader.current();
   if (context.language.punctuation.test(util.regexEscape(current)))
-    return context.createToken(
-      "punctuation",
-      current,
-      context.reader.getLine(),
-      context.reader.getColumn()
-    );
+    return context.createToken("punctuation", current);
 
   return null;
 }
 
 function parseIdent(context: ParserContext): ?Token {
-  const line = context.reader.getLine();
-  const column = context.reader.getColumn();
-
   if (!isIdentMatch(context)) return null;
 
   let ident = context.reader.current();
@@ -65,16 +57,10 @@ function parseIdent(context: ParserContext): ?Token {
     ident += context.reader.read();
   }
 
-  return context.createToken("ident", ident, line, column);
+  return context.createToken("ident", ident);
 }
 
 function parseDefault(context: ParserContext): ?Token {
-  if (context.defaultData.text === "") {
-    // new default token
-    context.defaultData.line = context.reader.getLine();
-    context.defaultData.column = context.reader.getColumn();
-  }
-
   context.defaultData.text += context.reader.current();
   return null;
 }
@@ -96,11 +82,9 @@ function parseScopes(context: ParserContext): ?Token {
       )
         continue;
 
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
       context.reader.read(opener.length - 1);
       const continuation = new Continuation(scope, tokenName);
-      return continuation.process(context, continuation, value, line, column);
+      return continuation.process(context, continuation, value);
     }
   }
 

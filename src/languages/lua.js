@@ -124,9 +124,6 @@ export const customParseRules = [
     // [=*[ string contents ]=*]
     if (context.reader.current() !== "[") return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     let numberOfEqualsSigns = 0;
     let count = 0;
     let peek;
@@ -153,7 +150,7 @@ export const customParseRules = [
       value += context.reader.read();
     }
 
-    return context.createToken("verbatimString", value, line, column);
+    return context.createToken("verbatimString", value);
   }
 ];
 
