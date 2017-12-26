@@ -182,61 +182,58 @@
     "prefer-spread": [
       "error"
     ],
-    "prettier\/prettier": [
+    "prettier/prettier": [
       "error"
     ],
-    "flowtype\/boolean-style": [
+    "flowtype/boolean-style": [
       "error",
       "boolean"
     ],
-    "flowtype\/define-flow-type": "warn",
-    "flowtype\/delimiter-dangle": [
+    "flowtype/define-flow-type": "warn",
+    "flowtype/delimiter-dangle": [
       "error",
       "never"
     ],
-    "flowtype\/generic-spacing": [
-      "error",
-      "never"
-    ],
-    "flowtype\/no-primitive-constructor-types": "error",
-    "flowtype\/no-types-missing-file-annotation": "error",
-    "flowtype\/no-weak-types": "error",
-    "flowtype\/object-type-delimiter": [
+    "flowtype/generic-spacing": "off",
+    "flowtype/no-primitive-constructor-types": "error",
+    "flowtype/no-types-missing-file-annotation": "error",
+    "flowtype/no-weak-types": "error",
+    "flowtype/object-type-delimiter": [
       "error",
       "comma"
     ],
-    "flowtype\/require-parameter-type": "error",
-    "flowtype\/require-return-type": [
+    "flowtype/require-parameter-type": "error",
+    "flowtype/require-return-type": [
       "error",
       "always",
       {
         "annotateUndefined": "never"
       }
     ],
-    "flowtype\/require-valid-file-annotation": "error",
-    "flowtype\/semi": [
+    "flowtype/require-valid-file-annotation": "error",
+    "flowtype/semi": [
       "error",
       "always"
     ],
-    "flowtype\/space-after-type-colon": [
+    "flowtype/space-after-type-colon": [
       "error",
       "always"
     ],
-    "flowtype\/space-before-generic-bracket": [
+    "flowtype/space-before-generic-bracket": [
       "error",
       "never"
     ],
-    "flowtype\/space-before-type-colon": [
+    "flowtype/space-before-type-colon": [
       "error",
       "never"
     ],
-    "flowtype\/type-id-match": "off",
-    "flowtype\/union-intersection-spacing": [
+    "flowtype/type-id-match": "off",
+    "flowtype/union-intersection-spacing": [
       "error",
       "always"
     ],
-    "flowtype\/use-flow-type": "warn",
-    "flowtype\/valid-syntax": "warn"
+    "flowtype/use-flow-type": "warn",
+    "flowtype/valid-syntax": "warn"
   },
   "env": {
     "es6": true,
@@ -251,6 +248,7 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:flowtype/recommended",
     "prettier"
   ],
   "root": true,
