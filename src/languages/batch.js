@@ -25,24 +25,25 @@ export const customParseRules = [
   function(context: ParserContext): ?(Token[]) {
     if (
       !context.reader.isPrecededByWhitespaceOnly() ||
-      context.reader.current() !== ":" ||
-      context.reader.peek() === ":"
+      context.reader.newPeek() !== ":"
     )
       return null;
 
-    const colon = context.createToken("operator", ":");
+    const peek = context.reader.peekWithOffset(1);
+    if (peek === ":" || peek === "" || /\s/.test(peek)) return null;
 
     // Label. Read until whitespace.
-    if (context.reader.isPeekEOF() || /\s/.test(context.reader.peek()))
-      return null;
-
-    let value = context.reader.read();
-    while (!context.reader.isPeekEOF() && !/\s/.test(context.reader.peek()))
-      value += context.reader.read();
+    context.reader.newRead();
+    let value = context.reader.newRead();
+    while (!context.reader.newIsEOF() && !/\s/.test(context.reader.newPeek()))
+      value += context.reader.newRead();
 
     if (value === "") return null;
 
-    return [colon, context.createToken("label", value)];
+    return [
+      context.createToken("operator", ":"),
+      context.createToken("label", value)
+    ];
   },
 
   // Label after goto statements
@@ -59,9 +60,9 @@ export const customParseRules = [
     )
       return null;
 
-    let value = context.reader.current();
-    while (!context.reader.isPeekEOF() && !/[\W]/.test(context.reader.peek()))
-      value += context.reader.read();
+    let value = context.reader.newRead();
+    while (!context.reader.newIsEOF() && !/[\W]/.test(context.reader.newPeek()))
+      value += context.reader.newRead();
 
     return context.createToken("label", value);
   },

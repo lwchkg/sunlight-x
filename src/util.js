@@ -99,7 +99,7 @@ export function matchWord(
 ): ?Token {
   wordMap = wordMap || {};
 
-  let current = context.reader.current();
+  let current = context.reader.newPeek();
   if (context.language.caseInsensitive) current = current.toUpperCase();
 
   if (!wordMap[current]) return null;
@@ -108,17 +108,16 @@ export function matchWord(
 
   const index = subMap.findIndex((wordItem: *): boolean => {
     const word = wordItem.value;
-    const peek = current + context.reader.peek(word.length);
+    const peek = context.reader.newPeek(word.length + 1);
     return word === peek || wordItem.regex.test(peek);
   });
 
   if (index >= 0)
     return context.createToken(
       tokenName,
-      context.reader.current() +
-        (doNotRead
-          ? context.reader.peek(subMap[index].value.length - 1)
-          : context.reader.read(subMap[index].value.length - 1))
+      doNotRead
+        ? context.reader.newPeek(subMap[index].value.length)
+        : context.reader.newRead(subMap[index].value.length)
     );
 
   return null;
@@ -160,13 +159,13 @@ export function getRegexpParser(
   regex: RegExp
 ): ParserContext => ?Token {
   return function(context: ParserContext): ?Token {
-    const match = context.reader.currentAndPeekTillEOL().match(regex);
+    const match = context.reader.newPeekTillEOL().match(regex);
     // Fail if no match or not matching the start of a string.
     if (!match || match.index !== 0) return null;
 
     return context.createToken(
       tokenName,
-      context.reader.current() + context.reader.read(match[0].length - 1)
+      context.reader.newRead(match[0].length)
     );
   };
 }

@@ -163,7 +163,7 @@ export const customParseRules = [
 
     return function(context: ParserContext): ?Token {
       // short circuit
-      if (!/[A-Za-z]/.test(context.reader.current())) return null;
+      if (!/[A-Za-z]/.test(context.reader.newPeek())) return null;
 
       // if it follows "new" or ":", then it's not a function
       const walker = context.getTokenWalker();
@@ -179,28 +179,25 @@ export const customParseRules = [
       const token = util.matchWord(context, functions, "globalFunction", true);
       if (!token) return null;
 
-      // make sure that a "(" follows it
-      let peek;
-      const count = token.value.length;
-      while ((peek = context.reader.peek(count)) && peek.length === count)
-        if (!/\s$/.test(peek)) {
-          if (peek.charAt(count - 1) === "(") {
-            context.reader.read(token.value.length - 1);
-            return new Token(token.name, token.value, token.language);
-          }
-          break;
-        }
+      // Grab the next non-whitespace character, and make sure it is a "(".
+      for (let offset = token.value.length; ; offset++) {
+        const peek = context.reader.peekWithOffset(offset);
+        if (peek === "(") break;
+        if (peek === "" || !/^\s$/.test(peek)) return null;
+      }
 
-      return null;
+      context.reader.newRead(token.value.length);
+      return new Token(token.name, token.value, token.language);
     };
   })(),
 
   // regex literal, stolen from javascript
   function(context: ParserContext): ?Token {
-    // doesn't start with a / or starts with // (comment) or /* (multi line comment)
-    const peek = context.reader.peek();
-    if (context.reader.current() !== "/" || peek === "/" || peek === "*")
-      return null;
+    // Must start with a "/".
+    if (context.reader.newPeek() !== "/") return null;
+    // Should not start with "//" (comment) or "/*" (multi-line comment).
+    const peek = context.reader.newPeek(2);
+    if (peek === "//" || peek === "/*") return null;
 
     const isValid = (function(): boolean {
       const previousNonWsToken = context.token(context.count() - 1);
@@ -241,23 +238,23 @@ export const customParseRules = [
     if (!isValid) return null;
 
     // read the regex literal
-    let regexLiteral = "/";
-    while (!context.reader.isPeekEOF()) {
-      const next = context.reader.read();
+    let regexLiteral = context.reader.newRead();
+    while (!context.reader.newIsEOF()) {
+      const next = context.reader.newRead();
       regexLiteral += next;
       // escaped backslash or escaped forward slash
-      if (next === "\\") regexLiteral += context.reader.read();
+      if (next === "\\") regexLiteral += context.reader.newRead();
       else if (next === "/") break;
     }
 
     // read the regex modifiers
     // only "g", "i", "m", "s" and "x" are allowed, but for the sake of
     // simplicity we'll just say any alphabetical character is valid
-    while (!context.reader.isPeekEOF()) {
-      if (!/[A-Za-z]/.test(context.reader.peek())) break;
-
-      regexLiteral += context.reader.read();
-    }
+    while (
+      !context.reader.newIsEOF() &&
+      /[A-Za-z]/.test(context.reader.newPeek())
+    )
+      regexLiteral += context.reader.newRead();
 
     return context.createToken("regexLiteral", regexLiteral);
   }
