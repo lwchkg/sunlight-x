@@ -46,27 +46,34 @@ class EventClass<T> {
   }
 }
 
-// TODO: reformat after prettier recognize flow
-type BeforeHighlightNodeEventType = EventClass<BeforeHighlightNodeEventArgs>;
-export const BeforeHighlightNodeEvent: BeforeHighlightNodeEventType = new EventClass();
+export const BeforeHighlightNodeEvent: EventClass<
+  BeforeHighlightNodeEventArgs
+> = new EventClass();
 
-type BeforeHighlightEventType = EventClass<BeforeHighlightEventArgs>;
-export const BeforeHighlightEvent: BeforeHighlightEventType = new EventClass();
+export const BeforeHighlightEvent: EventClass<
+  BeforeHighlightEventArgs
+> = new EventClass();
 
-type BeforeTokenizeEventType = EventClass<BeforeTokenizeEventArgs>;
-export const BeforeTokenizeEvent: BeforeTokenizeEventType = new EventClass();
+export const BeforeTokenizeEvent: EventClass<
+  BeforeTokenizeEventArgs
+> = new EventClass();
 
-type AfterTokenizeEventType = EventClass<AfterTokenizeEventArgs>;
-export const AfterTokenizeEvent: AfterTokenizeEventType = new EventClass();
+export const AfterTokenizeEvent: EventClass<
+  AfterTokenizeEventArgs
+> = new EventClass();
 
-type BeforeAnalyzeEventType = EventClass<BeforeAnalyzeEventArgs>;
-export const BeforeAnalyzeEvent: BeforeAnalyzeEventType = new EventClass();
+export const BeforeAnalyzeEvent: EventClass<
+  BeforeAnalyzeEventArgs
+> = new EventClass();
 
-type AfterAnalyzeEventType = EventClass<AfterAnalyzeEventArgs>;
-export const AfterAnalyzeEvent: AfterAnalyzeEventType = new EventClass();
+export const AfterAnalyzeEvent: EventClass<
+  AfterAnalyzeEventArgs
+> = new EventClass();
 
-type AfterHighlightEventType = EventClass<AfterHighlightEventArgs>;
-export const AfterHighlightEvent: AfterHighlightEventType = new EventClass();
+export const AfterHighlightEvent: EventClass<
+  AfterHighlightEventArgs
+> = new EventClass();
 
-type AfterHighlightNodeEventType = EventClass<AfterHighlightNodeEventArgs>;
-export const AfterHighlightNodeEvent: AfterHighlightNodeEventType = new EventClass();
+export const AfterHighlightNodeEvent: EventClass<
+  AfterHighlightNodeEventArgs
+> = new EventClass();

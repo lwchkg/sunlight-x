@@ -20,7 +20,7 @@ export class AnalyzerContext {
   userDefinedNameStore: UserDefinedNameStore;
   continuation: ?Continuation;
   items: ContextItemsType;
-  index: number; // TODO: initialize. But what to initialize with?
+  index: number; // Uninitizlized by constructor. Managed by highlighter.js.
 
   nbsp: string;
   tab: string;
