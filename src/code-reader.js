@@ -26,8 +26,9 @@ export class CodeReader {
   }
 
   toString(): string {
-    return `length: ${this.length}, index: ${this.index}, line: ${this
-      .line}, column: ${this.column}, current: [${this.currentChar}]`;
+    return `length: ${this.length}, index: ${this.index}, line: ${
+      this.line
+    }, column: ${this.column}, current: [${this.currentChar}]`;
   }
 
   current(): string {
