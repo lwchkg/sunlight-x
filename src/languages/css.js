@@ -19,24 +19,19 @@ function peekSelectorToken(context: ParserContext): string | null {
   }
 
   // now check to make sure we run into a { before a ;
-
   let value = "";
   let appendToValue = true;
-  let count = 1;
-  let peek = context.reader.peek();
-  while (peek.length === count) {
-    const letter = peek.charAt(peek.length - 1);
-    if (/[^\w-]$/.test(peek)) {
+  for (let offset = 1; ; offset++) {
+    const peek = context.reader.peekWithOffset(offset);
+    if (peek === "") break;
+
+    if (/[^\w-]/.test(peek)) {
       appendToValue = false;
-
-      if (letter === "{") break;
-
-      if (letter === ";") return null;
+      if (peek === "{") break;
+      if (peek === ";") return null;
+    } else if (appendToValue) {
+      value += peek;
     }
-
-    if (appendToValue) value += letter;
-
-    peek = context.reader.peek(++count);
   }
 
   return value;
@@ -554,23 +549,18 @@ export const customParseRules = [
       if (!token) return null;
 
       // the next non-whitespace character must be a "("
-      let count = token.value.length;
-      let peek = context.reader.peek(count);
-      while (peek.length === count) {
-        if (!/\s$/.test(peek)) {
-          if (peek.charAt(peek.length - 1) === "(") {
-            // this token really is a function
-            context.reader.read(token.value.length - 1);
-            return token;
-          }
+      for (let offset = token.value.length; ; offset++) {
+        const peek = context.reader.peekWithOffset(offset);
+        if (peek === "") return null;
 
-          break;
+        if (peek === "(") {
+          // this token really is a function
+          context.reader.newRead(token.value.length);
+          return token;
         }
 
-        peek = context.reader.peek(++count);
+        if (!/^\s$/.test(peek)) return null;
       }
-
-      return null;
     };
   })(),
 
@@ -675,12 +665,12 @@ export const customParseRules = [
     // we can't just make this a scope because we'll get false positives for things like ".png" in url(image.png) (image.png doesn't need to be in quotes)
     // so we detect them the hard way
 
-    if (context.reader.current() !== ".") return null;
+    if (!context.reader.newMatch(".")) return null;
 
     const className = peekSelectorToken(context);
     if (className === null) return null;
 
-    context.reader.read(className.length);
+    context.reader.newRead(className.length + 1);
     return [
       context.createToken("operator", "."),
       context.createToken("class", className)
@@ -689,9 +679,7 @@ export const customParseRules = [
 
   // element selctors (div, html, body, etc.)
   function(context: ParserContext): ?Token {
-    const current = context.reader.current();
-
-    if (!/[A-Za-z_]/.test(current)) return null;
+    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
 
     const prevToken = util.getPreviousNonWsToken(
       context.getAllTokens(),
@@ -707,34 +695,36 @@ export const customParseRules = [
     const tagName = peekSelectorToken(context);
     if (tagName === null) return null;
 
-    context.reader.read(tagName.length);
-    return context.createToken("element", current + tagName);
+    return context.createToken(
+      "element",
+      context.reader.newRead(tagName.length + 1)
+    );
   },
 
   // hex color value
   function(context: ParserContext): ?Token {
-    if (context.reader.current() !== "#") return null;
+    if (!context.reader.newMatch("#")) return null;
 
-    let count = 1;
-    let value = "#";
-    let validHex = true;
-    let peek = context.reader.peek();
-    while (peek.length === count) {
-      const letter = peek.charAt(peek.length - 1);
-      if (letter === "}" || letter === ";") break;
+    let length: number = 1;
+    let nonHex: boolean = false;
+    for (let offset = 1; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek === "" || peek === "}" || peek === ";") break;
 
       // must be between ":" and ";" basically if we run into a "{" before a "}
       // it's an id selector instead.
-      if (letter === "{") return null;
+      if (peek === "{") return null;
 
-      if (validHex && /[A-Fa-f0-9]/.test(letter)) value += letter;
-      else validHex = false;
+      if (nonHex) continue;
 
-      peek = context.reader.peek(++count);
+      if (/[A-Fa-f0-9]/.test(peek)) length++;
+      else nonHex = true;
     }
 
-    context.reader.read(value.length - 1); // -1 because we already read the "#"
-    return context.createToken("hexColor", value);
+    // Should not be the "#" character alone without any hex digits following.
+    if (length === 1) return null;
+
+    return context.createToken("hexColor", context.reader.newRead(length));
   }
 ];
 

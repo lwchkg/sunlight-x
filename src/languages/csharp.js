@@ -167,7 +167,9 @@ export const customParseRules = [
 
   // get/set contextual keyword
   function(context: ParserContext): ?Token {
-    if (!/^(get|set)\b/.test(context.reader.currentAndPeek(4))) return null;
+    const initialLength = "get".length;
+    if (!/^(get|set)\b/.test(context.reader.newPeek(initialLength + 1)))
+      return null;
 
     if (
       !util.IsFollowsRuleSatisfied(context.getTokenWalker(), [
@@ -182,66 +184,48 @@ export const customParseRules = [
     )
       return null;
 
-    // now we need to look ahead and verify that the next non-sunlight.util.whitespace token is "{" or ";"
-    let count = "get".length;
-    let peek = context.reader.peek(count);
-    let allGoodYo = false;
-    while (peek.length === count) {
+    // now we need to look ahead and verify that the next non-whitespace token is "{" or ";"
+    for (let offset = initialLength; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek === "") return null;
+
       if (!/\s$/.test(peek)) {
-        if (!/[{;]$/.test(peek)) return null;
-
-        allGoodYo = true;
-        break;
+        if (peek === "{" || peek === ";") break;
+        return null;
       }
-
-      peek = context.reader.peek(++count);
     }
 
-    if (!allGoodYo) return null;
-
-    const value = context.reader.current() + context.reader.read(2); // we already read the first letter
+    const value = context.reader.newRead(initialLength);
     return context.createToken("keyword", value);
   },
 
   // value contextual keyword
   function(context: ParserContext): ?Token {
-    if (!/^value\b/.test(context.reader.currentAndPeek(6))) return null;
+    const initialLength = "value".length;
+    if (!/^value\b/.test(context.reader.newPeek(initialLength + 1)))
+      return null;
 
     // comes after "set" but not after the closing "}" (we'll have to count them to make sure scoping is correct)
     // can't be on the left side of an assignment
 
     // first check equals because that's easy
-    let count = "value".length;
-    let peek = context.reader.peek(count);
-    let allGoodYo = false;
-    while (peek.length === count) {
+    for (let offset = initialLength; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek === "") return null;
+
       if (!/\s$/.test(peek)) {
-        const peekPlus1 = context.reader.peek(count + 1);
-        if (
-          peek.charAt(peek.length - 1) === "=" &&
-          peekPlus1.charAt(peekPlus1.length - 1) !== "="
-        )
-          // "value" is on the left side of an assignment, so this is not the droid we're looking for
-          return null;
-
-        allGoodYo = true;
-        break;
+        if (peek !== "=" || context.reader.peekWithOffset(offset + 1) === "=")
+          break;
+        return null;
       }
-
-      peek = context.reader.peek(++count);
     }
-
-    if (!allGoodYo)
-      // EOF FTL
-      return null;
 
     // now go backward until we run into a "set" keyword, keeping track of all brackets along the way
     const bracketCount = [0, 0]; // open, close
     const walker = context.getTokenWalker();
-    let token;
     tokenLoop: for (;;) {
       if (!walker.hasPrev()) return null;
-      token = walker.prev();
+      const token = walker.prev();
       if (token.name === "punctuation") {
         if (token.value === "{") bracketCount[0]++;
         else if (token.value === "}") bracketCount[1]++;
@@ -266,8 +250,10 @@ export const customParseRules = [
       // nope
       return null;
 
-    context.reader.read(4); // already read the "v" in "value"
-    return context.createToken("keyword", "value");
+    return context.createToken(
+      "keyword",
+      context.reader.newRead(initialLength)
+    );
   }
 ];
 

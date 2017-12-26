@@ -153,7 +153,7 @@ export const customTokens = {
 
 export const customParseRules = [
   function(context: ParserContext): ?Token {
-    if (context.reader.newPeek() !== "#") return null;
+    if (!context.reader.newMatch("#")) return null;
 
     // Quick and dirty: everything between "#" (inclusive) and whitespace
     // (exclusive) is a constant too dirty.  Need to account for parens and

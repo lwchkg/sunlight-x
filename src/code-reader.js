@@ -195,11 +195,23 @@ export class CodeReader {
     return this.EOF;
   }
 
+  // Deprecated. Do not use in new code.
   match(str: string): boolean {
     return this.text.substr(this.index, str.length) === str;
   }
 
+  // Deprecated. Do not use in new code.
   matchPeek(str: string): boolean {
     return this.text.substr(this.index + 1, str.length) === str;
+  }
+
+  // TODO: rename to "match" after migration.
+  newMatch(str: string): boolean {
+    return (
+      this.text.substr(
+        this.readAlready ? this.index + 1 : this.index,
+        str.length
+      ) === str
+    );
   }
 }

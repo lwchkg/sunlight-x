@@ -25,10 +25,11 @@ export const customParseRules = [
   function(context: ParserContext): ?(Token[]) {
     if (
       !context.reader.isPrecededByWhitespaceOnly() ||
-      context.reader.newPeek() !== ":"
+      !context.reader.newMatch(":")
     )
       return null;
 
+    // Not a label if "::", end of line, or ":" followed by a whitespace.
     const peek = context.reader.peekWithOffset(1);
     if (peek === ":" || peek === "" || /\s/.test(peek)) return null;
 
@@ -222,7 +223,7 @@ export const customParseRules = [
         }
       }
 
-      context.reader.read(token.value.length - 1);
+      context.reader.newRead(token.value.length);
       return token;
     };
   })()

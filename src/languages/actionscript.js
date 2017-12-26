@@ -194,10 +194,10 @@ export const customParseRules = [
   // regex literal, stolen from javascript
   function(context: ParserContext): ?Token {
     // Must start with a "/".
-    if (context.reader.newPeek() !== "/") return null;
+    if (!context.reader.newMatch("/")) return null;
     // Should not start with "//" (comment) or "/*" (multi-line comment).
-    const peek = context.reader.newPeek(2);
-    if (peek === "//" || peek === "/*") return null;
+    if (context.reader.newMatch("//") || context.reader.newMatch("/*"))
+      return null;
 
     const isValid = (function(): boolean {
       const previousNonWsToken = context.token(context.count() - 1);
