@@ -65,16 +65,7 @@ export class ParserContext {
       partialContext.continuation = null;
       // The following statement can write to this.continuation
       // TODO: clean up
-      this.tokens.push(
-        continuation.process(
-          this,
-          continuation,
-          "",
-          this.reader.getLine(),
-          this.reader.getColumn(),
-          true
-        )
-      );
+      this.tokens.push(continuation.process(this, continuation, "", true));
     }
 
     while (!this.reader.isEOF()) {

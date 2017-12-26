@@ -27,8 +27,6 @@ export class Continuation {
     context: ParserContext,
     continuation: Continuation,
     buffer: string,
-    line: number,
-    column: number,
     processCurrent: boolean = false
   ): Token {
     let foundCloser = false;
