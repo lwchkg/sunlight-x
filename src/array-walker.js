@@ -21,8 +21,9 @@ export class ArrayWalker<T> {
   current(): T {
     if (this.index < 0 || this.index >= this._data.length)
       throw new Error(
-        `Invalid index ${this.index}. The array has ${this._data
-          .length} elements.`
+        `Invalid index ${this.index}. The array has ${
+          this._data.length
+        } elements.`
       );
     return this._data[this.index];
   }

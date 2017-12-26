@@ -3,21 +3,33 @@
   "version": "0.0.2",
   "description": "Sunlight highlighter refactored for Node.js",
   "main": "babel-out/sunlight.js",
-  "keywords": ["highlight", "syntax"],
+  "keywords": [
+    "highlight",
+    "syntax"
+  ],
   "author": "WC Leung <lwchkg@gmail.com>",
-  "contributors": ["WC Leung <lwchkg@gmail.com>"],
+  "contributors": [
+    "WC Leung <lwchkg@gmail.com>"
+  ],
   "homepage": "https://github.com/lwchkg/sunlight-x/",
-  "bugs": { "url": "https://github.com/lwchkg/sunlight-x/issues" },
+  "bugs": {
+    "url": "https://github.com/lwchkg/sunlight-x/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/lwchkg/sunlight-x.git"
   },
   "license": "Apache-2.0",
-  "files": ["babel-out/", "compiled-assets/"],
-  "engines": { "node": ">=5.1" },
+  "files": [
+    "babel-out/",
+    "compiled-assets/"
+  ],
+  "engines": {
+    "node": ">=5.1"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.1.2",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "cash-cat": "^0.2.0",
@@ -27,19 +39,23 @@
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-flowtype": "^2.35.0",
     "eslint-plugin-prettier": "^2.1.2",
-    "flow-bin": "^0.52.0",
+    "flow-bin": "^0.61.0",
     "flow-typed": "^2.1.5",
-    "jest": "^20.0.4",
+    "jest": "20",
     "less": "^2.7.2",
     "prettier": "^1.5.3",
-    "utf8": "^2.1.2"
+    "utf8": "^3.0.0"
   },
   "dependencies": {
     "jsdom": "^9.12.0"
   },
   "jest": {
-    "coverageReporters": ["lcov"],
-    "testMatch": ["**/test/**/*.js?(x)"],
+    "coverageReporters": [
+      "lcov"
+    ],
+    "testMatch": [
+      "**/test/**/*.js?(x)"
+    ],
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/babel-out/",

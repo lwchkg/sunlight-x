@@ -44,8 +44,9 @@ export class AnalyzerContext {
     }
 
     // this.tokens = (partialContext ? partialContext.tokens : []).concat(parserContext.getAllTokens());
-    this.tokens = ((partialContext && partialContext.tokens) || [])
-      .concat(parserContext.getAllTokens());
+    this.tokens = ((partialContext && partialContext.tokens) || []).concat(
+      parserContext.getAllTokens()
+    );
     this.analyzerOverrides = [];
     this.continuation = parserContext.continuation;
     this.items = parserContext.items;

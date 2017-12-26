@@ -1,27 +1,28 @@
 // @flow
 import { DEFAULT_CLASS_PREFIX } from "./constants.js";
 
-type SunlightOptionsMapType = { [string]: mixed };
-type SunlightOptionsObjectType = {
+export type SunlightOptionsType = {
   theme: string,
   tabWidth: number,
   classPrefix: string,
   showWhitespace: boolean,
   maxHeight: false | string,
-  enableScalaXmlInterpolation: boolean
+  enableScalaXmlInterpolation: boolean,
+  [string]: mixed
 };
-export type SunlightOptionsType = SunlightOptionsMapType &
-  SunlightOptionsObjectType;
 
-type SunlightPartialOptionsObjectType = {
-  theme?: $PropertyType<SunlightOptionsObjectType, "theme">,
-  tabWidth?: $PropertyType<SunlightOptionsObjectType, "tabWidth">,
-  classPrefix?: $PropertyType<SunlightOptionsObjectType, "classPrefix">,
-  showWhitespace?: $PropertyType<SunlightOptionsObjectType, "showWhitespace">,
-  maxHeight?: $PropertyType<SunlightOptionsObjectType, "maxHeight">
+export type SunlightPartialOptionsType = {
+  theme?: $PropertyType<SunlightOptionsType, "theme">,
+  tabWidth?: $PropertyType<SunlightOptionsType, "tabWidth">,
+  classPrefix?: $PropertyType<SunlightOptionsType, "classPrefix">,
+  showWhitespace?: $PropertyType<SunlightOptionsType, "showWhitespace">,
+  maxHeight?: $PropertyType<SunlightOptionsType, "maxHeight">,
+  enableScalaXmlInterpolation?: $PropertyType<
+    SunlightOptionsType,
+    "enableScalaXmlInterpolation"
+  >,
+  [string]: mixed
 };
-export type SunlightPartialOptionsType = SunlightOptionsMapType &
-  SunlightPartialOptionsObjectType;
 
 // Global sunlight variables. These can be added or modified by plugins.
 export const globalOptions: SunlightOptionsType = {
