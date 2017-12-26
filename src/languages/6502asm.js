@@ -156,9 +156,6 @@ export const customParseRules = [
     const current = context.reader.current();
     if (current !== "#") return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     // Quick and dirty: everything between "#" (inclusive) and whitespace
     // (exclusive) is a constant too dirty.  Need to account for parens and
     // square brackets, whitespace can appear inside them. New routine: once
@@ -181,7 +178,7 @@ export const customParseRules = [
       peek = context.reader.peek();
     }
 
-    return context.createToken("constant", value, line, column);
+    return context.createToken("constant", value);
   },
 
   // labels
@@ -201,8 +198,6 @@ export const customParseRules = [
 
     return function(context: ParserContext): ?Token {
       let label, peek;
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
 
       if (!/[A-Za-z]/.test(context.reader.current())) return null;
 
@@ -229,7 +224,7 @@ export const customParseRules = [
         label += context.reader.read();
       }
 
-      return context.createToken("label", label, line, column);
+      return context.createToken("label", label);
     };
   })()
 ];
@@ -244,8 +239,6 @@ export const caseInsensitive = true;
  */
 export function numberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
-  const line = context.reader.getLine();
-  const column = context.reader.getColumn();
 
   let number;
   // is first char a digit?
@@ -269,5 +262,5 @@ export function numberParser(context: ParserContext): ?Token {
     number += context.reader.read();
   }
 
-  return context.createToken("number", number, line, column);
+  return context.createToken("number", number);
 }

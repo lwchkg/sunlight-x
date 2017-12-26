@@ -30,26 +30,19 @@ export const customParseRules = [
     )
       return null;
 
-    const colon = context.createToken(
-      "operator",
-      ":",
-      context.reader.getLine(),
-      context.reader.getColumn()
-    );
+    const colon = context.createToken("operator", ":");
 
     // Label. Read until whitespace.
     if (context.reader.isPeekEOF() || /\s/.test(context.reader.peek()))
       return null;
 
     let value = context.reader.read();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
     while (!context.reader.isPeekEOF() && !/\s/.test(context.reader.peek()))
       value += context.reader.read();
 
     if (value === "") return null;
 
-    return [colon, context.createToken("label", value, line, column)];
+    return [colon, context.createToken("label", value)];
   },
 
   // Label after goto statements
@@ -66,14 +59,11 @@ export const customParseRules = [
     )
       return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     let value = context.reader.current();
     while (!context.reader.isPeekEOF() && !/[\W]/.test(context.reader.peek()))
       value += context.reader.read();
 
-    return context.createToken("label", value, line, column);
+    return context.createToken("label", value);
   },
 
   // keywords have to be handled manually because strings don't have to be quoted

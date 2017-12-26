@@ -240,13 +240,7 @@ export const customParseRules = [
         ((prevToken.name === "operator" && prevToken.value === ".") ||
           (prevToken.name === "keyword" && prevToken.value === "Sub"))
       )
-        return new Token(
-          "ident",
-          token.value,
-          token.line,
-          token.column,
-          token.language
-        );
+        return new Token("ident", token.value, token.language);
 
       return token;
     };

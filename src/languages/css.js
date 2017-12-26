@@ -672,9 +672,6 @@ export const customParseRules = [
 
   // classes
   function(context: ParserContext): ?(Token[]) {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     // we can't just make this a scope because we'll get false positives for things like ".png" in url(image.png) (image.png doesn't need to be in quotes)
     // so we detect them the hard way
 
@@ -685,16 +682,14 @@ export const customParseRules = [
 
     context.reader.read(className.length);
     return [
-      context.createToken("operator", ".", line, column),
-      context.createToken("class", className, line, column + 1)
+      context.createToken("operator", "."),
+      context.createToken("class", className)
     ];
   },
 
   // element selctors (div, html, body, etc.)
   function(context: ParserContext): ?Token {
     const current = context.reader.current();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     if (!/[A-Za-z_]/.test(current)) return null;
 
@@ -713,14 +708,11 @@ export const customParseRules = [
     if (tagName === null) return null;
 
     context.reader.read(tagName.length);
-    return context.createToken("element", current + tagName, line, column);
+    return context.createToken("element", current + tagName);
   },
 
   // hex color value
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     if (context.reader.current() !== "#") return null;
 
     let count = 1;
@@ -742,7 +734,7 @@ export const customParseRules = [
     }
 
     context.reader.read(value.length - 1); // -1 because we already read the "#"
-    return context.createToken("hexColor", value, line, column);
+    return context.createToken("hexColor", value);
   }
 ];
 

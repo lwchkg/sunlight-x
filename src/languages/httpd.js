@@ -80,8 +80,6 @@ export const customParseRules = [
   // regex literals for mod_rewrite
   function(context: ParserContext): ?Token {
     const current = context.reader.current();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     if (/[\s\n]/.test(current)) return null;
 
@@ -110,7 +108,7 @@ export const customParseRules = [
       regexLiteral += context.reader.read();
     }
 
-    return context.createToken("regexLiteral", regexLiteral, line, column);
+    return context.createToken("regexLiteral", regexLiteral);
   },
 
   // directives: http://httpd.apache.org/docs/current/mod/quickreference.html

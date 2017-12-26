@@ -167,9 +167,6 @@ export const customParseRules = [
 
   // get/set contextual keyword
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     if (!/^(get|set)\b/.test(context.reader.currentAndPeek(4))) return null;
 
     if (
@@ -203,14 +200,11 @@ export const customParseRules = [
     if (!allGoodYo) return null;
 
     const value = context.reader.current() + context.reader.read(2); // we already read the first letter
-    return context.createToken("keyword", value, line, column);
+    return context.createToken("keyword", value);
   },
 
   // value contextual keyword
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     if (!/^value\b/.test(context.reader.currentAndPeek(6))) return null;
 
     // comes after "set" but not after the closing "}" (we'll have to count them to make sure scoping is correct)
@@ -273,7 +267,7 @@ export const customParseRules = [
       return null;
 
     context.reader.read(4); // already read the "v" in "value"
-    return context.createToken("keyword", "value", line, column);
+    return context.createToken("keyword", "value");
   }
 ];
 

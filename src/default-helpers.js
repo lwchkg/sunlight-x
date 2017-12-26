@@ -66,8 +66,6 @@ export class defaultAnalyzer extends Analyzer {
  */
 export function defaultNumberParser(context: ParserContext): ?Token {
   const current = context.reader.current();
-  const line = context.reader.getLine();
-  const column = context.reader.getColumn();
 
   let number: string;
   let allowDecimal = true;
@@ -101,5 +99,5 @@ export function defaultNumberParser(context: ParserContext): ?Token {
     }
     number += context.reader.read();
   }
-  return context.createToken("number", number, line, column);
+  return context.createToken("number", number);
 }

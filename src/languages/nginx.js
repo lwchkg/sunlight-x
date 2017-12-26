@@ -70,9 +70,6 @@ export const customParseRules = [
     const current = context.reader.current();
     if (/[\s\n]/.test(current)) return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     let isRegexLiteral = false;
     const walker = context.getTokenWalker();
     while (walker.hasPrev()) {
@@ -123,7 +120,7 @@ export const customParseRules = [
       regexLiteral += context.reader.read();
     }
 
-    return context.createToken("regexLiteral", regexLiteral, line, column);
+    return context.createToken("regexLiteral", regexLiteral);
   },
 
   // directives, can't just make them keywords because then values (not directives) will possibly be highlighted

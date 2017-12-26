@@ -135,12 +135,7 @@ export const customParseRules = [
     const previousNonWsToken = context.token(context.count() - 1);
     let previousToken = null;
     if (context.defaultData.text !== "")
-      previousToken = context.createToken(
-        "default",
-        context.defaultData.text,
-        context.defaultData.line,
-        context.defaultData.column
-      );
+      previousToken = context.createToken("default", context.defaultData.text);
 
     if (!previousToken) previousToken = previousNonWsToken;
 
@@ -164,9 +159,6 @@ export const customParseRules = [
         return null;
     }
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     // read the regex literal
     let regexLiteral = "/";
     let charClass = false;
@@ -188,7 +180,7 @@ export const customParseRules = [
     )
       regexLiteral += context.reader.read();
 
-    return context.createToken("regexLiteral", regexLiteral, line, column);
+    return context.createToken("regexLiteral", regexLiteral);
   },
 
   // symbols
@@ -241,12 +233,7 @@ export const customParseRules = [
 
     // read the symbol
     const symbol: string = /^:\w+/.exec(context.reader.substring())[0];
-    const token = context.createToken(
-      "symbol",
-      symbol,
-      context.reader.getLine(),
-      context.reader.getColumn()
-    );
+    const token = context.createToken("symbol", symbol);
     context.reader.read(symbol.length - 1); // already read the ":"
     return token;
   },
@@ -261,9 +248,6 @@ export const customParseRules = [
       !/<[\w'"`-]/.test(context.reader.peek(2))
     )
       return null;
-
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     // cannot be preceded by an a number or a string
     const walker = context.getTokenWalker();
@@ -330,7 +314,7 @@ export const customParseRules = [
         context.items.heredocQueue
       );
 
-    return context.createToken("heredocDeclaration", value, line, column);
+    return context.createToken("heredocDeclaration", value);
   },
 
   // heredoc
@@ -374,9 +358,6 @@ export const customParseRules = [
         ignoreWhitespace = true;
       }
 
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
-
       // read until "\n{declaration}\n"
       // unless the declaration is prefixed with "-", then we don't care about
       // preceding whitespace, but it must be on its own line e.g. \n[
@@ -395,7 +376,7 @@ export const customParseRules = [
         : substring.length;
       value += context.reader.read(lengthOfMatch);
 
-      tokens.push(context.createToken("heredoc", value, line, column));
+      tokens.push(context.createToken("heredoc", value));
       value = "";
     }
 
@@ -411,9 +392,6 @@ export const customParseRules = [
   function(context: ParserContext): ?Token {
     // begin with % or %q or %Q with a non-alphanumeric delimiter (opening bracket/paren are closed by corresponding closing bracket/paren)
     if (context.reader.current() !== "%") return null;
-
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     let readCount = 1;
     let isRegex = false;
@@ -463,20 +441,12 @@ export const customParseRules = [
         value += context.reader.read();
       }
 
-    return context.createToken(
-      isRegex ? "regexLiteral" : "rawString",
-      value,
-      line,
-      column
-    );
+    return context.createToken(isRegex ? "regexLiteral" : "rawString", value);
   },
 
   // doc comments
   // http://www.ruby-doc.org/docs/ruby-doc-bundle/Manual/man-1.4/syntax.html#embed_doc
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     let value = "=begin";
 
     // these begin on with a line that starts with "=begin" and end with a line that starts with "=end"
@@ -495,7 +465,7 @@ export const customParseRules = [
     while (!context.reader.isPeekEOF() && context.reader.peek() !== "\n")
       value += context.reader.read();
 
-    return context.createToken("docComment", value, line, column);
+    return context.createToken("docComment", value);
   }
 ];
 

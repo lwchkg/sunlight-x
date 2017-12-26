@@ -49,8 +49,7 @@ export const customParseRules = [
   // tag names
   function(context: ParserContext): ?Token {
     const current = context.reader.current();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
+
     if (!/[A-Za-z_]/.test(current)) return null;
 
     const prevToken = context.token(context.count() - 1);
@@ -68,14 +67,12 @@ export const customParseRules = [
     while (!context.reader.isPeekEOF() && /[.\w-]/.test(context.reader.peek()))
       tagName += context.reader.read();
 
-    return context.createToken("tagName", tagName, line, column);
+    return context.createToken("tagName", tagName);
   },
 
   // strings (attribute values)
   function(context: ParserContext): ?Token {
     const delimiter = context.reader.current();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     if (delimiter !== '"' && delimiter !== "'") return null;
 
@@ -90,14 +87,12 @@ export const customParseRules = [
       if (next === delimiter) break;
     }
 
-    return context.createToken("string", stringValue, line, column);
+    return context.createToken("string", stringValue);
   },
 
   // attributes
   function(context: ParserContext): ?Token {
     const current = context.reader.current();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     if (!/[A-Za-z_]/.test(current)) return null;
 
@@ -115,7 +110,7 @@ export const customParseRules = [
       if (/>$/.test(peek)) {
         attribute = attribute || current + peek.substring(0, peek.length - 1);
         context.reader.read(attribute.length - 1);
-        return context.createToken("attribute", attribute, line, column);
+        return context.createToken("attribute", attribute);
       }
 
       if (!attribute && /[=\s:]$/.test(peek))
@@ -130,8 +125,7 @@ export const customParseRules = [
   // entities
   function(context: ParserContext): ?Token {
     const current = context.reader.current();
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
+
     if (current !== "&") return null;
 
     // find semicolon, or whitespace, or < or >
@@ -141,9 +135,7 @@ export const customParseRules = [
       if (peek.charAt(peek.length - 1) === ";")
         return context.createToken(
           "entity",
-          current + context.reader.read(count),
-          line,
-          column
+          current + context.reader.read(count)
         );
 
       if (!/[A-Za-z0-9]$/.test(peek)) break;
@@ -156,9 +148,6 @@ export const customParseRules = [
 
   // asp.net server side comments: <%-- --%>
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     const startAspToken = "<%--";
     const endAspToken = "--%>";
     // have to do these manually or else they get swallowed by the open tag: <%
@@ -172,7 +161,7 @@ export const customParseRules = [
 
     value += context.reader.read(endAspToken.length - 1);
 
-    return context.createToken("comment", value, line, column);
+    return context.createToken("comment", value);
   }
 ];
 

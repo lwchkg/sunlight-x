@@ -36,20 +36,12 @@ function parseOperator(context: ParserContext): ?Token {
 function parsePunctuation(context: ParserContext): ?Token {
   const current = context.reader.current();
   if (context.language.punctuation.test(util.regexEscape(current)))
-    return context.createToken(
-      "punctuation",
-      current,
-      context.reader.getLine(),
-      context.reader.getColumn()
-    );
+    return context.createToken("punctuation", current);
 
   return null;
 }
 
 function parseIdent(context: ParserContext): ?Token {
-  const line = context.reader.getLine();
-  const column = context.reader.getColumn();
-
   if (!isIdentMatch(context)) return null;
 
   let ident = context.reader.current();
@@ -65,7 +57,7 @@ function parseIdent(context: ParserContext): ?Token {
     ident += context.reader.read();
   }
 
-  return context.createToken("ident", ident, line, column);
+  return context.createToken("ident", ident);
 }
 
 function parseDefault(context: ParserContext): ?Token {

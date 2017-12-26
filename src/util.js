@@ -97,8 +97,6 @@ export function matchWord(
   tokenName: string,
   doNotRead: boolean = false
 ): ?Token {
-  const line = context.reader.getLine();
-  const column = context.reader.getColumn();
   wordMap = wordMap || {};
 
   let current = context.reader.current();
@@ -120,9 +118,7 @@ export function matchWord(
       context.reader.current() +
         (doNotRead
           ? context.reader.peek(subMap[index].value.length - 1)
-          : context.reader.read(subMap[index].value.length - 1)),
-      line,
-      column
+          : context.reader.read(subMap[index].value.length - 1))
     );
 
   return null;
@@ -168,13 +164,9 @@ export function getRegexpParser(
     // Fail if no match or not matching the start of a string.
     if (!match || match.index !== 0) return null;
 
-    const line = context.reader.line;
-    const column = context.reader.column;
     return context.createToken(
       tokenName,
-      context.reader.current() + context.reader.read(match[0].length - 1),
-      line,
-      column
+      context.reader.current() + context.reader.read(match[0].length - 1)
     );
   };
 }

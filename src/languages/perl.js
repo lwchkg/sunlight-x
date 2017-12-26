@@ -520,9 +520,6 @@ export const customParseRules = [
   function(context: ParserContext): ?Token {
     if (!isValidForRegexLiteral(context)) return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     const current = context.reader.current();
     const peek = context.reader.peek();
 
@@ -575,7 +572,7 @@ export const customParseRules = [
     )
       value += context.reader.read();
 
-    return context.createToken("regexLiteral", value, line, column);
+    return context.createToken("regexLiteral", value);
   },
 
   // raw strings
@@ -583,9 +580,6 @@ export const customParseRules = [
     // begin with q, qw, qx, or qq  with a non-alphanumeric delimiter (opening bracket/paren are closed by corresponding closing bracket/paren)
     if (context.reader.current() !== "q") return null;
     let value = "q";
-
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     let readCount = 1;
     const peek = context.reader.peek();
@@ -598,16 +592,13 @@ export const customParseRules = [
     value +=
       context.reader.read(readCount - 1) +
       readBetweenDelimiters(context, context.reader.read(), true);
-    return context.createToken("rawString", value, line, column);
+    return context.createToken("rawString", value);
   },
 
   // heredoc declaration (stolen from ruby)
   function(context: ParserContext): ?Token {
     const opener = "<<";
     if (!context.reader.match(opener)) return null;
-
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     // cannot be preceded by an ident or a number or a string
     const prevToken = util.getPreviousNonWsToken(
@@ -670,7 +661,7 @@ export const customParseRules = [
         context.items.heredocQueue
       );
 
-    return context.createToken("heredocDeclaration", value, line, column);
+    return context.createToken("heredocDeclaration", value);
   },
 
   // heredoc
@@ -708,9 +699,6 @@ export const customParseRules = [
         return null;
       }
 
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
-
       // read until "\n{declaration}\n"
       while (!context.reader.isPeekEOF()) {
         const peekIdent = context.reader.peek(declaration.length + 2);
@@ -723,7 +711,7 @@ export const customParseRules = [
         }
         value += context.reader.read();
       }
-      tokens.push(context.createToken("heredoc", value, line, column));
+      tokens.push(context.createToken("heredoc", value));
       value = "";
     }
 
@@ -741,9 +729,6 @@ export const customParseRules = [
     if (context.reader.current() !== "=" || !context.reader.isStartOfLine())
       return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     // read until "\n=cut" and then everything until the end of that line
     let value = "=";
 
@@ -756,7 +741,7 @@ export const customParseRules = [
     while (!context.reader.isPeekEOF() && context.reader.peek() !== "\n")
       value += context.reader.read();
 
-    return context.createToken("docComment", value, line, column);
+    return context.createToken("docComment", value);
   }
 ];
 

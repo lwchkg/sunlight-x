@@ -240,21 +240,13 @@ export const customParseRules = [
 
     if (peek.length !== count) return null;
 
-    const token = context.createToken(
-      "operator",
-      "#" + peek,
-      context.reader.getLine(),
-      context.reader.getColumn()
-    );
+    const token = context.createToken("operator", "#" + peek);
     context.reader.read(peek.length);
     return token;
   },
 
   // characters prepended by the #\ operator are read as idents
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     if (context.defaultData.text !== "" || /\s/.test(context.reader.current()))
       // whitespace is not allowed
       return null;
@@ -275,14 +267,11 @@ export const customParseRules = [
       value += context.reader.read();
     }
 
-    return context.createToken("ident", value, line, column);
+    return context.createToken("ident", value);
   },
 
   // variables
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     if (context.reader.current() !== "*") return null;
 
     const token = util.getPreviousNonWsToken(
@@ -304,7 +293,7 @@ export const customParseRules = [
       if (next === "*") break;
     }
 
-    return context.createToken("variable", value, line, column);
+    return context.createToken("variable", value);
   },
 
   // function after #' operator
@@ -312,9 +301,6 @@ export const customParseRules = [
     const boundary = new RegExp(functionBoundary);
 
     return function(context: ParserContext): ?Token {
-      const line = context.reader.getLine();
-      const column = context.reader.getColumn();
-
       if (
         context.defaultData.text !== "" ||
         boundary.test(context.reader.current())
@@ -334,7 +320,7 @@ export const customParseRules = [
         value += context.reader.read();
       }
 
-      return context.createToken("function", value, line, column);
+      return context.createToken("function", value);
     };
   })(),
 

@@ -185,16 +185,8 @@ export const customParseRules = [
       while ((peek = context.reader.peek(count)) && peek.length === count)
         if (!/\s$/.test(peek)) {
           if (peek.charAt(count - 1) === "(") {
-            const line = context.reader.getLine();
-            const column = context.reader.getColumn();
             context.reader.read(token.value.length - 1);
-            return new Token(
-              token.name,
-              token.value,
-              line,
-              column,
-              token.language
-            );
+            return new Token(token.name, token.value, token.language);
           }
           break;
         }
@@ -210,9 +202,6 @@ export const customParseRules = [
     if (context.reader.current() !== "/" || peek === "/" || peek === "*")
       return null;
 
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     const isValid = (function(): boolean {
       const previousNonWsToken = context.token(context.count() - 1);
       let previousToken = null;
@@ -220,9 +209,7 @@ export const customParseRules = [
       if (context.defaultData.text !== "") {
         previousToken = context.createToken(
           "default",
-          context.defaultData.text,
-          0,
-          0
+          context.defaultData.text
         );
       } else {
         previousToken = previousNonWsToken;
@@ -272,7 +259,7 @@ export const customParseRules = [
       regexLiteral += context.reader.read();
     }
 
-    return context.createToken("regexLiteral", regexLiteral, line, column);
+    return context.createToken("regexLiteral", regexLiteral);
   }
 ];
 

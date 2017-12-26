@@ -51,9 +51,6 @@ export const keywords = [
 export const customParseRules = [
   // character literals, e.g. 'a'
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     const peek = context.reader.peek();
     if (context.reader.current() !== "'" && peek !== "'") return null;
 
@@ -67,12 +64,7 @@ export const customParseRules = [
       // doesn't end with an apostrophe, so it's a template operator
       return null;
 
-    return context.createToken(
-      "char",
-      "'" + context.reader.read(expectedEnd),
-      line,
-      column
-    );
+    return context.createToken("char", "'" + context.reader.read(expectedEnd));
   },
 
   // look for user defined functions
@@ -80,9 +72,6 @@ export const customParseRules = [
     // read the ident, if a :: operator follows it, then it's a function definition (i guess, like i know anything about haskell)
     // or if follows newtype, class or data, we keep track of it as well
     if (!/[A-Za-z_]/.test(context.reader.current())) return null;
-
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
 
     let peek;
     let count = 0;
@@ -101,7 +90,7 @@ export const customParseRules = [
       context.userDefinedNameStore.addName(ident, name);
 
       context.reader.read(ident.length - 1); // already read the first character
-      return context.createToken("ident", ident, line, column);
+      return context.createToken("ident", ident);
     }
 
     // function definitions: start of line followed by ::
@@ -115,7 +104,7 @@ export const customParseRules = [
           context.userDefinedNameStore.addName(ident, name);
 
           context.reader.read(ident.length - 1); // already read the first character
-          return context.createToken("ident", ident, line, column);
+          return context.createToken("ident", ident);
         }
 
     return null;

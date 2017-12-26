@@ -48,9 +48,6 @@ export const keywords = [
 export const customParseRules = [
   // atom/function/userDefinedFunction detection
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     if (!/[A-Za-z_]/.test(context.reader.current())) return null;
 
     let peek;
@@ -78,7 +75,7 @@ export const customParseRules = [
     context.reader.read(ident.length - 1);
     count = 1;
 
-    if (!isFunction) return context.createToken("ident", ident, line, column);
+    if (!isFunction) return context.createToken("ident", ident);
 
     let parenCount = 1; // Already read a "(" before.
     // is it a function declaration? (preceded by -> operator)
@@ -93,12 +90,7 @@ export const customParseRules = [
               // function declaration
               context.userDefinedNameStore.addName(ident, name);
 
-              return context.createToken(
-                "userDefinedFunction",
-                ident,
-                line,
-                column
-              );
+              return context.createToken("userDefinedFunction", ident);
             }
 
             break;
@@ -112,7 +104,7 @@ export const customParseRules = [
     }
 
     // just a regular function call
-    return context.createToken("function", ident, line, column);
+    return context.createToken("function", ident);
   }
 ];
 

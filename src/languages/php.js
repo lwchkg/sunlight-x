@@ -3242,9 +3242,6 @@ export const scopes = {
 export const customParseRules = [
   // heredoc/nowdoc
   function(context: ParserContext): ?Token {
-    const line = context.reader.getLine();
-    const column = context.reader.getColumn();
-
     let value = "<<<";
     if (!context.reader.match(value)) return null;
     context.reader.read(value.length - 1);
@@ -3271,12 +3268,7 @@ export const customParseRules = [
 
     value += context.reader.read(ident.length); // don't read the semicolon
 
-    return context.createToken(
-      isNowdoc ? "nowdoc" : "heredoc",
-      value,
-      line,
-      column
-    );
+    return context.createToken(isNowdoc ? "nowdoc" : "heredoc", value);
   }
 ];
 
