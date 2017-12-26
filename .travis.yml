@@ -3,7 +3,7 @@ language: node_js
 node_js:
 - "node"
 - "lts/*"
-- "5.1"
+- "5.11"
 script:
 - npm test
 cache:
