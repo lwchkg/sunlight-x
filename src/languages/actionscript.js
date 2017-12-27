@@ -6,6 +6,7 @@
 // @flow
 import { Token } from "../util.js";
 import * as util from "../util.js";
+import { ParseRegExpLiteral } from "./common/regexp.js";
 
 import type { AnalyzerContext, ParserContext } from "../util.js";
 
@@ -192,72 +193,7 @@ export const customParseRules = [
   })(),
 
   // regex literal, stolen from javascript
-  function(context: ParserContext): ?Token {
-    // Must start with a "/".
-    if (!context.reader.newMatch("/")) return null;
-    // Should not start with "//" (comment) or "/*" (multi-line comment).
-    if (context.reader.newMatch("//") || context.reader.newMatch("/*"))
-      return null;
-
-    const isValid = (function(): boolean {
-      const previousNonWsToken = context.token(context.count() - 1);
-      let previousToken = null;
-
-      if (context.defaultData.text !== "") {
-        previousToken = context.createToken(
-          "default",
-          context.defaultData.text
-        );
-      } else {
-        previousToken = previousNonWsToken;
-        // first token of the string
-        if (previousToken === undefined) return true;
-      }
-
-      // since JavaScript doesn't require statement terminators, if the previous token was whitespace and contained a newline, then we're good
-      if (
-        previousToken.name === "default" &&
-        previousToken.value.indexOf("\n") > -1
-      )
-        return true;
-
-      if (
-        util.contains(["keyword", "ident", "number"], previousNonWsToken.name)
-      )
-        return false;
-
-      if (
-        previousNonWsToken.name === "punctuation" &&
-        !util.contains(["(", "{", "[", ",", ";"], previousNonWsToken.value)
-      )
-        return false;
-
-      return true;
-    })();
-
-    if (!isValid) return null;
-
-    // read the regex literal
-    let regexLiteral = context.reader.newRead();
-    while (!context.reader.newIsEOF()) {
-      const next = context.reader.newRead();
-      regexLiteral += next;
-      // escaped backslash or escaped forward slash
-      if (next === "\\") regexLiteral += context.reader.newRead();
-      else if (next === "/") break;
-    }
-
-    // read the regex modifiers
-    // only "g", "i", "m", "s" and "x" are allowed, but for the sake of
-    // simplicity we'll just say any alphabetical character is valid
-    while (
-      !context.reader.newIsEOF() &&
-      /[A-Za-z]/.test(context.reader.newPeek())
-    )
-      regexLiteral += context.reader.newRead();
-
-    return context.createToken("regexLiteral", regexLiteral);
-  }
+  ParseRegExpLiteral
 ];
 
 export const identFirstLetter = /[A-Za-z_]/;

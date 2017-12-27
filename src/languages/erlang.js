@@ -77,12 +77,13 @@ export const customParseRules = [
     if (!isFunction && !/^[A-Z_]/.test(ident)) return null;
 
     context.reader.newRead(ident.length);
+    offset -= ident.length;
 
     if (!isFunction) return context.createToken("ident", ident);
 
     let parenCount = 1; // Already read a "(" before.
     // is it a function declaration? (preceded by -> operator)
-    for (offset = offset - ident.length + 1; parenCount > 0; offset++) {
+    for (offset++; parenCount > 0; offset++) {
       const peek = context.reader.peekWithOffset(offset);
       if (peek === "") break;
 
