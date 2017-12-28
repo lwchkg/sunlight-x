@@ -181,33 +181,29 @@ export const customParseRules = [
   // message destination (e.g. method calls)
   function(context: ParserContext): ?Token {
     // read the ident first
-    if (!identFirstLetter.test(context.reader.current())) return null;
+    if (!identFirstLetter.test(context.reader.newPeek())) return null;
 
-    let count = 0;
-    let peek;
-    while ((peek = context.reader.peek(++count)) && peek.length === count)
-      if (
-        !context.language.identAfterFirstLetter.test(
-          peek.charAt(peek.length - 1)
-        )
-      )
-        break;
+    let offset: number;
+    for (offset = 1; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek === "") break;
+      if (!context.language.identAfterFirstLetter.test(peek)) break;
+    }
 
-    const ident = context.reader.currentAndPeek(peek.length);
+    const identLength = offset;
+
+    for (; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek === "") return null;
+      if (!/\s/.test(peek)) break;
+    }
 
     let possibleMessageArgument = false;
-    count--;
-    while ((peek = context.reader.peek(++count)) && peek.length === count)
-      if (!/\s$/.test(peek)) {
-        const match: ?[string] = /[\]:]$/.exec(peek);
-        if (!match)
-          // not a message destination
-          return null;
-
-        possibleMessageArgument =
-          match[0] === ":" && !/::$/.test(context.reader.peek(count + 1));
-        break;
-      }
+    const peek = context.reader.peekWithOffset(offset);
+    if (peek === ":")
+      possibleMessageArgument =
+        context.reader.peekWithOffset(offset + 1) !== ":";
+    else if (peek !== "]" && peek !== ")") return null;
 
     // must be the second expression after "["
     let parenCount = 0;
@@ -233,16 +229,13 @@ export const customParseRules = [
             break;
           case "[":
             if (bracketCount === 0 && parenCount === 0) {
-              if (exprCount >= 1) {
-                const token2 = context.createToken(
+              if (exprCount >= 1)
+                return context.createToken(
                   possibleMessageArgument && exprCount > 1
                     ? "messageArgumentName"
                     : "messageDestination",
-                  ident
+                  context.reader.newRead(identLength)
                 );
-                context.reader.read(ident.length - 1);
-                return token2;
-              }
 
               return null;
             }
@@ -301,9 +294,8 @@ export const customParseRules = [
           )
             return null;
 
-          const token2 = context.createToken(token.name, token.value);
-          context.reader.read(token2.value.length - 1);
-          return token2;
+          context.reader.newRead(token.value.length);
+          return token;
         } else if (prevToken.value === ";") {
           return null;
         }

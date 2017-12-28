@@ -74,12 +74,14 @@ export class ParserContext {
       if (!this.reader.newIsEOF()) this.reader.resetAlreadyRead();
     }
 
-    while (!this.reader.isEOF()) {
+    while (!this.reader.newIsEOF()) {
       this.highlighter.switchToEmbeddedLanguageIfNecessary(this);
       const token = parseNextToken(this);
 
-      // flush default data if needed (in pretty much all languages this is just whitespace)
       if (token !== null && token !== undefined) {
+        // Write the stored default data if exist. These data are meant to be
+        // joined into a single default token before writing.
+        // Note: default data are whitespace and things marked not to parse.
         if (this.defaultData.text !== "") {
           this.tokens.push(this.createToken("default", this.defaultData.text));
           this.defaultData.text = "";

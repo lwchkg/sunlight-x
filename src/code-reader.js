@@ -64,9 +64,13 @@ export class CodeReader {
       : this.text.substr(this.index + relativeIndex, count);
   }
 
-  // TODO: rename. New name TBD.
+  // Deprecated. Do not use in new code.
   substring(): string {
     return this.text.substring(this.index);
+  }
+
+  peekToEOF(): string {
+    return this.text.substring(this.readAlready ? this.index + 1 : this.index);
   }
 
   // Deprecated. Do not use in new code.

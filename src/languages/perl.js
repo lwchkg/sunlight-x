@@ -32,8 +32,8 @@ function isValidForRegexLiteral(context: ParserContext): boolean {
 function readWhileWhitespace(context: ParserContext): string {
   let value = "";
 
-  while (!context.reader.isPeekEOF() && /\s/.test(context.reader.peek()))
-    value += context.reader.read();
+  while (!context.reader.newIsEOF() && /\s/.test(context.reader.newPeek()))
+    value += context.reader.newRead();
 
   return value;
 }
@@ -62,11 +62,11 @@ function readBetweenDelimiters(
   const trackCloser = util.contains(["[", "(", "{"], opener);
   let value = opener;
   let closerCount = 1;
-  while (!context.reader.isPeekEOF()) {
-    const next = context.reader.read();
+  while (!context.reader.newIsEOF()) {
+    const next = context.reader.newRead();
     // Escapes.
     if (next === "\\") {
-      value += next + context.reader.read();
+      value += next + context.reader.newRead();
       continue;
     }
 
@@ -89,19 +89,23 @@ function readBetweenDelimiters(
 // perl allows whitespace before delimiters (wtf?)
 function getDelimiterIfValid(
   context: ParserContext,
-  peekCount: number
+  startOffset: number
 ): { delimiter: string, value: string } | false {
-  let peek = context.reader.peek(peekCount);
-  while (peek.length === peekCount && /\s$/.test(peek))
-    peek = context.reader.peek(++peekCount);
+  let offset: number;
+  let peek: string = "";
 
-  if (/[\w]$/.test(peek)) return false;
+  for (offset = startOffset; ; offset++) {
+    peek = context.reader.peekWithOffset(offset);
+    if (peek === "") return false;
+    if (!/^\s$/.test(peek)) break;
+  }
 
-  context.reader.read(peekCount);
-  return {
-    delimiter: context.reader.current(),
-    value: peek.substring(0, peek.length - 1)
-  };
+  if (/\w/.test(peek)) return false;
+
+  const value = context.reader.peekWithOffset(1, offset - 1);
+
+  context.reader.newRead(offset);
+  return { delimiter: context.reader.newRead(), value: value };
 }
 
 export const name = "perl";
@@ -520,14 +524,14 @@ export const customParseRules = [
   function(context: ParserContext): ?Token {
     if (!isValidForRegexLiteral(context)) return null;
 
-    const current = context.reader.current();
-    const peek = context.reader.peek();
+    const currentAndNext = context.reader.newPeek(2);
+    const current = currentAndNext.charAt(0);
 
     let delimiter;
     let hasReplace = false;
     let value = "";
     if (current === "/" || current === "?") {
-      delimiter = current;
+      delimiter = context.reader.newRead();
     } else if (current === "m" || current === "y" || current === "s") {
       const delimiterInfo = getDelimiterIfValid(context, 1);
       if (!delimiterInfo) return null;
@@ -535,7 +539,7 @@ export const customParseRules = [
       value = current + delimiterInfo.value;
       delimiter = delimiterInfo.delimiter;
       hasReplace = current === "y" || current === "s";
-    } else if ((current === "t" || current === "q") && peek === "r") {
+    } else if (currentAndNext === "tr" || currentAndNext === "qr") {
       const delimiterInfo = getDelimiterIfValid(context, 2);
       if (!delimiterInfo) return null;
 
@@ -555,7 +559,7 @@ export const customParseRules = [
 
       const fetchSecondDelimiter = util.contains(["[", "(", "{"], delimiter);
       if (fetchSecondDelimiter) {
-        const delimiterInfo = getDelimiterIfValid(context, 1);
+        const delimiterInfo = getDelimiterIfValid(context, 0);
         if (delimiterInfo) {
           value += delimiterInfo.value;
           delimiter = delimiterInfo.delimiter;
@@ -567,38 +571,37 @@ export const customParseRules = [
 
     // read the regex modifiers (we just assume any character is valid)
     while (
-      !context.reader.isPeekEOF() &&
-      /[A-Za-z]/.test(context.reader.peek())
+      !context.reader.newIsEOF() &&
+      /[A-Za-z]/.test(context.reader.newPeek())
     )
-      value += context.reader.read();
+      value += context.reader.newRead();
 
     return context.createToken("regexLiteral", value);
   },
 
   // raw strings
   function(context: ParserContext): ?Token {
-    // begin with q, qw, qx, or qq  with a non-alphanumeric delimiter (opening bracket/paren are closed by corresponding closing bracket/paren)
-    if (context.reader.current() !== "q") return null;
-    let value = "q";
+    // begin with q, qw, qx, or qq  with a non-alphanumeric delimiter (opening
+    // bracket/paren are closed by corresponding closing bracket/paren)
+    if (!context.reader.newMatch("q")) return null;
 
     let readCount = 1;
-    const peek = context.reader.peek();
+    const peek = context.reader.peekWithOffset(1);
     if (peek === "q" || peek === "w" || peek === "x") readCount++;
 
-    if (/[A-Za-z0-9]$/.test(context.reader.peek(readCount)))
+    if (/[A-Za-z0-9]/.test(context.reader.peekWithOffset(readCount)))
       // potential % operator
       return null;
 
-    value +=
-      context.reader.read(readCount - 1) +
-      readBetweenDelimiters(context, context.reader.read(), true);
+    let value = context.reader.newRead(readCount);
+    value += readBetweenDelimiters(context, context.reader.newRead(), true);
     return context.createToken("rawString", value);
   },
 
   // heredoc declaration (stolen from ruby)
   function(context: ParserContext): ?Token {
     const opener = "<<";
-    if (!context.reader.match(opener)) return null;
+    if (!context.reader.newMatch(opener)) return null;
 
     // cannot be preceded by an ident or a number or a string
     const prevToken = util.getPreviousNonWsToken(
@@ -615,12 +618,12 @@ export const customParseRules = [
 
     // can be between quotes (double, single or back) or not, or preceded by a hyphen
     let value = opener;
-    context.reader.read(opener.length);
+    context.reader.newRead(opener.length);
 
-    let current = context.reader.current();
+    let current = context.reader.newRead();
     if (current === "-") {
       value += current;
-      current = context.reader.read();
+      current = context.reader.newRead();
     }
 
     let ident = "";
@@ -630,23 +633,23 @@ export const customParseRules = [
 
     value += current;
 
-    while (!context.reader.isPeekEOF()) {
-      const peek = context.reader.peek();
+    while (!context.reader.newIsEOF()) {
+      const peek = context.reader.newPeek();
       if (peek === "\n" || (delimiter === "" && /\W/.test(peek))) break;
 
       if (peek === "\\") {
-        const peek2 = context.reader.peek(2);
+        const peek2 = context.reader.newPeek(2);
         if (
           delimiter !== "" &&
           util.contains(["\\" + delimiter, "\\\\"], peek2)
         ) {
           value += peek2;
-          ident += context.reader.read(2);
+          ident += context.reader.newRead(2);
           continue;
         }
       }
 
-      value += context.reader.read();
+      value += context.reader.newRead();
 
       if (delimiter !== "" && peek === delimiter) break;
 
@@ -684,11 +687,10 @@ export const customParseRules = [
     // we're confirmed to be in the heredoc body, so read until all of the
     // heredoc declarations have been satisfied
     const tokens: Token[] = [];
-    let value = context.reader.current();
     while (
       Array.isArray(context.items.heredocQueue) &&
       context.items.heredocQueue.length > 0 &&
-      !context.reader.isPeekEOF()
+      !context.reader.newIsEOF()
     ) {
       const declaration = context.items.heredocQueue.shift();
       if (!(typeof declaration === "string")) {
@@ -696,23 +698,23 @@ export const customParseRules = [
           `Content of context.items.heredocQueue is not a string.`,
           declaration
         );
-        return null;
+        break;
       }
 
       // read until "\n{declaration}\n"
-      while (!context.reader.isPeekEOF()) {
-        const peekIdent = context.reader.peek(declaration.length + 2);
+      let value = "";
+      while (!context.reader.newIsEOF()) {
+        const peekIdent = context.reader.newPeek(declaration.length + 2);
         if (
           peekIdent === "\n" + declaration ||
           peekIdent === "\n" + declaration + "\n"
         ) {
-          value += context.reader.read(declaration.length + 2);
+          value += context.reader.newRead(declaration.length + 2);
           break;
         }
-        value += context.reader.read();
+        value += context.reader.newRead();
       }
       tokens.push(context.createToken("heredoc", value));
-      value = "";
     }
 
     // Reset queue. This is needed if the reader reach EOF.
@@ -726,20 +728,20 @@ export const customParseRules = [
   function(context: ParserContext): ?Token {
     // these begin on with a line that starts with "=begin" and end with a line that starts with "=end"
     // apparently stuff on the same line as "=end" is also part of the comment
-    if (context.reader.current() !== "=" || !context.reader.isStartOfLine())
+    if (!context.reader.newMatch("=") || !context.reader.isStartOfLine())
       return null;
 
     // read until "\n=cut" and then everything until the end of that line
-    let value = "=";
+    let value = context.reader.newRead();
 
     const endOfPod = "\n=cut";
-    while (!context.reader.isPeekEOF() && !context.reader.matchPeek(endOfPod))
-      value += context.reader.read();
+    while (!context.reader.newIsEOF() && !context.reader.newMatch(endOfPod))
+      value += context.reader.newRead();
 
-    value += context.reader.read(endOfPod.length);
+    value += context.reader.newRead(endOfPod.length);
 
-    while (!context.reader.isPeekEOF() && context.reader.peek() !== "\n")
-      value += context.reader.read();
+    while (!context.reader.newIsEOF() && !context.reader.newMatch("\n"))
+      value += context.reader.newRead();
 
     return context.createToken("docComment", value);
   }

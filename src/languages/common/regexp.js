@@ -11,11 +11,11 @@ import type { ParserContext } from "../../util.js";
 
 /**
  * Helper function to see if the previous token is okay to preceed a regexp
- * literal.
+ * literal. The function was used for JavaScript and ActionScript.
  * @param {Object} context
  * @returns {boolean}
  */
-function isValidJSRegExp(context: ParserContext): boolean {
+function isValidRegExp(context: ParserContext): boolean {
   const previousNonWsToken = context.token(context.count() - 1);
 
   let previousToken;
@@ -49,7 +49,7 @@ function isValidJSRegExp(context: ParserContext): boolean {
 }
 
 /**
- * Parse a regular expression literal.
+ * Parse a regular expression literal. Used by Javascript and ActionScript.
  * @param {Object} context
  * @returns {Object}
  */
@@ -60,7 +60,7 @@ export function ParseRegExpLiteral(context: ParserContext): ?Token {
   if (context.reader.newMatch("//") || context.reader.newMatch("/*"))
     return null;
 
-  if (!isValidJSRegExp(context)) return null;
+  if (!isValidRegExp(context)) return null;
 
   // read the regex literal
   let regexLiteral = context.reader.newRead();

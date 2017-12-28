@@ -67,8 +67,8 @@ export const embeddedLanguages = {
       context.items.literalXmlNestingLevel = 0;
 
       if (
-        context.reader.current() !== "<" ||
-        !/[\w!?]/.test(context.reader.peek())
+        context.reader.newPeek() !== "<" ||
+        !/[\w!?]/.test(context.reader.peekWithOffset(1))
       )
         return false;
 
@@ -137,16 +137,16 @@ export const identAfterFirstLetter = /\w/;
 export const customParseRules = [
   // symbol literals
   function(context: ParserContext): ?Token {
-    if (context.reader.current() !== "'") return null;
+    if (!context.reader.newMatch("'")) return null;
 
     // TODO: don't use regular expression.
-    const match: [string, string] = /^(\w+)(?!')/i.exec(
-      context.reader.peekSubstring()
+    const match: [string, string] = /^('\w+)(?!')/i.exec(
+      context.reader.peekToEOF()
     );
     if (!match) return null;
-    context.reader.read(match[1].length);
+    context.reader.newRead(match[1].length);
 
-    return context.createToken("symbolLiteral", "'" + match[1]);
+    return context.createToken("symbolLiteral", match[1]);
   },
 
   // case classes: can't distinguish between a case class and a function call so
@@ -154,7 +154,7 @@ export const customParseRules = [
   function(context: ParserContext): ?Token {
     if (context.defaultData.text === "") return null;
 
-    if (!/[A-Za-z]/.test(context.reader.current())) return null;
+    if (!/[A-Za-z]/.test(context.reader.newPeek())) return null;
 
     const prevToken = context.token(context.count() - 1);
     if (
@@ -165,9 +165,9 @@ export const customParseRules = [
       return null;
 
     // read the ident
-    let ident = context.reader.current();
-    while (!context.reader.isPeekEOF() && /\w/.test(context.reader.peek()))
-      ident += context.reader.read();
+    let ident = context.reader.newRead();
+    while (!context.reader.newIsEOF() && /\w/.test(context.reader.newPeek()))
+      ident += context.reader.newRead();
 
     context.userDefinedNameStore.addName(ident, name);
     return context.createToken("ident", ident);

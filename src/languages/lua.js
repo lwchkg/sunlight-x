@@ -122,32 +122,28 @@ export const customParseRules = [
   // literal strings
   function(context: ParserContext): ?Token {
     // [=*[ string contents ]=*]
-    if (context.reader.current() !== "[") return null;
+    if (context.reader.newPeek() !== "[") return null;
 
-    let numberOfEqualsSigns = 0;
-    let count = 0;
-    let peek;
-    while ((peek = context.reader.peek(++count)) && peek.length === count)
-      if (!/=$/.test(peek)) {
-        if (!/\[$/.test(peek)) return null;
-
-        numberOfEqualsSigns = peek.length - 1;
+    let offset: number;
+    for (offset = 1; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek !== "=") {
+        if (peek !== "[") return null;
         break;
       }
+    }
+    const numberOfEqualsSigns = offset - 1;
 
-    let value = "[" + peek;
-    context.reader.read(peek.length);
+    let value = context.reader.newRead(offset + 1);
 
     // read until "]" + numberOfEqualsSigns + "]"
     const closer = "]" + new Array(numberOfEqualsSigns + 1).join("=") + "]";
-    while (!context.reader.isPeekEOF()) {
-      const peek = context.reader.peek();
-      if (peek === "]" && context.reader.matchPeek(closer)) {
-        value += context.reader.read(closer.length);
+    while (!context.reader.newIsEOF()) {
+      if (context.reader.newMatch(closer)) {
+        value += context.reader.newRead(closer.length);
         break;
       }
-
-      value += context.reader.read();
+      value += context.reader.newRead();
     }
 
     return context.createToken("verbatimString", value);

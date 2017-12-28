@@ -42,22 +42,17 @@ export const customParseRules = [
 
     return function(context: ParserContext): ?Token {
       const token = util.matchWord(context, words, "context", true);
-
       if (!token) return null;
 
       // if we encounter a "{" before a ";", we're good to go
-      let peek, count;
-      count = token.value.length;
-      while ((peek = context.reader.peek(count++)) !== context.reader.EOF) {
-        if (/\{$/.test(peek)) {
-          context.reader.read(token.value.length - 1); // already read the first letter
-          return token;
-        }
-
-        if (/;$/.test(peek)) break;
+      for (let offset = token.value.length; ; offset++) {
+        const peek = context.reader.peekWithOffset(offset);
+        if (peek === "" || peek === ";") return null;
+        if (peek === "{") break;
       }
 
-      return null;
+      context.reader.newRead(token.value.length);
+      return token;
     };
   })(),
 
@@ -67,7 +62,7 @@ export const customParseRules = [
     // or after "location ^~"
     // or after "location ~"
     // or after "location ~*"
-    const current = context.reader.current();
+    const current = context.reader.newPeek();
     if (/[\s\n]/.test(current)) return null;
 
     let isRegexLiteral = false;
@@ -113,11 +108,10 @@ export const customParseRules = [
     if (!isRegexLiteral) return null;
 
     // read to the end of the regex literal
-    let regexLiteral = current;
-    while (!context.reader.isPeekEOF()) {
-      if (/[\s;\n]/.test(context.reader.peek())) break;
-
-      regexLiteral += context.reader.read();
+    let regexLiteral = context.reader.newRead();
+    while (!context.reader.newIsEOF()) {
+      if (/[\s;\n]/.test(context.reader.newPeek())) break;
+      regexLiteral += context.reader.newRead();
     }
 
     return context.createToken("regexLiteral", regexLiteral);
@@ -633,7 +627,7 @@ export const customParseRules = [
         (prevToken.name === "punctuation" &&
           util.contains(["{", "}", ";"], prevToken.value))
       ) {
-        context.reader.read(token.value.length - 1); // already read the first character
+        context.reader.newRead(token.value.length);
         return token;
       }
 
