@@ -5,7 +5,6 @@ export class CodeReader {
   index: number;
   line: number;
   column: number;
-  EOF: string;
   nextReadBeginsLine: boolean;
   text: string;
   length: number;
@@ -18,7 +17,6 @@ export class CodeReader {
     this.index = 0;
     this.line = 1;
     this.column = 1;
-    this.EOF = ""; // TODO: remove
     this.nextReadBeginsLine = false;
 
     // Normalize line endings to unix
@@ -28,27 +26,6 @@ export class CodeReader {
     this.currentChar = text.charAt(0);
 
     this.readAlready = false;
-  }
-
-  toString(): string {
-    return `length: ${this.length}, index: ${this.index}, line: ${
-      this.line
-    }, column: ${this.column}, current: [${this.currentChar}]`;
-  }
-
-  // Deprecated. Do not use in new code.
-  current(): string {
-    return this.currentChar;
-  }
-
-  // Deprecated. Do not use in new code.
-  currentAndPeek(count: number = 1): string {
-    return this.text.substr(this.index, count);
-  }
-
-  // Deprecated. TODO: determine to rename or delete.
-  peek(count: number = 1): string {
-    return this.text.substr(this.index + 1, count);
   }
 
   // TODO: rename to "peek" after migration.
@@ -64,29 +41,11 @@ export class CodeReader {
       : this.text.substr(this.index + relativeIndex, count);
   }
 
-  // Deprecated. Do not use in new code.
-  substring(): string {
-    return this.text.substring(this.index);
-  }
-
   peekToEOF(): string {
     return this.text.substring(this.readAlready ? this.index + 1 : this.index);
   }
 
-  // Deprecated. Do not use in new code.
-  peekSubstring(): string {
-    return this.text.substring(this.index + 1);
-  }
-
-  // Deprecated. Do not use in new code.
-  currentAndPeekTillEOL(): string {
-    const startIndex = this.index;
-    const endIndex: number = this.text.indexOf("\n", startIndex);
-    if (endIndex >= 0) return this.text.substring(startIndex, endIndex);
-    return this.text.substring(startIndex);
-  }
-
-  // TODO: rename to "peekTillEOL".
+  // TODO: rename to "peekToEOL".
   newPeekTillEOL(): string {
     const startIndex = this.readAlready ? this.index + 1 : this.index;
     const endIndex: number = this.text.indexOf("\n", startIndex);
@@ -99,9 +58,9 @@ export class CodeReader {
     this.readAlready = true;
     if (count === 0) return "";
 
-    const value = this.peek(count);
+    const value = this.text.substr(this.index + 1, count);
 
-    if (value !== this.EOF) {
+    if (value !== "") {
       // advance index
       this.index += value.length;
       this.column += value.length;
@@ -127,7 +86,7 @@ export class CodeReader {
       this.currentChar = lastChar;
     } else {
       this.index = this.length;
-      this.currentChar = this.EOF;
+      this.currentChar = "";
     }
 
     return value;
@@ -137,7 +96,7 @@ export class CodeReader {
   newRead(count: number = 1): string {
     return this.readAlready
       ? this.read(count)
-      : this.current() + this.read(count - 1);
+      : this.currentChar + this.read(count - 1);
   }
 
   // Migration mechanism. TODO: delete after migration is finished.
@@ -150,27 +109,9 @@ export class CodeReader {
     return this.text;
   }
 
-  getLine(): number {
-    return this.line;
-  }
-
-  getColumn(): number {
-    return this.column;
-  }
-
-  // Deprecated. Don't use.
-  isEOF(): boolean {
-    return this.index >= this.length;
-  }
-
   // TODO: rename to "isEOF" after migration.
   newIsEOF(): boolean {
     return (this.readAlready ? this.index + 1 : this.index) >= this.length;
-  }
-
-  // TODO: decide fate of this function. Will probably delete.
-  isPeekEOF(): boolean {
-    return this.index + 1 >= this.length;
   }
 
   // TODO: determine whether this should be refactored. Use only at the start of
@@ -186,27 +127,6 @@ export class CodeReader {
       this.index
     );
     return /^\s*$/.test(lineBeforeCurrent);
-  }
-
-  // TODO: determine whether this should be refactored. Use only at the start of
-  // a series of reads.
-  isEol(): boolean {
-    return this.nextReadBeginsLine;
-  }
-
-  // TODO: delete.
-  EOF(): string {
-    return this.EOF;
-  }
-
-  // Deprecated. Do not use in new code.
-  match(str: string): boolean {
-    return this.text.substr(this.index, str.length) === str;
-  }
-
-  // Deprecated. Do not use in new code.
-  matchPeek(str: string): boolean {
-    return this.text.substr(this.index + 1, str.length) === str;
   }
 
   // TODO: rename to "match" after migration.
