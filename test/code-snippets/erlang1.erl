@@ -27,9 +27,11 @@ sender(OtherNode) ->
         done ->
             void
     end.
-send_message(Message) ->
+% Add extra spaces after send_message to test the highlighter.
+send_message    (Message) ->
     receiver ! {message, Message}.
-receiver() ->
+% Remove the space between () and -> to test the highlighter.
+receiver()->
     receive
         {message, Message} ->
             io:format("~s~n", [Message]),

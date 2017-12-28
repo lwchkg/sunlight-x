@@ -227,27 +227,24 @@ export const customTokens = {
 export const customParseRules = [
   // #<n>r operator where n is an integer
   function(context: ParserContext): ?Token {
-    if (context.reader.current() !== "#") return null;
+    if (context.reader.newPeek() !== "#") return null;
 
-    let peek;
-    let count = 0;
-    while ((peek = context.reader.peek(++count)) && peek.length === count)
-      if (!/\d$/.test(peek)) {
-        if (/[AR]$/i.test(peek)) break;
-
+    let offset: number;
+    for (offset = 1; ; offset++) {
+      const peek = context.reader.peekWithOffset(offset);
+      if (peek === "") return null;
+      if (!/\d/.test(peek)) {
+        if (/[AR]/i.test(peek)) break;
         return null;
       }
+    }
 
-    if (peek.length !== count) return null;
-
-    const token = context.createToken("operator", "#" + peek);
-    context.reader.read(peek.length);
-    return token;
+    return context.createToken("operator", context.reader.newRead(offset + 1));
   },
 
   // characters prepended by the #\ operator are read as idents
   function(context: ParserContext): ?Token {
-    if (context.defaultData.text !== "" || /\s/.test(context.reader.current()))
+    if (context.defaultData.text !== "" || /\s/.test(context.reader.newPeek()))
       // whitespace is not allowed
       return null;
 
@@ -260,11 +257,10 @@ export const customParseRules = [
       return null;
 
     // the next characters up until whitespace or ( or ) are part of the ident
-    let value = context.reader.current();
-    while (!context.reader.isPeekEOF()) {
-      if (/[\s()]/.test(context.reader.peek())) break;
-
-      value += context.reader.read();
+    let value = context.reader.newRead();
+    while (!context.reader.newIsEOF()) {
+      if (/[\s()]/.test(context.reader.newPeek())) break;
+      value += context.reader.newRead();
     }
 
     return context.createToken("ident", value);
@@ -272,7 +268,7 @@ export const customParseRules = [
 
   // variables
   function(context: ParserContext): ?Token {
-    if (context.reader.current() !== "*") return null;
+    if (context.reader.newPeek() !== "*") return null;
 
     const token = util.getPreviousNonWsToken(
       context.getAllTokens(),
@@ -282,12 +278,12 @@ export const customParseRules = [
       // function that starts with "*"
       return null;
 
-    if (/[\s*)(]/.test(context.reader.peek())) return null;
+    if (/[\s*)(]/.test(context.reader.peekWithOffset(1))) return null;
 
     // read until *
-    let value = "*";
-    while (!context.reader.isPeekEOF()) {
-      const next = context.reader.read();
+    let value = context.reader.newRead();
+    while (!context.reader.newIsEOF()) {
+      const next = context.reader.newRead();
       value += next;
 
       if (next === "*") break;
@@ -303,7 +299,7 @@ export const customParseRules = [
     return function(context: ParserContext): ?Token {
       if (
         context.defaultData.text !== "" ||
-        boundary.test(context.reader.current())
+        boundary.test(context.reader.newPeek())
       )
         // whitespace is not allowed or we're already at the boundary
         return null;
@@ -313,11 +309,10 @@ export const customParseRules = [
         return null;
 
       // read until function boundary
-      let value = context.reader.current();
-      while (!context.reader.isPeekEOF()) {
-        if (boundary.test(context.reader.peek())) break;
-
-        value += context.reader.read();
+      let value = context.reader.newRead();
+      while (!context.reader.newIsEOF()) {
+        if (boundary.test(context.reader.newPeek())) break;
+        value += context.reader.newRead();
       }
 
       return context.createToken("function", value);

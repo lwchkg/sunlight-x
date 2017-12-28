@@ -3243,13 +3243,13 @@ export const customParseRules = [
   // heredoc/nowdoc
   function(context: ParserContext): ?Token {
     let value = "<<<";
-    if (!context.reader.match(value)) return null;
-    context.reader.read(value.length - 1);
+    if (!context.reader.newMatch(value)) return null;
+    context.reader.newRead(value.length);
 
     let ident = "";
     let isNowdoc = false;
-    while (!context.reader.isPeekEOF() && context.reader.peek() !== "\n") {
-      const next = context.reader.read();
+    while (!context.reader.newIsEOF() && !context.reader.newMatch("\n")) {
+      const next = context.reader.newRead();
       value += next;
 
       // Ignore NOWDOC apostophres. If an apostophre is found in places other
@@ -3261,12 +3261,13 @@ export const customParseRules = [
 
     // Read until "\n{ident};"
     while (
-      !context.reader.isPeekEOF() &&
-      !context.reader.match("\n" + ident + ";")
+      !context.reader.newIsEOF() &&
+      !context.reader.newMatch("\n" + ident + ";")
     )
-      value += context.reader.read();
+      value += context.reader.newRead();
 
-    value += context.reader.read(ident.length); // don't read the semicolon
+    // Read "\n{ident}", but not the semicolon.
+    value += context.reader.newRead(ident.length + 1);
 
     return context.createToken(isNowdoc ? "nowdoc" : "heredoc", value);
   }

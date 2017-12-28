@@ -58,22 +58,30 @@ export class ParserContext {
     this.embeddedLanguageStack = [];
     this.defaultData = { text: "", line: 1, column: 1 };
 
-    // if continuation is given, then we need to pick up where we left off from a previous parse
-    // basically it indicates that a scope was never closed, so we need to continue that scope
+    // If a continuation is given, then we need to pick up where we left off
+    // from a previous parse. That indicates that a scope was not yet closed, so
+    // so we need to continue that scope.
     if (partialContext && partialContext.continuation) {
-      const continuation = partialContext.continuation;
-      partialContext.continuation = null;
-      // The following statement can write to this.continuation
-      // TODO: clean up
-      this.tokens.push(continuation.process(this, continuation, "", true));
+      // Process the continuation. Note that this can potentially write to
+      // this.continuation.
+      this.tokens.push(
+        partialContext.continuation.process(
+          this,
+          partialContext.continuation,
+          ""
+        )
+      );
+      if (!this.reader.newIsEOF()) this.reader.resetAlreadyRead();
     }
 
-    while (!this.reader.isEOF()) {
+    while (!this.reader.newIsEOF()) {
       this.highlighter.switchToEmbeddedLanguageIfNecessary(this);
       const token = parseNextToken(this);
 
-      // flush default data if needed (in pretty much all languages this is just whitespace)
       if (token !== null && token !== undefined) {
+        // Write the stored default data if exist. These data are meant to be
+        // joined into a single default token before writing.
+        // Note: default data are whitespace and things marked not to parse.
         if (this.defaultData.text !== "") {
           this.tokens.push(this.createToken("default", this.defaultData.text));
           this.defaultData.text = "";
@@ -84,7 +92,7 @@ export class ParserContext {
       }
 
       this.highlighter.switchBackFromEmbeddedLanguageIfNecessary(this);
-      this.reader.read();
+      this.reader.resetAlreadyRead();
     }
 
     // append the last default token, if necessary

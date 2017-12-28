@@ -511,21 +511,17 @@ export const customParseRules = [
       if (!token) return null;
 
       // the next non-whitespace character must be a "("
-      let count = token.value.length;
-      let peek = context.reader.peek(count);
-      while (peek.length === count && peek !== context.reader.EOF) {
-        if (!/\s$/.test(peek)) {
-          if (peek.charAt(peek.length - 1) === "(") {
-            // this token really is a function
-            context.reader.read(token.value.length - 1);
-            return token;
-          }
-          break;
+      for (let offset = token.value.length; ; offset++) {
+        const peek = context.reader.peekWithOffset(offset);
+        if (peek === "") return null;
+        if (!/^\s$/.test(peek)) {
+          if (peek === "(") break;
+          return null;
         }
-        peek = context.reader.peek(++count);
       }
 
-      return null;
+      context.reader.newRead(token.value.length);
+      return token;
     };
   })()
 ];

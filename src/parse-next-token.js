@@ -7,10 +7,6 @@ import type { Token } from "./token.js";
 
 /* eslint require-jsdoc: 0, no-magic-numbers: ["error", { "ignore": [-1, 0, 1, 2, 3] }]*/
 
-function isIdentMatch(context: ParserContext): boolean {
-  return context.language.identFirstLetter.test(context.reader.current());
-}
-
 // token parsing functions
 function parseKeyword(context: ParserContext): ?Token {
   return util.matchWord(context, context.language.keywords, "keyword");
@@ -34,47 +30,40 @@ function parseOperator(context: ParserContext): ?Token {
 }
 
 function parsePunctuation(context: ParserContext): ?Token {
-  const current = context.reader.current();
+  const current = context.reader.newPeek();
   if (context.language.punctuation.test(util.regexEscape(current)))
-    return context.createToken("punctuation", current);
+    return context.createToken("punctuation", context.reader.newRead());
 
   return null;
 }
 
 function parseIdent(context: ParserContext): ?Token {
-  if (!isIdentMatch(context)) return null;
+  if (!context.language.identFirstLetter.test(context.reader.newPeek()))
+    return null;
 
-  let ident = context.reader.current();
+  let ident = context.reader.newRead();
 
-  for (;;) {
-    const peek = context.reader.peek();
-    if (
-      peek === context.reader.EOF ||
-      !context.language.identAfterFirstLetter.test(peek)
-    )
-      break;
-
-    ident += context.reader.read();
-  }
+  while (
+    !context.reader.newIsEOF() &&
+    context.language.identAfterFirstLetter.test(context.reader.newPeek())
+  )
+    ident += context.reader.newRead();
 
   return context.createToken("ident", ident);
 }
 
 function parseDefault(context: ParserContext): ?Token {
-  context.defaultData.text += context.reader.current();
+  context.defaultData.text += context.reader.newRead();
   return null;
 }
 
 function parseScopes(context: ParserContext): ?Token {
-  const current = context.reader.current();
-
   for (const tokenName in context.language.scopes) {
     const specificScopes = context.language.scopes[tokenName];
     for (const scope of specificScopes) {
       const opener = scope[0];
 
-      const value = current + context.reader.peek(opener.length - 1);
-
+      const value = context.reader.newPeek(opener.length);
       if (
         opener !== value &&
         (!context.language.caseInsensitive ||
@@ -82,7 +71,7 @@ function parseScopes(context: ParserContext): ?Token {
       )
         continue;
 
-      context.reader.read(opener.length - 1);
+      context.reader.newRead(opener.length);
       const continuation = new Continuation(scope, tokenName);
       return continuation.process(context, continuation, value);
     }
@@ -109,7 +98,7 @@ function parseCustomRules(context: ParserContext): ?Token | Token[] {
 }
 
 export function parseNextToken(context: ParserContext): ?Token | Token[] {
-  if (context.language.doNotParse.test(context.reader.current()))
+  if (context.language.doNotParse.test(context.reader.newPeek()))
     return parseDefault(context);
 
   return (

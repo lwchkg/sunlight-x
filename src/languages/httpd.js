@@ -62,26 +62,20 @@ export const customParseRules = [
       if (!token) return null;
 
       // if we encounter a ">" before a newline, we're good
-      let count = token.value.length;
-      let peek;
-      while ((peek = context.reader.peek(count++)) !== context.reader.EOF) {
-        if (/>$/.test(peek)) {
-          context.reader.read(token.value.length - 1); // already read the first letter
-          return token;
-        }
-
-        if (/\n$/.test(peek)) break;
+      for (let offset = token.value.length; ; offset++) {
+        const peek = context.reader.peekWithOffset(offset);
+        if (peek === "" || peek === "\n") return null;
+        if (peek === ">") break;
       }
 
-      return null;
+      context.reader.newRead(token.value.length);
+      return token;
     };
   })(),
 
   // regex literals for mod_rewrite
   function(context: ParserContext): ?Token {
-    const current = context.reader.current();
-
-    if (/[\s\n]/.test(current)) return null;
+    if (/[\s\n]/.test(context.reader.newPeek())) return null;
 
     // first argument after RewriteRule, delimited by \s
     // second argument after RewriteCond, delimited by \s
@@ -101,11 +95,10 @@ export const customParseRules = [
     }
 
     // read to the end of the regex literal
-    let regexLiteral = current;
-    while (!context.reader.isPeekEOF()) {
-      if (/[\s\n]/.test(context.reader.peek())) break;
-
-      regexLiteral += context.reader.read();
+    let regexLiteral = context.reader.newRead();
+    while (!context.reader.newIsEOF()) {
+      if (/[\s\n]/.test(context.reader.newPeek())) break;
+      regexLiteral += context.reader.newRead();
     }
 
     return context.createToken("regexLiteral", regexLiteral);

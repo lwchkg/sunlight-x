@@ -5,6 +5,7 @@ import type { ParserContext } from "./parser-context.js";
 import type { ScopeType } from "./languages.js";
 import type { Token } from "./token.js";
 
+// TODO: rename the class to something more descriptive.
 export class Continuation {
   closer: RegExp;
   closerLength: number;
@@ -26,60 +27,37 @@ export class Continuation {
   process(
     context: ParserContext,
     continuation: Continuation,
-    buffer: string,
-    processCurrent: boolean = false
+    buffer: string
   ): Token {
     let foundCloser = false;
-    // buffer = buffer || ""; // TODO: remove
 
-    const _processSingle = (processCurrent: boolean): boolean => {
-      // check for escape sequences
-      const current = context.reader.current() || "";
-
-      const maybeMinusOne = processCurrent ? 1 : 0;
-      const peepStart = processCurrent ? current : "";
-      for (const escapeSequence of this.escapeSequences) {
-        const peekValue =
-          peepStart +
-          context.reader.peek(escapeSequence.length - maybeMinusOne);
-        if (peekValue === escapeSequence) {
-          buffer += context.reader.read(peekValue.length - maybeMinusOne);
-          return true;
+    while (!context.reader.newIsEOF()) {
+      let foundEscapeSequence = false;
+      for (const escapeSequence of this.escapeSequences)
+        if (context.reader.newPeek(escapeSequence.length) === escapeSequence) {
+          buffer += context.reader.newRead(escapeSequence.length);
+          foundEscapeSequence = true;
         }
-      }
+      if (foundEscapeSequence) continue;
 
-      const peekValue =
-        peepStart + context.reader.peek(this.closerLength - maybeMinusOne);
+      const peekValue = context.reader.newPeek(this.closerLength);
       if (this.closer.test(peekValue)) {
         foundCloser = true;
-        return false;
+        break;
       }
 
-      buffer += processCurrent ? current : context.reader.read();
-      return true;
-    };
-
-    if (!processCurrent || _processSingle(true))
-      while (
-        context.reader.peek() !== context.reader.EOF &&
-        _processSingle(false)
-      ) {
-        // empty
-      }
-
-    if (processCurrent) {
-      buffer += context.reader.current();
-      context.reader.read();
-    } else {
-      buffer +=
-        this.zeroWidth || context.reader.peek() === context.reader.EOF
-          ? ""
-          : context.reader.read(this.closerLength);
+      buffer += context.reader.newRead();
     }
 
-    // we need to signal to the context that this scope was never properly closed
-    // this has significance for partial parses (e.g. for nested languages)
-    if (!foundCloser) context.continuation = continuation;
+    // TODO: Untested on multi-language settings. Probably buggy.
+    if (foundCloser) {
+      if (!this.zeroWidth && !context.reader.newIsEOF())
+        buffer += context.reader.newRead(this.closerLength);
+    } else {
+      // This scope is not closed. We are now at EOF, and will continue with the
+      // scope in the next partial parse.
+      context.continuation = continuation;
+    }
 
     return context.createToken(this.tokenName, buffer);
   }

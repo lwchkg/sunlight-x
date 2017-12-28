@@ -8,6 +8,7 @@ import * as util from "../util.js";
 
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
 
+/* eslint no-magic-numbers: 1 */
 export const name = "haskell";
 
 // http://www.haskell.org/haskellwiki/Keywords
@@ -51,34 +52,33 @@ export const keywords = [
 export const customParseRules = [
   // character literals, e.g. 'a'
   function(context: ParserContext): ?Token {
-    const peek = context.reader.peek();
-    if (context.reader.current() !== "'" && peek !== "'") return null;
-
+    if (context.reader.newPeek() !== "'") return null;
     // to differentiate from template haskell, we'll just assume that character literals
     // are exactly one character long (or two for \' and \\) and delimited by '
 
-    let expectedEnd = 2;
-    if (peek && peek === "\\") expectedEnd++;
+    const peek = context.reader.peekWithOffset(1);
+    if (peek === "" || peek === "'") return null;
 
-    if (!/'$/.test(context.reader.peek(expectedEnd)))
+    const length = peek === "\\" ? 4 : 3;
+
+    if (context.reader.peekWithOffset(length - 1) !== "'")
       // doesn't end with an apostrophe, so it's a template operator
       return null;
 
-    return context.createToken("char", "'" + context.reader.read(expectedEnd));
+    return context.createToken("char", context.reader.newRead(length));
   },
 
   // look for user defined functions
   function(context: ParserContext): ?Token {
     // read the ident, if a :: operator follows it, then it's a function definition (i guess, like i know anything about haskell)
     // or if follows newtype, class or data, we keep track of it as well
-    if (!/[A-Za-z_]/.test(context.reader.current())) return null;
+    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
 
-    let peek;
-    let count = 0;
-    while ((peek = context.reader.peek(++count)) && peek.length === count)
-      if (!/[\w']$/.test(peek)) break;
+    let offset = 1;
+    while (/[\w']/.test(context.reader.peekWithOffset(offset))) offset++;
 
-    const ident = context.reader.current() + peek.substring(0, peek.length - 1);
+    const identLength = offset;
+    let isIdent = false;
 
     // if it follows class, newtype, type or data
     const prevToken = context.token(context.count() - 1);
@@ -86,28 +86,25 @@ export const customParseRules = [
       prevToken &&
       prevToken.name === "keyword" &&
       util.contains(["class", "newtype", "data", "type"], prevToken.value)
-    ) {
-      context.userDefinedNameStore.addName(ident, name);
-
-      context.reader.read(ident.length - 1); // already read the first character
-      return context.createToken("ident", ident);
-    }
+    )
+      isIdent = true;
 
     // function definitions: start of line followed by ::
-    if (context.reader.isPrecededByWhitespaceOnly())
+    if (!isIdent && context.reader.isPrecededByWhitespaceOnly()) {
       // should be some whitespace, and then ::
-      while ((peek = context.reader.peek(++count)) && peek.length === count)
-        if (!/\s$/.test(peek)) {
-          if (!/::$/.test(context.reader.peek(++count))) return null;
+      for (; ; offset++) {
+        const peek = context.reader.peekWithOffset(offset);
+        if (peek === "") return null;
+        if (!/^\s$/.test(peek)) break;
+      }
+      if (context.reader.peekWithOffset(offset, 2) === "::") isIdent = true;
+    }
 
-          // yay it's a function!
-          context.userDefinedNameStore.addName(ident, name);
+    if (!isIdent) return null;
 
-          context.reader.read(ident.length - 1); // already read the first character
-          return context.createToken("ident", ident);
-        }
-
-    return null;
+    const ident = context.reader.newRead(identLength);
+    context.userDefinedNameStore.addName(ident, name);
+    return context.createToken("ident", ident);
   }
 ];
 
