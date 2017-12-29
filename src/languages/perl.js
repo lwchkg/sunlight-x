@@ -87,7 +87,7 @@ function readBetweenDelimiters(
 }
 
 // perl allows whitespace before delimiters (wtf?)
-function getDelimiterIfValid(
+function readDelimiterIfValid(
   context: ParserContext,
   startOffset: number
 ): { delimiter: string, value: string } | false {
@@ -102,9 +102,7 @@ function getDelimiterIfValid(
 
   if (/\w/.test(peek)) return false;
 
-  const value = context.reader.peekWithOffset(1, offset - 1);
-
-  context.reader.newRead(offset);
+  const value = context.reader.newRead(offset);
   return { delimiter: context.reader.newRead(), value: value };
 }
 
@@ -533,18 +531,18 @@ export const customParseRules = [
     if (current === "/" || current === "?") {
       delimiter = context.reader.newRead();
     } else if (current === "m" || current === "y" || current === "s") {
-      const delimiterInfo = getDelimiterIfValid(context, 1);
+      const delimiterInfo = readDelimiterIfValid(context, 1);
       if (!delimiterInfo) return null;
 
-      value = current + delimiterInfo.value;
+      value = delimiterInfo.value;
       delimiter = delimiterInfo.delimiter;
       hasReplace = current === "y" || current === "s";
     } else if (currentAndNext === "tr" || currentAndNext === "qr") {
-      const delimiterInfo = getDelimiterIfValid(context, 2);
+      const delimiterInfo = readDelimiterIfValid(context, 2);
       if (!delimiterInfo) return null;
 
       hasReplace = current === "t";
-      value = current + delimiterInfo.value;
+      value = delimiterInfo.value;
       delimiter = delimiterInfo.delimiter;
     } else {
       return null;
@@ -559,7 +557,7 @@ export const customParseRules = [
 
       const fetchSecondDelimiter = util.contains(["[", "(", "{"], delimiter);
       if (fetchSecondDelimiter) {
-        const delimiterInfo = getDelimiterIfValid(context, 0);
+        const delimiterInfo = readDelimiterIfValid(context, 0);
         if (delimiterInfo) {
           value += delimiterInfo.value;
           delimiter = delimiterInfo.delimiter;
