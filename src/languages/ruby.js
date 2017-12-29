@@ -130,7 +130,7 @@ export const customTokens = {
 export const customParseRules = [
   // regex literal, mostly the same as javascript
   function(context: ParserContext): ?Token {
-    if (!context.reader.newMatch("/")) return null;
+    if (!context.reader.match("/")) return null;
 
     const previousNonWsToken = context.token(context.count() - 1);
     let previousToken = null;
@@ -160,13 +160,13 @@ export const customParseRules = [
     }
 
     // read the regex literal
-    let regexLiteral = context.reader.newRead();
+    let regexLiteral = context.reader.read();
     let charClass = false;
-    while (!context.reader.newIsEOF()) {
-      const next = context.reader.newRead();
+    while (!context.reader.isEOF()) {
+      const next = context.reader.read();
       regexLiteral += next;
 
-      if (next === "\\") regexLiteral += context.reader.newRead();
+      if (next === "\\") regexLiteral += context.reader.read();
       else if (next === "[") charClass = true;
       else if (next === "]") charClass = false;
       else if (next === "/" && !charClass) break;
@@ -174,11 +174,8 @@ export const customParseRules = [
 
     // Read the regex modifiers. For the sake of simplicity we accept all
     // characters, but currently only "ioxmusen" are supported.
-    while (
-      !context.reader.newIsEOF() &&
-      /[A-Za-z]/.test(context.reader.newPeek())
-    )
-      regexLiteral += context.reader.newRead();
+    while (!context.reader.isEOF() && /[A-Za-z]/.test(context.reader.peek()))
+      regexLiteral += context.reader.read();
 
     return context.createToken("regexLiteral", regexLiteral);
   },
@@ -188,7 +185,7 @@ export const customParseRules = [
     // this is goofy, because it needs to recognize things like "foo = true ? :true :not_true"
     // and detect that :not_true is not a symbol
     if (
-      context.reader.newPeek() !== ":" ||
+      context.reader.peek() !== ":" ||
       !/[a-zA-Z_]/.test(context.reader.peekWithOffset(1))
     )
       return null;
@@ -232,9 +229,9 @@ export const customParseRules = [
     }
 
     // read the symbol
-    let symbol = context.reader.newRead();
-    while (!context.reader.newIsEOF() && /\w/.test(context.reader.newPeek()))
-      symbol += context.reader.newRead();
+    let symbol = context.reader.read();
+    while (!context.reader.isEOF() && /\w/.test(context.reader.peek()))
+      symbol += context.reader.read();
     return context.createToken("symbol", symbol);
   },
 
@@ -244,7 +241,7 @@ export const customParseRules = [
   // and then use them later in the heredoc custom parse rule below
   function(context: ParserContext): ?Token {
     if (
-      !context.reader.newMatch("<<") ||
+      !context.reader.match("<<") ||
       !/[\w'"`-]/.test(context.reader.peekWithOffset(2))
     )
       return null;
@@ -266,13 +263,13 @@ export const customParseRules = [
     // so, we just force you to have whitespace between << and the rhs operand in these ambiguous cases
 
     // can be between quotes (double, single or back) or not, or preceded by a hyphen
-    let value = context.reader.newRead(2);
+    let value = context.reader.read(2);
     let ident = "";
-    let current = context.reader.newRead();
+    let current = context.reader.read();
     if (current === "-") {
       value += current;
       ident += current;
-      current = context.reader.newRead();
+      current = context.reader.read();
     }
 
     let delimiter = "";
@@ -281,10 +278,10 @@ export const customParseRules = [
 
     value += current;
 
-    while (!context.reader.newIsEOF()) {
-      const peek = context.reader.newPeek();
+    while (!context.reader.isEOF()) {
+      const peek = context.reader.peek();
       if (peek === "\n" || (delimiter === "" && /\W/.test(peek))) break;
-      value += context.reader.newRead();
+      value += context.reader.read();
       if (peek === delimiter) break;
       ident += peek;
     }
@@ -324,7 +321,7 @@ export const customParseRules = [
     while (
       Array.isArray(context.items.heredocQueue) &&
       context.items.heredocQueue.length > 0 &&
-      !context.reader.newIsEOF()
+      !context.reader.isEOF()
     ) {
       let declaration = context.items.heredocQueue.shift();
       if (!(typeof declaration === "string")) {
@@ -356,7 +353,7 @@ export const customParseRules = [
       const lengthOfMatch = match
         ? match.index + match[0].length
         : substring.length;
-      const value = context.reader.newRead(lengthOfMatch);
+      const value = context.reader.read(lengthOfMatch);
 
       tokens.push(context.createToken("heredoc", value));
     }
@@ -372,7 +369,7 @@ export const customParseRules = [
   // http://www.ruby-doc.org/docs/ruby-doc-bundle/Manual/man-1.4/syntax.html#regexp
   function(context: ParserContext): ?Token {
     // begin with % or %q or %Q with a non-alphanumeric delimiter (opening bracket/paren are closed by corresponding closing bracket/paren)
-    if (!context.reader.newMatch("%")) return null;
+    if (!context.reader.match("%")) return null;
 
     let readCount = 1;
     let isRegex = false;
@@ -386,8 +383,8 @@ export const customParseRules = [
       return null;
     }
 
-    let value = context.reader.newRead();
-    value += context.reader.newRead(readCount);
+    let value = context.reader.read();
+    value += context.reader.read(readCount);
     let delimiter = value.charAt(value.length - 1);
     switch (delimiter) {
       case "(":
@@ -402,21 +399,21 @@ export const customParseRules = [
     }
 
     // read until the delimiter
-    while (!context.reader.newIsEOF()) {
-      const next = context.reader.newRead();
+    while (!context.reader.isEOF()) {
+      const next = context.reader.read();
       value += next;
 
       if (next === "\\")
         // Escapes.
-        value += context.reader.newRead();
+        value += context.reader.read();
       else if (next === delimiter) break;
     }
 
     if (isRegex)
       // read potential regex modifiers
-      while (!context.reader.newIsEOF()) {
-        if (!/[A-Za-z]/.test(context.reader.newPeek())) break;
-        value += context.reader.newRead();
+      while (!context.reader.isEOF()) {
+        if (!/[A-Za-z]/.test(context.reader.peek())) break;
+        value += context.reader.read();
       }
 
     return context.createToken(isRegex ? "regexLiteral" : "rawString", value);
@@ -428,18 +425,18 @@ export const customParseRules = [
     // these begin on with a line that starts with "=begin" and end with a line that starts with "=end"
     // apparently stuff on the same line as "=end" is also part of the comment
     let value = "=begin";
-    if (!context.reader.isStartOfLine() || !context.reader.newMatch(value))
+    if (!context.reader.isStartOfLine() || !context.reader.match(value))
       return null;
-    context.reader.newRead(value.length);
+    context.reader.read(value.length);
 
     const endOfDoc = "\n=end";
-    while (!context.reader.newIsEOF() && !context.reader.newMatch(endOfDoc))
-      value += context.reader.newRead();
+    while (!context.reader.isEOF() && !context.reader.match(endOfDoc))
+      value += context.reader.read();
 
-    value += context.reader.newRead(endOfDoc.length);
+    value += context.reader.read(endOfDoc.length);
 
-    while (!context.reader.newIsEOF() && context.reader.newPeek() !== "\n")
-      value += context.reader.newRead();
+    while (!context.reader.isEOF() && context.reader.peek() !== "\n")
+      value += context.reader.read();
 
     return context.createToken("docComment", value);
   }

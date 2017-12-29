@@ -463,7 +463,7 @@ export const customParseRules = [
         if (!/\s/.test(peek)) return null;
       }
 
-      context.reader.newRead(token.value.length);
+      context.reader.read(token.value.length);
       return token;
     };
   })()

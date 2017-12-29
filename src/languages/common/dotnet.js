@@ -15,17 +15,17 @@ export function XMLDocComment(
   commentStart: string
 ): ParserContext => ?(Token[]) {
   return function(context: ParserContext): ?(Token[]) {
-    if (!context.reader.newMatch(commentStart)) return null;
+    if (!context.reader.match(commentStart)) return null;
 
     const metaName = "xmlDocCommentMeta"; // tags and the "///" starting token
     const contentName = "xmlDocCommentContent"; // actual comments (words and stuff)
     const tokens = [context.createToken(metaName, commentStart)];
-    context.reader.newRead(commentStart.length);
+    context.reader.read(commentStart.length);
 
     const current: { name: string, value: string } = { name: "", value: "" };
 
-    while (!context.reader.newIsEOF()) {
-      const peek = context.reader.newPeek();
+    while (!context.reader.isEOF()) {
+      const peek = context.reader.peek();
       if (peek === "<" && current.name !== metaName) {
         // push the current token
         if (current.value !== "")
@@ -33,13 +33,13 @@ export function XMLDocComment(
 
         // and create a token for the tag
         current.name = metaName;
-        current.value = context.reader.newRead();
+        current.value = context.reader.read();
         continue;
       }
 
       if (peek === ">" && current.name === metaName) {
         // close the tag
-        current.value += context.reader.newRead();
+        current.value += context.reader.read();
         tokens.push(context.createToken(current.name, current.value));
         current.name = "";
         current.value = "";
@@ -50,7 +50,7 @@ export function XMLDocComment(
 
       if (current.name === "") current.name = contentName;
 
-      current.value += context.reader.newRead();
+      current.value += context.reader.read();
     }
 
     if (current.name === contentName)

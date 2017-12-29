@@ -164,7 +164,7 @@ export const customParseRules = [
 
     return function(context: ParserContext): ?Token {
       // short circuit
-      if (!/[A-Za-z]/.test(context.reader.newPeek())) return null;
+      if (!/[A-Za-z]/.test(context.reader.peek())) return null;
 
       // if it follows "new" or ":", then it's not a function
       const walker = context.getTokenWalker();
@@ -187,7 +187,7 @@ export const customParseRules = [
         if (peek === "" || !/^\s$/.test(peek)) return null;
       }
 
-      context.reader.newRead(token.value.length);
+      context.reader.read(token.value.length);
       return new Token(token.name, token.value, token.language);
     };
   })(),

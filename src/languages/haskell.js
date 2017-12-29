@@ -52,7 +52,7 @@ export const keywords = [
 export const customParseRules = [
   // character literals, e.g. 'a'
   function(context: ParserContext): ?Token {
-    if (context.reader.newPeek() !== "'") return null;
+    if (context.reader.peek() !== "'") return null;
     // to differentiate from template haskell, we'll just assume that character literals
     // are exactly one character long (or two for \' and \\) and delimited by '
 
@@ -65,14 +65,14 @@ export const customParseRules = [
       // doesn't end with an apostrophe, so it's a template operator
       return null;
 
-    return context.createToken("char", context.reader.newRead(length));
+    return context.createToken("char", context.reader.read(length));
   },
 
   // look for user defined functions
   function(context: ParserContext): ?Token {
     // read the ident, if a :: operator follows it, then it's a function definition (i guess, like i know anything about haskell)
     // or if follows newtype, class or data, we keep track of it as well
-    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
+    if (!/[A-Za-z_]/.test(context.reader.peek())) return null;
 
     let offset = 1;
     while (/[\w']/.test(context.reader.peekWithOffset(offset))) offset++;
@@ -102,7 +102,7 @@ export const customParseRules = [
 
     if (!isIdent) return null;
 
-    const ident = context.reader.newRead(identLength);
+    const ident = context.reader.read(identLength);
     context.userDefinedNameStore.addName(ident, name);
     return context.createToken("ident", ident);
   }

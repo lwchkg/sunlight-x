@@ -181,7 +181,7 @@ export const customParseRules = [
   // message destination (e.g. method calls)
   function(context: ParserContext): ?Token {
     // read the ident first
-    if (!identFirstLetter.test(context.reader.newPeek())) return null;
+    if (!identFirstLetter.test(context.reader.peek())) return null;
 
     let offset: number;
     for (offset = 1; ; offset++) {
@@ -234,7 +234,7 @@ export const customParseRules = [
                   possibleMessageArgument && exprCount > 1
                     ? "messageArgumentName"
                     : "messageDestination",
-                  context.reader.newRead(identLength)
+                  context.reader.read(identLength)
                 );
 
               return null;
@@ -294,7 +294,7 @@ export const customParseRules = [
           )
             return null;
 
-          context.reader.newRead(token.value.length);
+          context.reader.read(token.value.length);
           return token;
         } else if (prevToken.value === ";") {
           return null;

@@ -25,7 +25,7 @@ export const customParseRules = [
   function(context: ParserContext): ?(Token[]) {
     if (
       !context.reader.isPrecededByWhitespaceOnly() ||
-      !context.reader.newMatch(":")
+      !context.reader.match(":")
     )
       return null;
 
@@ -34,10 +34,10 @@ export const customParseRules = [
     if (peek === ":" || peek === "" || /\s/.test(peek)) return null;
 
     // Label. Read until whitespace.
-    context.reader.newRead();
-    let value = context.reader.newRead();
-    while (!context.reader.newIsEOF() && !/\s/.test(context.reader.newPeek()))
-      value += context.reader.newRead();
+    context.reader.read();
+    let value = context.reader.read();
+    while (!context.reader.isEOF() && !/\s/.test(context.reader.peek()))
+      value += context.reader.read();
 
     if (value === "") return null;
 
@@ -61,9 +61,9 @@ export const customParseRules = [
     )
       return null;
 
-    let value = context.reader.newRead();
-    while (!context.reader.newIsEOF() && !/[\W]/.test(context.reader.newPeek()))
-      value += context.reader.newRead();
+    let value = context.reader.read();
+    while (!context.reader.isEOF() && !/[\W]/.test(context.reader.peek()))
+      value += context.reader.read();
 
     return context.createToken("label", value);
   },
@@ -223,7 +223,7 @@ export const customParseRules = [
         }
       }
 
-      context.reader.newRead(token.value.length);
+      context.reader.read(token.value.length);
       return token;
     };
   })()

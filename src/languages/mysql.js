@@ -520,7 +520,7 @@ export const customParseRules = [
         }
       }
 
-      context.reader.newRead(token.value.length);
+      context.reader.read(token.value.length);
       return token;
     };
   })()
