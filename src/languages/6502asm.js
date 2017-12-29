@@ -153,18 +153,18 @@ export const customTokens = {
 
 export const customParseRules = [
   function(context: ParserContext): ?Token {
-    if (!context.reader.newMatch("#")) return null;
+    if (!context.reader.match("#")) return null;
 
     // Quick and dirty: everything between "#" (inclusive) and whitespace
     // (exclusive) is a constant too dirty.  Need to account for parens and
     // square brackets, whitespace can appear inside them. New routine: once
     // inside () or [], anything goes, but once outside, terminate with
     // whitespace
-    let value = context.reader.newRead();
+    let value = context.reader.read();
     let parenCount = 0;
     let bracketCount = 0;
     for (;;) {
-      const peek = context.reader.newPeek();
+      const peek = context.reader.peek();
       if (parenCount === 0 && bracketCount === 0 && /\s/.test(peek)) break;
 
       if (peek === ")" && parenCount > 0) parenCount--;
@@ -172,7 +172,7 @@ export const customParseRules = [
       if (peek === "(") parenCount++;
       if (peek === "[") bracketCount++;
 
-      value += context.reader.newRead();
+      value += context.reader.read();
     }
 
     return context.createToken("constant", value);
@@ -194,7 +194,7 @@ export const customParseRules = [
     ];
 
     return function(context: ParserContext): ?Token {
-      if (!/[A-Za-z]/.test(context.reader.newPeek())) return null;
+      if (!/[A-Za-z]/.test(context.reader.peek())) return null;
 
       const prevToken = util.getPreviousNonWsToken(
         context.getAllTokens(),
@@ -212,9 +212,9 @@ export const customParseRules = [
         return null;
 
       // Read until the end of the ident.
-      let label = context.reader.newRead();
-      while (!context.reader.newIsEOF() && /\w/.test(context.reader.newPeek()))
-        label += context.reader.newRead();
+      let label = context.reader.read();
+      while (!context.reader.isEOF() && /\w/.test(context.reader.peek()))
+        label += context.reader.read();
 
       return context.createToken("label", label);
     };
@@ -230,7 +230,7 @@ export const caseInsensitive = true;
  * @returns {Token?}
  */
 export function numberParser(context: ParserContext): ?Token {
-  const current = context.reader.newPeek();
+  const current = context.reader.peek();
 
   let number;
   // is first char a digit?
@@ -239,20 +239,17 @@ export function numberParser(context: ParserContext): ?Token {
     if (current !== "$" && current !== "%") return null;
 
     // hex/binary number
-    number = context.reader.newRead(2);
+    number = context.reader.read(2);
   } else {
-    number = context.reader.newRead(1);
+    number = context.reader.read(1);
     // is it a decimal?
-    if (context.reader.newPeek() === ".") number += context.reader.newRead();
+    if (context.reader.peek() === ".") number += context.reader.read();
   }
 
   // easy way out: read until it's not a number or letter a-f
   // this will work for hex ($FF), octal (012), decimal and binary
-  while (
-    !context.reader.newIsEOF() &&
-    /[A-Fa-f0-9]/.test(context.reader.newPeek())
-  )
-    number += context.reader.newRead();
+  while (!context.reader.isEOF() && /[A-Fa-f0-9]/.test(context.reader.peek()))
+    number += context.reader.read();
 
   return context.createToken("number", number);
 }

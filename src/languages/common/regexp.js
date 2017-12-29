@@ -55,21 +55,20 @@ function isValidRegExp(context: ParserContext): boolean {
  */
 export function ParseRegExpLiteral(context: ParserContext): ?Token {
   // Must start with a "/".
-  if (!context.reader.newMatch("/")) return null;
+  if (!context.reader.match("/")) return null;
   // Should not start with "//" (comment) or "/*" (multi-line comment).
-  if (context.reader.newMatch("//") || context.reader.newMatch("/*"))
-    return null;
+  if (context.reader.match("//") || context.reader.match("/*")) return null;
 
   if (!isValidRegExp(context)) return null;
 
   // read the regex literal
-  let regexLiteral = context.reader.newRead();
+  let regexLiteral = context.reader.read();
   let charClass = false;
-  while (!context.reader.newIsEOF()) {
-    const next = context.reader.newRead();
+  while (!context.reader.isEOF()) {
+    const next = context.reader.read();
     regexLiteral += next;
 
-    if (next === "\\") regexLiteral += context.reader.newRead();
+    if (next === "\\") regexLiteral += context.reader.read();
     else if (next === "[") charClass = true;
     else if (next === "]") charClass = false;
     else if (next === "/" && !charClass) break;
@@ -78,11 +77,8 @@ export function ParseRegExpLiteral(context: ParserContext): ?Token {
   // Read the regex modifiers. Only "g", "i" and "m", "u" and "y" are allowed,
   // but in the future extra letters may be allowed, so we allow any
   // alphabetical character here.
-  while (
-    !context.reader.newIsEOF() &&
-    /[A-Za-z]/.test(context.reader.newPeek())
-  )
-    regexLiteral += context.reader.newRead();
+  while (!context.reader.isEOF() && /[A-Za-z]/.test(context.reader.peek()))
+    regexLiteral += context.reader.read();
 
   return context.createToken("regexLiteral", regexLiteral);
 }

@@ -555,7 +555,7 @@ export const customParseRules = [
 
         if (peek === "(") {
           // this token really is a function
-          context.reader.newRead(token.value.length);
+          context.reader.read(token.value.length);
           return token;
         }
 
@@ -665,12 +665,12 @@ export const customParseRules = [
     // we can't just make this a scope because we'll get false positives for things like ".png" in url(image.png) (image.png doesn't need to be in quotes)
     // so we detect them the hard way
 
-    if (!context.reader.newMatch(".")) return null;
+    if (!context.reader.match(".")) return null;
 
     const className = peekSelectorToken(context);
     if (className === null) return null;
 
-    context.reader.newRead(className.length + 1);
+    context.reader.read(className.length + 1);
     return [
       context.createToken("operator", "."),
       context.createToken("class", className)
@@ -679,7 +679,7 @@ export const customParseRules = [
 
   // element selctors (div, html, body, etc.)
   function(context: ParserContext): ?Token {
-    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
+    if (!/[A-Za-z_]/.test(context.reader.peek())) return null;
 
     const prevToken = util.getPreviousNonWsToken(
       context.getAllTokens(),
@@ -697,13 +697,13 @@ export const customParseRules = [
 
     return context.createToken(
       "element",
-      context.reader.newRead(tagName.length + 1)
+      context.reader.read(tagName.length + 1)
     );
   },
 
   // hex color value
   function(context: ParserContext): ?Token {
-    if (!context.reader.newMatch("#")) return null;
+    if (!context.reader.match("#")) return null;
 
     let length: number = 1;
     let nonHex: boolean = false;
@@ -724,7 +724,7 @@ export const customParseRules = [
     // Should not be the "#" character alone without any hex digits following.
     if (length === 1) return null;
 
-    return context.createToken("hexColor", context.reader.newRead(length));
+    return context.createToken("hexColor", context.reader.read(length));
   }
 ];
 

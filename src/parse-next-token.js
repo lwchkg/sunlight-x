@@ -30,30 +30,30 @@ function parseOperator(context: ParserContext): ?Token {
 }
 
 function parsePunctuation(context: ParserContext): ?Token {
-  const current = context.reader.newPeek();
+  const current = context.reader.peek();
   if (context.language.punctuation.test(util.regexEscape(current)))
-    return context.createToken("punctuation", context.reader.newRead());
+    return context.createToken("punctuation", context.reader.read());
 
   return null;
 }
 
 function parseIdent(context: ParserContext): ?Token {
-  if (!context.language.identFirstLetter.test(context.reader.newPeek()))
+  if (!context.language.identFirstLetter.test(context.reader.peek()))
     return null;
 
-  let ident = context.reader.newRead();
+  let ident = context.reader.read();
 
   while (
-    !context.reader.newIsEOF() &&
-    context.language.identAfterFirstLetter.test(context.reader.newPeek())
+    !context.reader.isEOF() &&
+    context.language.identAfterFirstLetter.test(context.reader.peek())
   )
-    ident += context.reader.newRead();
+    ident += context.reader.read();
 
   return context.createToken("ident", ident);
 }
 
 function parseDefault(context: ParserContext): ?Token {
-  context.defaultData.text += context.reader.newRead();
+  context.defaultData.text += context.reader.read();
   return null;
 }
 
@@ -63,7 +63,7 @@ function parseScopes(context: ParserContext): ?Token {
     for (const scope of specificScopes) {
       const opener = scope[0];
 
-      const value = context.reader.newPeek(opener.length);
+      const value = context.reader.peek(opener.length);
       if (
         opener !== value &&
         (!context.language.caseInsensitive ||
@@ -71,7 +71,7 @@ function parseScopes(context: ParserContext): ?Token {
       )
         continue;
 
-      context.reader.newRead(opener.length);
+      context.reader.read(opener.length);
       const continuation = new Continuation(scope, tokenName);
       return continuation.process(context, continuation, value);
     }
@@ -98,7 +98,7 @@ function parseCustomRules(context: ParserContext): ?Token | Token[] {
 }
 
 export function parseNextToken(context: ParserContext): ?Token | Token[] {
-  if (context.language.doNotParse.test(context.reader.newPeek()))
+  if (context.language.doNotParse.test(context.reader.peek()))
     return parseDefault(context);
 
   return (

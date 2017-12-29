@@ -51,7 +51,7 @@ export const customParseRules = [
         if (peek === "{") break;
       }
 
-      context.reader.newRead(token.value.length);
+      context.reader.read(token.value.length);
       return token;
     };
   })(),
@@ -62,7 +62,7 @@ export const customParseRules = [
     // or after "location ^~"
     // or after "location ~"
     // or after "location ~*"
-    const current = context.reader.newPeek();
+    const current = context.reader.peek();
     if (/[\s\n]/.test(current)) return null;
 
     let isRegexLiteral = false;
@@ -108,10 +108,10 @@ export const customParseRules = [
     if (!isRegexLiteral) return null;
 
     // read to the end of the regex literal
-    let regexLiteral = context.reader.newRead();
-    while (!context.reader.newIsEOF()) {
-      if (/[\s;\n]/.test(context.reader.newPeek())) break;
-      regexLiteral += context.reader.newRead();
+    let regexLiteral = context.reader.read();
+    while (!context.reader.isEOF()) {
+      if (/[\s;\n]/.test(context.reader.peek())) break;
+      regexLiteral += context.reader.read();
     }
 
     return context.createToken("regexLiteral", regexLiteral);
@@ -627,7 +627,7 @@ export const customParseRules = [
         (prevToken.name === "punctuation" &&
           util.contains(["{", "}", ";"], prevToken.value))
       ) {
-        context.reader.newRead(token.value.length);
+        context.reader.read(token.value.length);
         return token;
       }
 

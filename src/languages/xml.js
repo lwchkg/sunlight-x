@@ -48,7 +48,7 @@ export const customTokens = {
 export const customParseRules = [
   // tag names
   function(context: ParserContext): ?Token {
-    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
+    if (!/[A-Za-z_]/.test(context.reader.peek())) return null;
 
     const prevToken = context.token(context.count() - 1);
     if (
@@ -59,28 +59,25 @@ export const customParseRules = [
       return null;
 
     // read the tag name
-    let tagName = context.reader.newRead();
+    let tagName = context.reader.read();
     // allow periods in tag names so that ASP.NET web.config files
     // work correctly
-    while (
-      !context.reader.newIsEOF() &&
-      /[.\w-]/.test(context.reader.newPeek())
-    )
-      tagName += context.reader.newRead();
+    while (!context.reader.isEOF() && /[.\w-]/.test(context.reader.peek()))
+      tagName += context.reader.read();
 
     return context.createToken("tagName", tagName);
   },
 
   // strings (attribute values)
   function(context: ParserContext): ?Token {
-    const delimiter = context.reader.newPeek();
+    const delimiter = context.reader.peek();
     if (delimiter !== '"' && delimiter !== "'") return null;
     if (!isInsideOpenBracket(context)) return null;
 
     // read until the delimiter
-    let stringValue = context.reader.newRead();
-    while (!context.reader.newIsEOF()) {
-      const next = context.reader.newRead();
+    let stringValue = context.reader.read();
+    while (!context.reader.isEOF()) {
+      const next = context.reader.read();
       stringValue += next;
 
       if (next === delimiter) break;
@@ -91,7 +88,7 @@ export const customParseRules = [
 
   // attributes
   function(context: ParserContext): ?Token {
-    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
+    if (!/[A-Za-z_]/.test(context.reader.peek())) return null;
 
     // must be between < and >
     if (!isInsideOpenBracket(context)) return null;
@@ -109,24 +106,18 @@ export const customParseRules = [
       if (!tokenLength && /[=\s:]/.test(peek)) tokenLength = offset;
     }
 
-    return context.createToken(
-      "attribute",
-      context.reader.newRead(tokenLength)
-    );
+    return context.createToken("attribute", context.reader.read(tokenLength));
   },
 
   // entities
   function(context: ParserContext): ?Token {
-    if (!context.reader.newMatch("&")) return null;
+    if (!context.reader.match("&")) return null;
 
     for (let offset = 1; ; offset++) {
       const peek = context.reader.peekWithOffset(offset);
       if (peek === "") return null;
       if (peek === ";")
-        return context.createToken(
-          "entity",
-          context.reader.newRead(offset + 1)
-        );
+        return context.createToken("entity", context.reader.read(offset + 1));
       if (!/[A-Za-z0-9]/.test(peek)) return null;
     }
   },
@@ -136,14 +127,14 @@ export const customParseRules = [
     const startAspToken = "<%--";
     const endAspToken = "--%>";
     // have to do these manually or else they get swallowed by the open tag: <%
-    if (!context.reader.newMatch(startAspToken)) return null;
+    if (!context.reader.match(startAspToken)) return null;
 
-    let value = context.reader.newRead(startAspToken.length);
+    let value = context.reader.read(startAspToken.length);
 
-    while (!context.reader.newIsEOF() && !context.reader.newMatch(endAspToken))
-      value += context.reader.newRead();
+    while (!context.reader.isEOF() && !context.reader.match(endAspToken))
+      value += context.reader.read();
 
-    value += context.reader.newRead(endAspToken.length);
+    value += context.reader.read(endAspToken.length);
 
     return context.createToken("comment", value);
   }
@@ -154,7 +145,7 @@ export const embeddedLanguages = {
     switchTo: function(context: ParserContext): boolean {
       if (context.options.enableScalaXmlInterpolation === true) return false;
 
-      if (context.reader.newMatch("</style")) return false;
+      if (context.reader.match("</style")) return false;
 
       const walker = context.getTokenWalker();
       if (!walker.hasPrev()) return false;
@@ -181,13 +172,13 @@ export const embeddedLanguages = {
     },
 
     switchBack: function(context: ParserContext): boolean {
-      return context.reader.newMatch("</style");
+      return context.reader.match("</style");
     }
   },
 
   javascript: {
     switchTo: function(context: ParserContext): boolean {
-      if (context.reader.newMatch("</script")) return false;
+      if (context.reader.match("</script")) return false;
 
       const walker = context.getTokenWalker();
       if (!walker.hasPrev()) return false;
@@ -218,13 +209,13 @@ export const embeddedLanguages = {
     },
 
     switchBack: function(context: ParserContext): boolean {
-      return context.reader.newMatch("</script");
+      return context.reader.match("</script");
     }
   },
 
   php: {
     switchTo: function(context: ParserContext): boolean {
-      return context.reader.newMatch("<?") && !context.reader.newMatch("<?xml");
+      return context.reader.match("<?") && !context.reader.match("<?xml");
     },
 
     switchBack: function(context: ParserContext): boolean {
@@ -240,7 +231,7 @@ export const embeddedLanguages = {
     },
 
     switchBack: function(context: ParserContext): boolean {
-      return context.reader.newMatch("%>");
+      return context.reader.match("%>");
     }
   },
 
@@ -249,7 +240,7 @@ export const embeddedLanguages = {
       context.items.scalaBracketNestingLevel = 0;
       return (
         context.options.enableScalaXmlInterpolation === true &&
-        context.reader.newMatch("{")
+        context.reader.match("{")
       );
     },
 

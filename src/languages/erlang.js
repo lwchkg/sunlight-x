@@ -48,7 +48,7 @@ export const keywords = [
 export const customParseRules = [
   // atom/function/userDefinedFunction detection
   function(context: ParserContext): ?Token {
-    if (!/[A-Za-z_]/.test(context.reader.newPeek())) return null;
+    if (!/[A-Za-z_]/.test(context.reader.peek())) return null;
 
     let peek: string;
     // read the ident (they can have letters, numbers, underscores and @-signs in them)
@@ -58,7 +58,7 @@ export const customParseRules = [
       if (peek === "" || !/[\w@]/.test(peek)) break;
     }
 
-    const ident = context.reader.newPeek(offset);
+    const ident = context.reader.peek(offset);
 
     // if the next non-whitespace character is "(", then it's a function
     let isFunction = false;
@@ -76,7 +76,7 @@ export const customParseRules = [
     // but it might be a keyword or something
     if (!isFunction && !/^[A-Z_]/.test(ident)) return null;
 
-    context.reader.newRead(ident.length);
+    context.reader.read(ident.length);
     offset -= ident.length;
 
     if (!isFunction) return context.createToken("ident", ident);

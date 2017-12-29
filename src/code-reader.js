@@ -15,8 +15,7 @@ export class CodeReader {
     this.length = this.text.length;
   }
 
-  // TODO: rename to "peek" after migration.
-  newPeek(count: number = 1): string {
+  peek(count: number = 1): string {
     return this.text.substr(this.index, count);
   }
 
@@ -30,30 +29,25 @@ export class CodeReader {
     return this.text.substring(this.index);
   }
 
-  // TODO: rename to "peekToEOL".
-  newPeekTillEOL(): string {
+  peekToEndOfLine(): string {
     const startIndex = this.index;
     const endIndex: number = this.text.indexOf("\n", startIndex);
     if (endIndex >= 0) return this.text.substring(startIndex, endIndex);
     return this.text.substring(startIndex);
   }
 
-  // TODO: rename to "read" after migration.
-  newRead(count: number = 1): string {
-    const ret = this.newPeek(count);
+  read(count: number = 1): string {
+    const ret = this.peek(count);
     // Advance index by the actual number of characters read, so it doesn't go
     // past the end of the text.
     this.index += ret.length;
     return ret;
   }
 
-  // TODO: rename to "isEOF" after migration.
-  newIsEOF(): boolean {
+  isEOF(): boolean {
     return this.index >= this.length;
   }
 
-  // TODO: determine whether this should be refactored. Use only at the start of
-  // a series of reads.
   isStartOfLine(): boolean {
     return this.index === 0 || this.peekWithOffset(-1) === "\n";
   }
@@ -69,7 +63,7 @@ export class CodeReader {
   }
 
   // TODO: rename to "match" after migration.
-  newMatch(str: string): boolean {
+  match(str: string): boolean {
     return this.text.substr(this.index, str.length) === str;
   }
 }

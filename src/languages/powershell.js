@@ -87,17 +87,14 @@ export const customParseRules = [
 
     return function(context: ParserContext): ?Token {
       if (
-        !/[A-Za-z_-]/.test(context.reader.newPeek()) ||
+        !/[A-Za-z_-]/.test(context.reader.peek()) ||
         !/[\w-]/.test(context.reader.peekWithOffset(1))
       )
         return null;
 
-      let ident = context.reader.newRead();
-      while (
-        !context.reader.newIsEOF() &&
-        /[\w-]/.test(context.reader.newPeek())
-      )
-        ident += context.reader.newRead();
+      let ident = context.reader.read();
+      while (!context.reader.isEOF() && /[\w-]/.test(context.reader.peek()))
+        ident += context.reader.read();
 
       const tokenType = util.contains(specialOperators, ident)
         ? "specialOperator"
@@ -158,17 +155,17 @@ export const customParseRules = [
     return function(context: ParserContext): ?Token {
       // illegal characters in a variable: ! @ # % & , . whitespace
       if (
-        context.reader.newPeek() !== "$" ||
+        context.reader.peek() !== "$" ||
         invalidVariableCharRegex.test(context.reader.peekWithOffset(1))
       )
         return null;
 
-      let value = context.reader.newRead();
+      let value = context.reader.read();
       while (
-        !context.reader.newIsEOF() &&
-        !invalidVariableCharRegex.test(context.reader.newPeek())
+        !context.reader.isEOF() &&
+        !invalidVariableCharRegex.test(context.reader.peek())
       )
-        value += context.reader.newRead();
+        value += context.reader.read();
 
       return context.createToken(
         util.contains(specialVariables, value.toUpperCase())

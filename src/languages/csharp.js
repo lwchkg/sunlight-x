@@ -168,7 +168,7 @@ export const customParseRules = [
   // get/set contextual keyword
   function(context: ParserContext): ?Token {
     const initialLength = "get".length;
-    if (!/^(get|set)\b/.test(context.reader.newPeek(initialLength + 1)))
+    if (!/^(get|set)\b/.test(context.reader.peek(initialLength + 1)))
       return null;
 
     if (
@@ -195,15 +195,14 @@ export const customParseRules = [
       }
     }
 
-    const value = context.reader.newRead(initialLength);
+    const value = context.reader.read(initialLength);
     return context.createToken("keyword", value);
   },
 
   // value contextual keyword
   function(context: ParserContext): ?Token {
     const initialLength = "value".length;
-    if (!/^value\b/.test(context.reader.newPeek(initialLength + 1)))
-      return null;
+    if (!/^value\b/.test(context.reader.peek(initialLength + 1))) return null;
 
     // comes after "set" but not after the closing "}" (we'll have to count them to make sure scoping is correct)
     // can't be on the left side of an assignment
@@ -250,10 +249,7 @@ export const customParseRules = [
       // nope
       return null;
 
-    return context.createToken(
-      "keyword",
-      context.reader.newRead(initialLength)
-    );
+    return context.createToken("keyword", context.reader.read(initialLength));
   }
 ];
 

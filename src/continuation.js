@@ -31,28 +31,28 @@ export class Continuation {
   ): Token {
     let foundCloser = false;
 
-    while (!context.reader.newIsEOF()) {
+    while (!context.reader.isEOF()) {
       let foundEscapeSequence = false;
       for (const escapeSequence of this.escapeSequences)
-        if (context.reader.newPeek(escapeSequence.length) === escapeSequence) {
-          buffer += context.reader.newRead(escapeSequence.length);
+        if (context.reader.peek(escapeSequence.length) === escapeSequence) {
+          buffer += context.reader.read(escapeSequence.length);
           foundEscapeSequence = true;
         }
       if (foundEscapeSequence) continue;
 
-      const peekValue = context.reader.newPeek(this.closerLength);
+      const peekValue = context.reader.peek(this.closerLength);
       if (this.closer.test(peekValue)) {
         foundCloser = true;
         break;
       }
 
-      buffer += context.reader.newRead();
+      buffer += context.reader.read();
     }
 
     // TODO: Untested on multi-language settings. Probably buggy.
     if (foundCloser) {
-      if (!this.zeroWidth && !context.reader.newIsEOF())
-        buffer += context.reader.newRead(this.closerLength);
+      if (!this.zeroWidth && !context.reader.isEOF())
+        buffer += context.reader.read(this.closerLength);
     } else {
       // This scope is not closed. We are now at EOF, and will continue with the
       // scope in the next partial parse.

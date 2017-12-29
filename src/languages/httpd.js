@@ -68,14 +68,14 @@ export const customParseRules = [
         if (peek === ">") break;
       }
 
-      context.reader.newRead(token.value.length);
+      context.reader.read(token.value.length);
       return token;
     };
   })(),
 
   // regex literals for mod_rewrite
   function(context: ParserContext): ?Token {
-    if (/[\s\n]/.test(context.reader.newPeek())) return null;
+    if (/[\s\n]/.test(context.reader.peek())) return null;
 
     // first argument after RewriteRule, delimited by \s
     // second argument after RewriteCond, delimited by \s
@@ -95,10 +95,10 @@ export const customParseRules = [
     }
 
     // read to the end of the regex literal
-    let regexLiteral = context.reader.newRead();
-    while (!context.reader.newIsEOF()) {
-      if (/[\s\n]/.test(context.reader.newPeek())) break;
-      regexLiteral += context.reader.newRead();
+    let regexLiteral = context.reader.read();
+    while (!context.reader.isEOF()) {
+      if (/[\s\n]/.test(context.reader.peek())) break;
+      regexLiteral += context.reader.read();
     }
 
     return context.createToken("regexLiteral", regexLiteral);

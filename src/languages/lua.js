@@ -122,7 +122,7 @@ export const customParseRules = [
   // literal strings
   function(context: ParserContext): ?Token {
     // [=*[ string contents ]=*]
-    if (context.reader.newPeek() !== "[") return null;
+    if (context.reader.peek() !== "[") return null;
 
     let offset: number;
     for (offset = 1; ; offset++) {
@@ -134,16 +134,16 @@ export const customParseRules = [
     }
     const numberOfEqualsSigns = offset - 1;
 
-    let value = context.reader.newRead(offset + 1);
+    let value = context.reader.read(offset + 1);
 
     // read until "]" + numberOfEqualsSigns + "]"
     const closer = "]" + new Array(numberOfEqualsSigns + 1).join("=") + "]";
-    while (!context.reader.newIsEOF()) {
-      if (context.reader.newMatch(closer)) {
-        value += context.reader.newRead(closer.length);
+    while (!context.reader.isEOF()) {
+      if (context.reader.match(closer)) {
+        value += context.reader.read(closer.length);
         break;
       }
-      value += context.reader.newRead();
+      value += context.reader.read();
     }
 
     return context.createToken("verbatimString", value);

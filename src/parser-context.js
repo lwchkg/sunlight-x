@@ -70,7 +70,7 @@ export class ParserContext {
         )
       );
 
-    while (!this.reader.newIsEOF()) {
+    while (!this.reader.isEOF()) {
       this.highlighter.switchToEmbeddedLanguageIfNecessary(this);
       const token = parseNextToken(this);
 
