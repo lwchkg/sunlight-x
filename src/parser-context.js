@@ -61,18 +61,14 @@ export class ParserContext {
     // If a continuation is given, then we need to pick up where we left off
     // from a previous parse. That indicates that a scope was not yet closed, so
     // so we need to continue that scope.
-    if (partialContext && partialContext.continuation) {
-      // Process the continuation. Note that this can potentially write to
-      // this.continuation.
+    if (partialContext && partialContext.continuation)
       this.tokens.push(
         partialContext.continuation.process(
-          this,
+          this, // this.continuation may be overwritten.
           partialContext.continuation,
           ""
         )
       );
-      if (!this.reader.newIsEOF()) this.reader.resetAlreadyRead();
-    }
 
     while (!this.reader.newIsEOF()) {
       this.highlighter.switchToEmbeddedLanguageIfNecessary(this);
@@ -92,7 +88,6 @@ export class ParserContext {
       }
 
       this.highlighter.switchBackFromEmbeddedLanguageIfNecessary(this);
-      this.reader.resetAlreadyRead();
     }
 
     // append the last default token, if necessary
