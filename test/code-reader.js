@@ -127,7 +127,7 @@ describe("Tests of CodeReader", function() {
     });
 
     it("isStartOfLine() returns if index is at start of line", function() {
-      const reader = new CodeReader(code + "\n");
+      const reader = new CodeReader(code);
       assert.strictEqual(reader.isStartOfLine(), true);
       assert.strictEqual(reader.index, 0);
 
@@ -139,10 +139,9 @@ describe("Tests of CodeReader", function() {
       assert.strictEqual(reader.isStartOfLine(), true);
       assert.strictEqual(reader.index, 16);
 
-      // Not start of line if EOF.
       reader.read(10);
       assert.strictEqual(reader.isStartOfLine(), false);
-      assert.strictEqual(reader.index, 23);
+      assert.strictEqual(reader.index, 22);
     });
 
     it("isPrecededByWhitespaceOnly() returns if current char is not preceded by a non-whitespace char in the line", function() {
@@ -165,6 +164,25 @@ describe("Tests of CodeReader", function() {
       assert.strictEqual(reader.isPrecededByWhitespaceOnly(), true);
       reader.index = 12;
       assert.strictEqual(reader.isPrecededByWhitespaceOnly(), false);
+    });
+
+    it("isStartOfLine() and isPrecededByWhitespaceOnly performs correctly at EOF.", function() {
+      let reader = new CodeReader(code + "\n");
+
+      // Returns false at EOF even if after a \n.
+      reader.read(30);
+      assert.strictEqual(reader.isStartOfLine(), false);
+      assert.strictEqual(reader.index, 23);
+      assert.strictEqual(reader.isPrecededByWhitespaceOnly(), false);
+      assert.strictEqual(reader.index, 23);
+
+      reader = new CodeReader(code + "\n ");
+      // Returns false at EOF even if after a \n.
+      reader.read(30);
+      assert.strictEqual(reader.isStartOfLine(), false);
+      assert.strictEqual(reader.index, 24);
+      assert.strictEqual(reader.isPrecededByWhitespaceOnly(), true);
+      assert.strictEqual(reader.index, 24);
     });
 
     it("match() returns if the current chars are given in the argument", function() {

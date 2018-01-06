@@ -54,8 +54,10 @@ export class CodeReader {
     );
   }
 
-  // Check if the current character is preceded by whitespace or nothing.
+  // Check if the current character is preceded by whitespace only or nothing.
   isPrecededByWhitespaceOnly(): boolean {
+    if (this.isEOF() && this.peekWithOffset(-1, 1) === "\n") return false;
+
     for (let offset = -1; ; offset--) {
       const peek = this.peekWithOffset(offset);
       if (peek === "" || peek === "\n") break;
