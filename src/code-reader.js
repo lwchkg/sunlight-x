@@ -49,11 +49,15 @@ export class CodeReader {
   }
 
   isStartOfLine(): boolean {
-    return this.index === 0 || this.peekWithOffset(-1) === "\n";
+    return (
+      this.index === 0 || (!this.isEOF() && this.peekWithOffset(-1) === "\n")
+    );
   }
 
-  // Check if the current character is preceded by whitespace or nothing.
+  // Check if the current character is preceded by whitespace only or nothing.
   isPrecededByWhitespaceOnly(): boolean {
+    if (this.isEOF() && this.peekWithOffset(-1, 1) === "\n") return false;
+
     for (let offset = -1; ; offset--) {
       const peek = this.peekWithOffset(offset);
       if (peek === "" || peek === "\n") break;
@@ -62,7 +66,6 @@ export class CodeReader {
     return true;
   }
 
-  // TODO: rename to "match" after migration.
   match(str: string): boolean {
     return this.text.substr(this.index, str.length) === str;
   }
