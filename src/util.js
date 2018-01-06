@@ -253,8 +253,7 @@ export function createProceduralRule(
       const expected = tokenRequirements[tokenRequirements.length - 1 - j];
 
       if (actual === undefined)
-        if (expected.optional !== undefined && expected.optional)
-          tokenIndexStart -= direction;
+        if (expected.optional === true) tokenIndexStart -= direction;
         else return false;
       else if (
         actual.name === expected.token &&
@@ -263,7 +262,7 @@ export function createProceduralRule(
       )
         // derp
         continue;
-      else if (expected.optional !== undefined && expected.optional)
+      else if (expected.optional === true)
         tokenIndexStart -= direction; // we need to reevaluate against this token again
       else return false;
     }

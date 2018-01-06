@@ -235,7 +235,7 @@ export class Highlighter {
     if (this.isAlreadyHighlighted(node)) return;
 
     const languageId = this.getLanguageFromNode(node);
-    if (!languageId) return;
+    if (typeof languageId !== "string" || languageId === "") return;
 
     BeforeHighlightNodeEvent.raise(this, { node: node });
 

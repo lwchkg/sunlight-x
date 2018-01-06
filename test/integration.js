@@ -135,7 +135,7 @@ describe("HTML files generation test", function() {
       allResults.push({
         filename: filename,
         theme: typeof options.theme === "string" ? options.theme : "",
-        lineNumbers: options.lineNumbers ? "true" : "false",
+        lineNumbers: options.lineNumbers === true ? "true" : "false",
         highlightedCode: testSupport.codeElement.outerHTML
       });
     }

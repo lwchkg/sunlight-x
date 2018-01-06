@@ -39,7 +39,7 @@ export function IsPrecedesRuleSatisfied(
     )
       continue;
 
-    if (expected.optional) walker.decreaseIndex();
+    if (expected.optional === true) walker.decreaseIndex();
     else return false;
   }
   return true;
@@ -75,7 +75,7 @@ export function IsFollowsRuleSatisfied(
     )
       continue;
 
-    if (expected.optional) walker.increaseIndex();
+    if (expected.optional === true) walker.increaseIndex();
     else return false;
   }
   return true;

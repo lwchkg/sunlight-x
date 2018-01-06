@@ -49,7 +49,7 @@ describe("Test of test fixtures", function() {
         const options = getOptionsFromHash(hash);
         for (let index = 0; index < cardinality; ++index) {
           const actual = options[periods[index].name];
-          if (!expected[index][counts[index]])
+          if (typeof expected[index][counts[index]] === "undefined")
             expected[index][counts[index]] = actual;
           else
             assert.strictEqual(
