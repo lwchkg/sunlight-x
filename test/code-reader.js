@@ -169,18 +169,19 @@ describe("Tests of CodeReader", function() {
     it("isStartOfLine() and isPrecededByWhitespaceOnly performs correctly at EOF.", function() {
       let reader = new CodeReader(code + "\n");
 
-      // Returns false at EOF even if after a \n.
       reader.read(30);
+      // isStartOfLine returns false at EOF even if after a \n.
       assert.strictEqual(reader.isStartOfLine(), false);
       assert.strictEqual(reader.index, 23);
+      // isPrecededByWhitespaceOnly returns false at EOF after \n.
       assert.strictEqual(reader.isPrecededByWhitespaceOnly(), false);
       assert.strictEqual(reader.index, 23);
 
       reader = new CodeReader(code + "\n ");
-      // Returns false at EOF even if after a \n.
       reader.read(30);
       assert.strictEqual(reader.isStartOfLine(), false);
       assert.strictEqual(reader.index, 24);
+      // isPrecededByWhitespaceOnly returns true at EOF after a whitespace.
       assert.strictEqual(reader.isPrecededByWhitespaceOnly(), true);
       assert.strictEqual(reader.index, 24);
     });
