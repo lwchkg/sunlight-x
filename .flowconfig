@@ -11,7 +11,9 @@
 
 [options]
 all=true
+include_warnings=true
 module.use_strict=true
 munge_underscores=true
 
 [lints]
+all=warn
