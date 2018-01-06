@@ -1,6 +1,6 @@
 {
   "name": "sunlight-x",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Sunlight highlighter refactored for Node.js",
   "main": "babel-out/sunlight.js",
   "keywords": [
