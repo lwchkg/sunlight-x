@@ -152,7 +152,7 @@ var isRegistered = sunlight.isRegistered(language)
 
 # Copyright
 
-Copyright 2017 Leung Wing-chung. All rights reserved.
+Copyright 2017-18 Leung Wing-chung. All rights reserved.
 Use of the software by a Apache License Version 2.0, that can be found in the LICENSE file.
 
 

@@ -49,7 +49,9 @@ export class CodeReader {
   }
 
   isStartOfLine(): boolean {
-    return this.index === 0 || this.peekWithOffset(-1) === "\n";
+    return (
+      this.index === 0 || (!this.isEOF() && this.peekWithOffset(-1) === "\n")
+    );
   }
 
   // Check if the current character is preceded by whitespace or nothing.
