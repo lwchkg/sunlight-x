@@ -64,7 +64,6 @@ export class CodeReader {
     return true;
   }
 
-  // TODO: rename to "match" after migration.
   match(str: string): boolean {
     return this.text.substr(this.index, str.length) === str;
   }
