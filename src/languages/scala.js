@@ -97,7 +97,8 @@ export const embeddedLanguages = {
       }
 
       if (prevToken.name === "tagName") {
-        if (!context.items.literalXmlOpenTag)
+        // TODO: investigate the code smell here.
+        if (typeof context.items.literalXmlOpenTag !== "string")
           context.items.literalXmlOpenTag = prevToken.value;
       } else if (prevToken.name === "operator") {
         switch (prevToken.value) {
@@ -112,7 +113,7 @@ export const embeddedLanguages = {
       }
 
       if (
-        context.items.literalXmlOpenTag &&
+        typeof context.items.literalXmlOpenTag === "string" &&
         context.items.literalXmlNestingLevel === 0 &&
         (prevToken.value === ">" || prevToken.value === "/>")
       )
