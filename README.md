@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/lwchkg/sunlight-x.svg?branch=master)](https://travis-ci.org/lwchkg/sunlight-x)
 [![Build status](https://ci.appveyor.com/api/projects/status/ilr6lbjngs8x5abg?svg=true)](https://ci.appveyor.com/project/lwchkg/sunlight-x)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flwchkg%2Fsunlight-x.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flwchkg%2Fsunlight-x?ref=badge_shield)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d34cdc3875a94bafb62c822ba120b4cd)](https://www.codacy.com/app/lwchkg/sunlight-x?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lwchkg/sunlight-x&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d34cdc3875a94bafb62c822ba120b4cd)](https://www.codacy.com/app/lwchkg/sunlight-x?utm_source=github.com&utm_medium=referral&utm_content=lwchkg/sunlight-x&utm_campaign=Badge_Coverage)
@@ -160,3 +161,7 @@ Use of the software by a Apache License Version 2.0, that can be found in the LI
 
 This software is forked from [Sunlight](http://sunlightjs.com/), authored by Tommy Montgomery.
 The original Sunlight is licensed by the [WTFPL](http://www.wtfpl.net/about/) (warning: foul language inside).
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flwchkg%2Fsunlight-x.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Flwchkg%2Fsunlight-x?ref=badge_large)
