@@ -376,6 +376,7 @@ export function getComputedStyle(element: Element, style: string): string {
   else
     func = function(element: Element): any {
       // TODO: Remove (IE compatibility)
+      // $FlowFixMe
       return element.currentStyle || {};
     };
 
