@@ -7,6 +7,7 @@
 import * as util from "../util.js";
 import * as DotNetCommon from "./common/dotnet.js";
 
+import type { ScopeType } from "../languages.js";
 import type {
   AnalyzerContext,
   FollowsOrPrecedesIdentRule,
@@ -53,7 +54,7 @@ function createNamedIdentFunction(
 
 export const name = "csharp";
 
-export const keywords = primitives.concat([
+export const keywords: string[] = primitives.concat([
   // this is also contextual (must be first thing in the file or something), but
   // it's never used so i don't really care
   "extern alias",
@@ -253,7 +254,7 @@ export const customParseRules = [
   }
 ];
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ['@"', '"', ['""'], false]

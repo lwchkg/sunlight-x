@@ -99,8 +99,10 @@ export const customParseRules = [
       const tokenType = util.contains(specialOperators, ident)
         ? "specialOperator"
         : util.contains(keywords, ident)
-          ? "keyword"
-          : ident.charAt(0) === "-" ? "switch" : "ident";
+        ? "keyword"
+        : ident.charAt(0) === "-"
+        ? "switch"
+        : "ident";
 
       return context.createToken(tokenType, ident);
     };

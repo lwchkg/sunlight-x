@@ -262,8 +262,8 @@ export function createProceduralRule(
       )
         // derp
         continue;
-      else if (expected.optional === true)
-        tokenIndexStart -= direction; // we need to reevaluate against this token again
+      else if (expected.optional === true) tokenIndexStart -= direction;
+      // we need to reevaluate against this token again
       else return false;
     }
 
@@ -376,6 +376,7 @@ export function getComputedStyle(element: Element, style: string): string {
   else
     func = function(element: Element): any {
       // TODO: Remove (IE compatibility)
+      // $FlowFixMe
       return element.currentStyle || {};
     };
 

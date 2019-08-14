@@ -6,6 +6,7 @@
 // @flow
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
 import type { AnalyzerContext, ParserContext, Token } from "../util.js";
 
 /* eslint no-magic-numbers: 1 */
@@ -340,7 +341,7 @@ export const customTokens = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [['"', '"', util.escapeSequences.concat(['\\"']), false]],
   comment: [["--", "\n", [], true], ["{-", "-}", [], false]],
   infixOperator: [["`", "`", ["\\`"], false]]

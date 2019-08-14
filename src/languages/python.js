@@ -6,6 +6,8 @@
 // @flow
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
+
 export const name = "python";
 export const keywords = [
   // http://docs.python.org/py3k/reference/lexical_analysis.html#keywords
@@ -281,7 +283,7 @@ export const customTokens = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   longString: [
     ['"""', '"""', util.escapeSequences.concat(['\\"']), false],
     ["'''", "'''", util.escapeSequences.concat(["\\'"]), false]

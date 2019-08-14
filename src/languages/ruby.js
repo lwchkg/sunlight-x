@@ -9,6 +9,7 @@
 import * as logger from "../logger.js";
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
 import type { ParserContext, Token } from "../util.js";
 
 export const name = "ruby";
@@ -287,6 +288,7 @@ export const customParseRules = [
     }
 
     if (Array.isArray(context.items.heredocQueue))
+      // $FlowFixMe
       context.items.heredocQueue.push(ident);
     else
       logger.errorInvalidValue(
@@ -323,6 +325,7 @@ export const customParseRules = [
       context.items.heredocQueue.length > 0 &&
       !context.reader.isEOF()
     ) {
+      // $FlowFixMe
       let declaration = context.items.heredocQueue.shift();
       if (!(typeof declaration === "string")) {
         logger.errorInvalidValue(
@@ -442,7 +445,7 @@ export const customParseRules = [
   }
 ];
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ["'", "'", ["\\'", "\\\\"], false]

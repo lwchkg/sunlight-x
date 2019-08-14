@@ -8,6 +8,7 @@ import { Token } from "../util.js";
 import * as util from "../util.js";
 import { ParseRegExpLiteral } from "./common/regexp.js";
 
+import type { ScopeType } from "../languages.js";
 import type { AnalyzerContext, ParserContext } from "../util.js";
 
 /* eslint no-magic-numbers: 1 */
@@ -121,7 +122,7 @@ export const customTokens = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ["'", "'", util.escapeSequences.concat(["\\'", "\\\\"]), false]

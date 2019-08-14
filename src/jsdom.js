@@ -4,9 +4,8 @@
 // be found in the LICENSE file.
 
 // @flow
-import { jsdom } from "jsdom";
-export { jsdom };
-export const document: Document = jsdom("", {});
+import { JSDOM } from "jsdom";
+export const document: Document = new JSDOM("", {}).window.document;
 
 const defaultView = document.defaultView;
 

@@ -6,6 +6,7 @@
 // @flow
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
 import type { ParserContext, Token } from "../util.js";
 
 export const name = "mysql";
@@ -526,7 +527,7 @@ export const customParseRules = [
   })()
 ];
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ["'", "'", ["\\'", "\\\\"], false]

@@ -6,6 +6,7 @@
 // @flow
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
 import type { AnalyzerContext, FollowsOrPrecedesIdentRule } from "../util.js";
 
 export const primitives = [
@@ -157,7 +158,7 @@ export const customTokens = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [['"', '"', util.escapeSequences.concat(['\\"']), false]],
   char: [["'", "'", ["\\'", "\\\\"], false]],
   comment: [["//", "\n", [], true], ["/*", "*/", [], false]],

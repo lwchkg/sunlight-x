@@ -46,34 +46,18 @@ class EventClass<T> {
   }
 }
 
-export const BeforeHighlightNodeEvent: EventClass<
-  BeforeHighlightNodeEventArgs
-> = new EventClass();
+export const BeforeHighlightNodeEvent: EventClass<BeforeHighlightNodeEventArgs> = new EventClass();
 
-export const BeforeHighlightEvent: EventClass<
-  BeforeHighlightEventArgs
-> = new EventClass();
+export const BeforeHighlightEvent: EventClass<BeforeHighlightEventArgs> = new EventClass();
 
-export const BeforeTokenizeEvent: EventClass<
-  BeforeTokenizeEventArgs
-> = new EventClass();
+export const BeforeTokenizeEvent: EventClass<BeforeTokenizeEventArgs> = new EventClass();
 
-export const AfterTokenizeEvent: EventClass<
-  AfterTokenizeEventArgs
-> = new EventClass();
+export const AfterTokenizeEvent: EventClass<AfterTokenizeEventArgs> = new EventClass();
 
-export const BeforeAnalyzeEvent: EventClass<
-  BeforeAnalyzeEventArgs
-> = new EventClass();
+export const BeforeAnalyzeEvent: EventClass<BeforeAnalyzeEventArgs> = new EventClass();
 
-export const AfterAnalyzeEvent: EventClass<
-  AfterAnalyzeEventArgs
-> = new EventClass();
+export const AfterAnalyzeEvent: EventClass<AfterAnalyzeEventArgs> = new EventClass();
 
-export const AfterHighlightEvent: EventClass<
-  AfterHighlightEventArgs
-> = new EventClass();
+export const AfterHighlightEvent: EventClass<AfterHighlightEventArgs> = new EventClass();
 
-export const AfterHighlightNodeEvent: EventClass<
-  AfterHighlightNodeEventArgs
-> = new EventClass();
+export const AfterHighlightNodeEvent: EventClass<AfterHighlightNodeEventArgs> = new EventClass();
