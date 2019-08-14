@@ -63,7 +63,7 @@ export class AnalyzerContext {
       const actualColumn =
         lastNewlineColumn >= 0 ? tabIndex - lastNewlineColumn - 1 : tabIndex;
       const tabLength =
-        this.options.tabWidth - actualColumn % this.options.tabWidth; // actual length of the TAB character
+        this.options.tabWidth - (actualColumn % this.options.tabWidth); // actual length of the TAB character
 
       value =
         value.substring(0, tabIndex) +

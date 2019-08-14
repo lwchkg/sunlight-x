@@ -126,7 +126,9 @@ export class Highlighter {
             ...analyzerContext.analyzerOverrides,
             analyzerContext.language.analyzer
           ].some((analyzer: Analyzer): boolean => {
-            if (analyzer.handlers.hasOwnProperty(tokenName)) {
+            if (
+              Object.prototype.hasOwnProperty.call(analyzer.handlers, tokenName)
+            ) {
               analyzer.handlers[tokenName](analyzerContext);
               return true;
             }

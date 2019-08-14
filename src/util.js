@@ -262,8 +262,8 @@ export function createProceduralRule(
       )
         // derp
         continue;
-      else if (expected.optional === true)
-        tokenIndexStart -= direction; // we need to reevaluate against this token again
+      else if (expected.optional === true) tokenIndexStart -= direction;
+      // we need to reevaluate against this token again
       else return false;
     }
 
