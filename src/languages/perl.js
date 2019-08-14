@@ -7,6 +7,7 @@
 import * as logger from "../logger.js";
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
 import type { ParserContext, Token } from "../util.js";
 
 /* eslint require-jsdoc: 0 */
@@ -502,7 +503,7 @@ export const customTokens = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ["'", "'", ["\\'", "\\\\"], false]
@@ -652,6 +653,7 @@ export const customParseRules = [
     }
 
     if (Array.isArray(context.items.heredocQueue))
+      // $FlowFixMe
       context.items.heredocQueue.push(ident);
     else
       logger.errorInvalidValue(
@@ -687,6 +689,7 @@ export const customParseRules = [
       context.items.heredocQueue.length > 0 &&
       !context.reader.isEOF()
     ) {
+      // $FlowFixMe
       const declaration = context.items.heredocQueue.shift();
       if (!(typeof declaration === "string")) {
         logger.errorInvalidValue(

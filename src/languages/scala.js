@@ -9,7 +9,7 @@ import * as logger from "../logger.js";
 import * as util from "../util.js";
 
 import type { Highlighter } from "../highlighter.js";
-
+import type { ScopeType } from "../languages.js";
 import type {
   AnalyzerContext,
   BetweenIdentRule,
@@ -124,7 +124,7 @@ export const embeddedLanguages = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [['"""', '"""', [], false], ['"', '"', ["\\\\", '\\"'], false]],
   char: [["'", "'", ["\\\\", "\\'"], false]],
   quotedIdent: [["`", "`", ["\\`", "\\\\"], false]],
@@ -141,6 +141,7 @@ export const customParseRules = [
     if (!context.reader.match("'")) return null;
 
     // TODO: don't use regular expression.
+    // $FlowFixMe
     const match: [string, string] = /^('\w+)(?!')/i.exec(
       context.reader.peekToEOF()
     );

@@ -6,6 +6,8 @@
 // @flow
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
+
 export const name = "bash";
 
 export const keywords = [
@@ -419,7 +421,7 @@ export const customTokens = {
   }
 };
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ["'", "'", ["'", "\\\\"], false]

@@ -6,6 +6,7 @@
 // @flow
 import * as util from "../util.js";
 
+import type { ScopeType } from "../languages.js";
 import type {
   AnalyzerContext,
   BetweenIdentRule,
@@ -102,7 +103,7 @@ export const keywords = [
   "true"
 ];
 
-export const scopes = {
+export const scopes: { [string]: ScopeType[] } = {
   string: [
     ['"', '"', util.escapeSequences.concat(['\\"']), false],
     ["'", "'", ["'", "\\\\"], false]
