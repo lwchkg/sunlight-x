@@ -50,7 +50,8 @@
     "utf8": "^3.0.0"
   },
   "dependencies": {
-    "jsdom": "^15.1.1"
+    "jsdom": "^15.1.1",
+    "snyk": "^1.319.0"
   },
   "jest": {
     "coverageReporters": [
@@ -84,8 +85,10 @@
     "jest-coverage": "jest --coverage --maxWorkers=4",
     "lessc": "lessc",
     "lint": "yarn run flow-typed-install && yarn run eslint-run",
-    "prepare": "yarn run compile",
+    "prepare": "yarn run snyk-protect && yarn run compile",
     "prettier": "prettier \"./**/*.js\" --ignore-path .eslintignore --write",
-    "test": "yarn run compile-css && yarn run lint && yarn run jest-coverage && yarn run codacy-coverage-upload"
-  }
+    "test": "yarn run compile-css && yarn run lint && yarn run jest-coverage && yarn run codacy-coverage-upload",
+    "snyk-protect": "snyk protect"
+  },
+  "snyk": true
 }
