@@ -86,6 +86,7 @@
     "lint": "yarn run flow-typed-install && yarn run eslint-run",
     "prepare": "yarn run compile",
     "prettier": "prettier \"./**/*.js\" --ignore-path .eslintignore --write",
-    "test": "yarn run compile-css && yarn run lint && yarn run jest-coverage && yarn run codacy-coverage-upload"
+    "test": "yarn run compile-css && yarn run jest-coverage && yarn run codacy-coverage-upload",
+    "test-with-lint": "yarn run compile-css && yarn run lint && yarn run jest-coverage && yarn run codacy-coverage-upload"
   }
 }
