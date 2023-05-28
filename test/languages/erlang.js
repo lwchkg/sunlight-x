@@ -114,9 +114,9 @@ describe("Erlang tests", function() {
     });
   });
 
-  describe("file #2", function() {
+  /*describe("file #2", function() {
     beforeAll(function() {
       testSupport = new TestSupportForFile("erlang2.erl", "erlang");
     });
-  });
+  });*/
 });

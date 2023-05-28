@@ -4,8 +4,7 @@ environment:
     secure: v7BExDEVPOGI6cYppo8ekPiclRCThplElo3oRX3IxSG5x781atjodldt2zUYLsCZ
 
   matrix:
-    - nodejs_version: "10"
-    - nodejs_version: "12"
+    - nodejs_version: "18"
 
 # Install scripts. (runs after repo cloning)
 install:
