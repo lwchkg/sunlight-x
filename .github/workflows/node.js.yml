@@ -26,5 +26,5 @@ jobs:
       uses: borales/actions-yarn@v4
       with:
         cmd: install # will run `yarn install` command    
-    - run: yarn build
+    - run: yarn compile
     - run: yarn test
