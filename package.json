@@ -49,7 +49,7 @@
     "utf8": "^3.0.0"
   },
   "dependencies": {
-    "jsdom": "^22.1.0"
+    "jsdom": "^24.1.1"
   },
   "jest": {
     "coverageReporters": [
